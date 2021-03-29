@@ -103,4 +103,10 @@ dist
 # TernJS port file
 .tern-port
 
+#MongoDB
+/db
+
+#Monitoring
+/monitoring/prometheus
+/monitoring/grafana
 
