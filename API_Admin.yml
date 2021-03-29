@@ -1,0 +1,96 @@
+openapi: 3.0.0
+info:
+  title: Azia Admin API
+  version: 0.0.2
+
+servers:
+  - url: https://62.109.28.233/azia/api
+    description: Stage server
+  - url: https://localhost/azia/api
+    description: Dev server
+
+paths:
+  /menu:
+    get:
+      summary: Получение списка блюд
+      responses:
+        "200":
+          description: Меню получено
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Menu"
+        "400":
+          description: Ошибка при чтении данных
+          content:
+            application/json:
+              schema:               
+                $ref: "#/components/schemas/Error"
+              example:
+                result: "error"
+                message: "Не удалось получить меню"
+        "500":
+          description: Внутренняя ошибка сервера
+
+components:
+  schemas:
+    Menu:
+      type: object
+      properties:
+        categories:
+          type: array
+          items: 
+            type: string
+        menu:
+          type: array
+          items: 
+            type: object
+            properties:
+              id: 
+                type: string
+              name:
+                type: string
+              description:
+                type: string
+              image:
+                type: string
+              cost:
+                type: number
+              category:
+                type: string
+              isEnd:
+                type: boolean
+      example:
+        categories: 
+          - Первый блюда
+          - Гарниры
+          - Напитки
+          - Второе
+          - Разное
+          - Салаты        
+        menu:   
+          - _id: "601619868b75531fc875d4b0" 
+            isEnd: false            
+            name: "Лагман"
+            cost: 200,
+            description: "Суп лагман — рецепт, который, по-видимому, был придуман уйгурами и потом распространился на всю Среднюю Азию. Приготовление лагмана имеет национальные особенности, есть уйгурский лагман, узбекский лагман. Рецепт приготовления уйгурского лагмана включает приготовление специальной приправы лаза. Это блюдо часто называют также суп лагман, рецепт приготовления при этом фактически такой же, просто добавляют больше бульона."
+            image: "lagman.jpg"
+            category: "Первый блюда"       
+          - _id: "601619868b75531fc875d4b1"
+            isEnd: false            
+            name": "Борщ"
+            cost: 150
+            description: "Классический борщ (красный борщ) – это знаменитый свекольный суп,..."
+            image: "borsh.jpg"
+            category: "Первый блюда"
+    Error:
+      type: object
+      properties:
+        result:
+          type: string
+        message:
+          type: string
+     
+        
+
+          

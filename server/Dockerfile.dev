@@ -1,0 +1,7 @@
+FROM node:12.18.4-alpine
+
+VOLUME /opt/server/ 
+
+WORKDIR /opt/server/
+
+CMD npm run start:dev

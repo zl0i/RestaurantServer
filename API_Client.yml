@@ -1,0 +1,334 @@
+openapi: 3.0.0
+info:
+  title: Azia Client API
+  version: 0.0.2
+
+servers:
+  - url: https://62.109.28.233/azia/api
+    description: Stage server
+  - url: https://localhost/azia/api
+    description: Dev server
+
+paths:
+  /menu:
+    get:
+      summary: Получение списка блюд
+      responses:
+        "200":
+          description: Меню получено
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Menu"
+        "400":
+          description: Ошибка при чтении данных
+          content:
+            application/json:
+              schema:               
+                $ref: "#/components/schemas/Error"
+              example:
+                result: "error"
+                message: "Не удалось получить меню"
+        "500":
+          description: Внутренняя ошибка сервера
+  /users/input:
+    post:
+      summary: Вход пользователя по номеру телефона через отправку СМС
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone:
+                  type: string
+            example:
+              phone: "+79999999999"
+      responses:
+        "200":
+          description: Возвращает статус
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+              example:
+                result: "ok"
+        "400":
+          description: "Не удалось отпарвить СМС на указанный номер"
+          content:
+            application/json:
+              schema:               
+                $ref: "#/components/schemas/Error"
+              example:
+                result: "error"
+                message: "Не удалось отправить СМС на указанный номер"
+
+  /users/login:
+    post:
+      summary: Проверка кода из СМС
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phone:
+                  type: string
+                code:
+                  type: string
+            example:
+              phone: "+79999999999"
+              code: "9674"
+      responses:
+        "200":
+          description: Код из СМС введен правильно
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Код из СМС введене не правильно
+          content:
+            application/json:
+              schema:               
+                $ref: "#/components/schemas/Error"
+              example:
+                result: "error"
+                message: "Код из СМС введен правильно"               
+                
+  /users/{clientId}/info:
+    summary: Возвращает информацию о пользователе
+    parameters:
+      - in: path
+        name: clientId
+        required: true
+        schema:
+          type: string
+    get:
+      responses:
+        "200":
+          description: Пользователь найден, активный заказ и история возвращены
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:               
+                $ref: "#/components/schemas/Error"
+              example:
+                result: "error"
+                message: "Пользователь не найден"
+
+
+  /events?clientId={clientId}:
+    parameters:
+      - in: query
+        name: clientId
+        schema:
+          type: string
+    summary: Получение акций
+    get:
+      responses:
+        "200":
+          description: Пользователь найден, акции возвращены
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Events"
+        "400":
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+              example:
+                msg: Ошибка! Пользователь не найден!
+  /orders:
+    summary: Оформление заказа
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Order"
+      responses:
+        "200":
+          description: Заказ может быть оформлен, необходимо оплатить заказ
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url_payment:
+                    type: string
+        "400":
+          description: Не удалось сформировать заказ
+          content:
+            application/json:
+              schema:
+                 $ref: "#/components/schemas/Error"
+              example:
+                result: "error"
+                message: "Отсутствую некоторые товары"
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        token:
+          type: string
+        phone:
+          type: string
+        address:
+          type: object
+          properties:
+            street:
+              type: string
+            house:
+              type: string
+            flat:
+              type: string
+        activeOrder:
+          type: object
+          properties:
+            cost: 
+              type: number
+            date:
+              type: string
+        history:
+          type: array
+          items:
+            type: object
+            properties:
+              cost: 
+                type: number
+              date: 
+                type: string
+      example:
+        phone: "+7999999"
+        address:
+          street: "Морская"
+          house: "46"
+          flat: "18"
+        activeOrder:
+          cost: 2350
+          date: "01-01-2021 18:36"
+        history:
+          - cost: 1240
+            date: "01-01-2021 18:36"
+          - cost: 1250
+            date: "03-01-2021 18:36"
+          - cost: 570
+            date: "04-01-2021 18:36"
+          - cost: 3573
+            date: "07-01-2021 18:36"
+    Events:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+          title:
+            type: string
+          body:
+            type: string
+          image_url:
+            type: string
+          type:
+            type: string
+            enum: ["push", "permanent"]
+      example:
+        id: 1
+        title: Лепешка в подарок
+        body: При заказе от 500 рублей, лепешка в подарок!
+        image_url: httpы://www.azia.ru/image/actions/ban_1.png
+        type: permanent
+    Order:
+      type: object
+      properties:
+        menu:
+          type: array
+          items:
+            type: object
+            properties:
+              menu_id: 
+                type: string
+              count: 
+                type: number
+      example:
+        menus:
+          - menu_id: "12312312-fasdkjnby2t3"
+            count: 1
+          - menu_id: "19876312-fasdkjnby2t3"
+            count: 2
+    Menu:
+      type: object
+      properties:
+        categories:
+          type: array
+          items: 
+            type: string
+        menu:
+          type: array
+          items: 
+            type: object
+            properties:
+              id: 
+                type: string
+              name:
+                type: string
+              description:
+                type: string
+              image:
+                type: string
+              cost:
+                type: number
+              category:
+                type: string
+              isEnd:
+                type: boolean
+      example:
+        categories: 
+          - Первый блюда
+          - Гарниры
+          - Напитки
+          - Второе
+          - Разное
+          - Салаты        
+        menu:   
+          - _id: "601619868b75531fc875d4b0" 
+            isEnd: false            
+            name: "Лагман"
+            cost: 200,
+            description: "Суп лагман — рецепт, который, по-видимому, был придуман уйгурами и потом распространился на всю Среднюю Азию. Приготовление лагмана имеет национальные особенности, есть уйгурский лагман, узбекский лагман. Рецепт приготовления уйгурского лагмана включает приготовление специальной приправы лаза. Это блюдо часто называют также суп лагман, рецепт приготовления при этом фактически такой же, просто добавляют больше бульона."
+            image: "lagman.jpg"
+            category: "Первый блюда"       
+          - _id: "601619868b75531fc875d4b1"
+            isEnd: false            
+            name": "Борщ"
+            cost: 150
+            description: "Классический борщ (красный борщ) – это знаменитый свекольный суп,..."
+            image: "borsh.jpg"
+            category: "Первый блюда"
+    Error:
+      type: object
+      properties:
+        result:
+          type: string
+        message:
+          type: string
+     
+        
+
+          
