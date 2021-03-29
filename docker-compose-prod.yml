@@ -141,8 +141,8 @@ services:
      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
      - GF_SERVER_SERVE_FROM_SUB_PATH=true
-     - GF_SERVER_DOMAIN=localhost
-     - GF_SERVER_ROOT_URL=https://localhost/azia/server/grafana
+     - GF_SERVER_DOMAIN=zloi.space
+     - GF_SERVER_ROOT_URL=https://zloi.space/azia/server/grafana
    restart: unless-stopped
    expose:
      - 3000
