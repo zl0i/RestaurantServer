@@ -124,6 +124,7 @@ services:
 
   promtail:
     image: grafana/promtail:2.0.0
+    container_name: promtail
     volumes:
       - ./monitoring/promtail/:/var/log
       - ./monitoring/promtail/:/etc/promtail/

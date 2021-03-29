@@ -5,20 +5,23 @@ services:
     image: mongo:4.4.1-bionic
     container_name: db    
     volumes:
-      - ./db/:/data/db/:rw
+      - db:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${APP_MONGODB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${APP_MONGODB_PASSWORD}
     restart: always
     networks:
      - azia-backend  
-    expose:
-      - 27017
+    ports: 
+      - 27017:27017
 
   app:
     build: 
       context: ./server
       dockerfile: Dockerfile.prod
     environment:
-      MONGODB_HOST: db
-      SMS_API_KEY: 5046D311-C38C-029F-D9DE-1A9EC32555B9
+      MONGODB_HOST: ${APP_MONGODB_HOST}
+      SMS_API_KEY: ${APP_SMS_API_KEY}  
     expose:
       - 3000
     networks: 
@@ -110,17 +113,18 @@ services:
 
   loki:
     image: grafana/loki:master-3bb7f52
-    container_name: loki
-    ports:
-      - "3100:3100"
+    container_name: loki   
     volumes:
       - ./monitoring/loki/local-config.yaml:/etc/loki/local-config.yaml
     command: -config.file=/etc/loki/local-config.yaml
+    expose:
+      - 3100
     networks:
       - azia-backend     
 
   promtail:
     image: grafana/promtail:2.0.0
+    container_name: promtail
     volumes:
       - ./monitoring/promtail/:/var/log
       - ./monitoring/promtail/:/etc/promtail/
@@ -150,6 +154,9 @@ services:
      - 3000
    networks:
      - azia-backend   
+
+volumes: 
+  db: {}
 
 networks: 
   azia-backend:
