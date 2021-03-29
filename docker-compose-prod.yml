@@ -14,8 +14,8 @@ services:
 
   app:
     build: 
-      context: .
-      dockerfile: ./server/Dockerfile.prod
+      context: ./server
+      dockerfile: Dockerfile.prod
     environment:
       MONGODB_HOST: db
       SMS_API_KEY: 5046D311-C38C-029F-D9DE-1A9EC32555B9
@@ -89,8 +89,9 @@ services:
       - azia-backend
 
   prometheus:
-    image: prom/prometheus:master
+    image: prom/prometheus:v2.25.2
     container_name: prometheus
+    user: root
     volumes:
       - ./monitoring/prometheus/:/etc/prometheus/
       - ./monitoring/prometheus/:/prometheus
@@ -133,6 +134,7 @@ services:
   grafana:
    image: grafana/grafana:7.3.7
    container_name: grafana
+   user: root
    volumes:
      - ./monitoring/grafana/:/var/lib/grafana
      - ./monitoring/grafana/datasources:/etc/grafana/datasources
