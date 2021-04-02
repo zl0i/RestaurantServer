@@ -21,7 +21,7 @@ app.use('/azia/api/orders', require('./routers/orderRouter'));
 app.use('/azia/api/shops', require('./routers/shopRouter'))
 app.use('/azia/api/address', require('./routers/addressRouter'))
 
-mongoose.connect(`mongodb://${dbUrl}:27017/azia`, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(`mongodb://${dbUser}:${dbPassword}@${dbUrl}:27017/azia?authSource=admin`, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log('[OK] DB is connected')
     })

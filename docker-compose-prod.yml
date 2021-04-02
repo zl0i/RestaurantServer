@@ -2,15 +2,14 @@ version: "3.8"
 
 services:
   db:
-    image: mongo:4.4.1-bionic
+    image: mongo:4.4.4-bionic
     container_name: db 
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
-      MONGO_INITDB_DATABASE: admin
-    command: mongod --auth
+      MONGO_INITDB_ROOT_USERNAME: ${APP_MONGODB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${APP_MONGODB_PASSWORD}
+      MONGO_INITDB_DATABASE:  ${APP_MONGODB_DB}
     volumes:
-      - db:/data/db
+      - db:/data/db:rw
     restart: always
     networks:
      - azia-backend  
@@ -23,7 +22,9 @@ services:
       dockerfile: Dockerfile.prod
     environment:
       MONGODB_HOST: ${APP_MONGODB_HOST}
-      SMS_API_KEY: ${APP_SMS_API_KEY}  
+      SMS_API_KEY: ${APP_SMS_API_KEY}
+      MONGODB_USER: ${APP_MONGODB_USER}
+      MONGODB_PASSWORD: ${APP_MONGODB_PASSWORD}
     expose:
       - 3000
     networks: 
