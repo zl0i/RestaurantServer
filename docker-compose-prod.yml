@@ -36,15 +36,27 @@ services:
     container_name: proxy
     volumes:
       - ./proxy/default.conf:/etc/nginx/conf.d/default.conf
-      - ./proxy/static/:/var/www/static/
-      - ./proxy/cert/:/etc/nginx/certs/
+      - ./proxy/static/:/var/www/static/     
+      - ./proxy/certbot/conf:/etc/letsencrypt
+    command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
     restart: always
     networks:
-     - azia-backend  
+      - azia-backend  
     ports:
       - 80:80
       - 443:443
   
+  certbot:
+    container_name: certbot
+    image: certbot/certbot:v1.13.0
+    restart: unless-stopped   
+    volumes:
+      - ./proxy/certbot/conf:/etc/letsencrypt
+      - ./proxy/static/certbot:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - azia-backend  
+
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.38.6
     container_name: cadvisor
