@@ -5,31 +5,128 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>zloi page</title>
 </head>
 
 <body>
-    <h1>Мармур лох!!!</h1>
-    <h3>Лечись давай, я к тебе сегодня приду. Бдуем в factorio ебошить.</h3>
+    <svg class="title" viewBox="0 0 1500 300">
+        <symbol id="s-text">
+            <text text-anchor="middle" x="50%" y="80%">This is zloi page</text>
+        </symbol>
+
+        <g class="g-ants">
+            <use xlink:href="#s-text" class="text-copy"></use>
+            <use xlink:href="#s-text" class="text-copy"></use>
+            <use xlink:href="#s-text" class="text-copy"></use>
+            <use xlink:href="#s-text" class="text-copy"></use>
+            <use xlink:href="#s-text" class="text-copy"></use>
+        </g>
+    </svg>
+
+    <p class="skills">
+        Hard Skills:
+    <ul class="skills">
+        <li>C/C++/Qt</li>
+        <li>NodeJS/MongoDB</li>
+        <li>VueJS</li>
+        <li>Jest</li>
+        <li>Rest API</li>
+        <li>Linux/Docker</li>
+        <li>UI/UX/Figma</li>
+    </ul>
+    </p>
+
+
+    <div>
+        <a style="width: 64px; height: 64px;" href="https://github.com/zl0i">
+            <div class="github-ref">
+                <img src="./github.svg" onerror="this.onerror=null;">
+            </div>
+        </a>
+
+        <a style="width: 64px; height: 64px;" href="https://habr.com/ru/users/zl0i/">
+            <div class="habr-ref">
+                <img src="./habr.png" onerror="this.onerror=null;">
+            </div>
+        </a>
+    </div>
+
+
+
+
 </body>
 
 <style>
+    @import url(https://fonts.googleapis.com/css?family=Russo+One);
+
     body {
-        width: 100%;
-        height: 100%;
-        background-color: #343434;
+        background: #1A1A1A;
+        font-family: 'Russo One';
     }
 
-    h1 {
-        text-align: center;
-        color: #FFFFFF;
-        font-size: 72px;
+    .github-ref {
+        width: 64px;
+        height: 64px;           
+        display: inline;
     }
 
-    h3 {
-        text-align: center;
-        color: #FFFFFF;
-        font-size: 40;
+    .habr-ref {
+        width: 64px;
+        height: 64px;       
+        display: inline;
+    }
+
+    .title {
+        display: block;
+        font: 10.5em 'Russo One';
+        width: 960px;
+        height: 300px;
+        margin: 0 auto;
+    }
+
+    .skills {
+        font-size: 1.5em;
+        color: #ffffff;
+    }
+
+    .text-copy {
+        fill: none;
+        stroke: white;
+        stroke-dasharray: 6% 29%;
+        stroke-width: 5px;
+        stroke-dashoffset: 0%;
+        animation: stroke-offset 5.5s infinite linear;
+    }
+
+    .text-copy:nth-child(1) {
+        stroke: #35239c;
+        animation-delay: -1;
+    }
+
+    .text-copy:nth-child(2) {
+        stroke: #ffffff;
+        animation-delay: -2s;
+    }
+
+    .text-copy:nth-child(3) {
+        stroke: #1b55f7;
+        animation-delay: -3s;
+    }
+
+    .text-copy:nth-child(4) {
+        stroke: #ffffff;
+        animation-delay: -4s;
+    }
+
+    .text-copy:nth-child(5) {
+        stroke: #451dfa;
+        animation-delay: -5s;
+    }
+
+    @keyframes stroke-offset {
+        100% {
+            stroke-dashoffset: -35%;
+        }
     }
 </style>
 
