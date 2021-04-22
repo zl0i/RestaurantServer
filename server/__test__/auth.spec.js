@@ -1,6 +1,5 @@
 const auth = require('../src/auth')
 const axios = require('axios').default
-const User = require('../models/userModel')
 const mongoose = require('mongoose')
 
 
