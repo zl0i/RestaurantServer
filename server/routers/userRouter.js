@@ -34,8 +34,7 @@ router.post('/login', async (req, res) => {
 
 router.post('/info', async (req, res) => {
     try {
-        let user = await User.findOne({ phone: req.body.phone, token: req.body.token })   
-        console.log(await ActiveOrders.findOne({ user_id: user._id }, { _id: 0, total: 1, datetime: 1, status: 1, menu: 1 }))
+        let user = await User.findOne({ phone: req.body.phone, token: req.body.token })
         res.status(200).json({
             'phone': user.phone,
             'token': user.token,
@@ -44,9 +43,8 @@ router.post('/info', async (req, res) => {
             'address': user.address
         })
     } catch (error) {
-        console.log(error.message)
         res.status(401).end();
     }
 });
 
-module.exports = router; 
+module.exports = router;

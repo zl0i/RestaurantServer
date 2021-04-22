@@ -18,20 +18,26 @@ app.use(express.urlencoded({ extended: false }));
 app.use(morgan(':date[iso] :remote-addr :method :url :status :response-time ms'));
 app.use('/azia/api/users', require('./routers/userRouter'));
 app.use('/azia/api/orders', require('./routers/orderRouter'));
-app.use('/azia/api/shops', require('./routers/shopRouter'))
-app.use('/azia/api/address', require('./routers/addressRouter'))
+app.use('/azia/api/shops', require('./routers/shopRouter'));
+app.use('/azia/api/address', require('./routers/addressRouter'));
 
-mongoose.connect(`mongodb://${dbUser}:${dbPassword}@${dbUrl}:27017/azia?authSource=admin`, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => {
-        console.log('[OK] DB is connected')
-    })
-    .catch(err => {
-        console.error('MongoDB is not connected')
-        console.error(err.message)
-        process.exit(1)
-    });
+if (process.env.NODE_ENV !== 'test') {
+    mongoose.connect(`mongodb://${dbUser}:${dbPassword}@${dbUrl}:27017/azia?authSource=admin`, { useNewUrlParser: true, useUnifiedTopology: true })
+        .then(() => {
+            console.log('[OK] DB is connected')
+        })
+        .catch(err => {
+            console.error('MongoDB is not connected')
+            console.error(err.message)
 
-app.listen(app.get('port'), () => {
+            process.exit(1)
+        });
+}
+
+const server = app.listen(app.get('port'), () => {
     console.log(`[OK] Server is running on ${app.get('port')} port`);
     yookassa.startCheckStatusPayments()
 });
+
+module.exports = { app, server }
+
