@@ -5,17 +5,6 @@ const ActiveOrders = require('../models/activeOrders')
 
 const router = express.Router();
 
-/*router.get('/', async (req, res) => {
-    //проверить на права доступа
-    try {
-        res.json(await User.find({}, { "__v": false }));
-    } catch (error) {
-        res.status(400).json({
-            error: error.message,
-        });
-    }
-});*/
-
 router.post('/input', async (req, res) => {
     try {
         await auth.sendUserCode(req.body.phone)
@@ -59,19 +48,5 @@ router.post('/info', async (req, res) => {
         res.status(401).end();
     }
 });
-
-/*router.delete('/:id', async (req, res) => {
-    //проверить на права доступа
-    try {
-        await User.findByIdAndRemove(req.params.id)
-        res.json({
-            message: "success deleted"
-        })
-    } catch (err) {
-        res.status(400).json({
-            error: err.message
-        })
-    }
-});*/
 
 module.exports = router; 
