@@ -3,6 +3,8 @@ const { app, server } = require("../main");
 const mongoose = require('mongoose')
 const auth = require('../src/auth')
 const yookassa = require('../src/yokassaAPI')
+const ActiveOrders = require('../models/activeOrders')
+const User = require('../models/userModel')
 
 yookassa.startCheckStatusPayments = jest.fn()
 mongoose.connect = jest.fn().mockImplementation(() => Promise.resolve());
@@ -18,9 +20,7 @@ describe("Test input user", () => {
     });
 
     test("should send sms code", async () => {
-        auth.sendUserCode = jest.fn().mockImplementation(() => {
-            return Promise.resolve();
-        });
+        auth.sendUserCode = jest.fn().mockImplementation(() => Promise.resolve());
 
         const response = await request(app).post("/azia/api/users/input").send({ phone: "+79200000000" });
         expect(auth.sendUserCode).toBeCalledTimes(1);
@@ -31,9 +31,7 @@ describe("Test input user", () => {
     });
 
     test('should error input', async () => {
-        auth.sendUserCode = jest.fn().mockImplementation(() => {
-            return Promise.reject();
-        });
+        auth.sendUserCode = jest.fn().mockImplementation(() => Promise.reject());
         const response = await request(app).post("/azia/api/users/input");
         expect(auth.sendUserCode).toBeCalledTimes(1);
         expect(response.statusCode).toBe(400);
@@ -58,13 +56,11 @@ describe('Test login user', () => {
         auth.checkUserCode = jest.fn().mockImplementation(() => {
             return data;
         });
-        let fn = mongoose.Query.prototype["findOne"] = jest.fn().mockImplementation(function (criteria, doc, options, callback) {
-            expect(criteria.user_id).toBe(data._id);
-            return {};
-        });
+        let fn = ActiveOrders.findOne = jest.fn().mockReturnValue({});
         const response = await request(app).post("/azia/api/users/login").send({ phone: '+79200000000' });
         expect(auth.checkUserCode).toBeCalledTimes(1);
         expect(fn).toBeCalledTimes(1);
+        expect(fn.mock.calls[0][0]['user_id']).toEqual(data._id);
         expect(response.statusCode).toBe(200);
         expect(response.body).toEqual({
             'result': 'ok',
@@ -77,13 +73,8 @@ describe('Test login user', () => {
     });
 
     test('should error login user', async () => {
-        let data = {};
-        auth.checkUserCode = jest.fn().mockImplementation(() => {
-            return Promise.reject();
-        });
-        let fn = mongoose.Query.prototype["findOne"] = jest.fn().mockImplementation(function (criteria, doc, options, callback) {
-            return {};
-        });
+        auth.checkUserCode = jest.fn().mockImplementation(() => Promise.reject());
+        let fn = ActiveOrders.findOne = jest.fn().mockReturnValue({});
         const response = await request(app).post("/azia/api/users/login").send({ phone: '+79200000000' });
         expect(auth.checkUserCode).toBeCalledTimes(1);
         expect(fn).toBeCalledTimes(0);
@@ -97,7 +88,7 @@ describe('Test info user', () => {
     });
 
     test('should info user', async () => {
-        let data = {
+        let user = {
             _id: 1,
             phone: '+79200000000',
             token: '99508ef0-1868-4eb5-9311-a9bc342bff62',
@@ -105,32 +96,31 @@ describe('Test info user', () => {
             orders: new Array(),
             address: {}
         };
-        let fn = mongoose.Query.prototype["findOne"] = jest.fn()
-            .mockImplementationOnce(function (criteria, doc, options, callback) {
-                expect(criteria.phone).toBe(data.phone);
-                expect(criteria.token).toBe(data.token);
-                return data;
-            })
-            .mockImplementationOnce(function (criteria, doc, options, callback) {
-                expect(criteria.user_id).toBe(data._id);
-                return {};
-            })
-        const response = await request(app).post("/azia/api/users/info").send({ phone: data.phone, token: data.token });
+        let order = {
+            _id: 1,
+            cost: 250,
+            datetime: ""
+        }
+        let userMock = User.findOne = jest.fn().mockReturnValue(user)
+        let orderMock = ActiveOrders.findOne = jest.fn().mockReturnValue(order) 
+
+        const response = await request(app).post("/azia/api/users/info").send({ phone: user.phone, token: user.token });
         expect(response.statusCode).toBe(200);
-        expect(fn).toBeCalledTimes(2);
+        expect(userMock).toBeCalledTimes(1);
+        expect(userMock.mock.calls[0][0]).toEqual({ phone: user.phone, token: user.token })
+        expect(orderMock).toBeCalledTimes(1);
+        expect(orderMock.mock.calls[0][0]).toEqual({ user_id: user._id })
         expect(response.body).toEqual({
-            'phone': data.phone,
-            'token': data.token,
+            'phone': user.phone,
+            'token': user.token,
             'history': [],
-            'activeOrder': {},
-            'address': data.address
+            'activeOrder': order,
+            'address': user.address
         });
     });
 
-    test('should error info user', async () => {        
-        let fn = mongoose.Query.prototype["findOne"] = jest.fn().mockImplementation(function (criteria, doc, options, callback) {
-            return {};
-        });
+    test('should error info user', async () => {
+        let fn = User.findOne = jest.fn().mockReturnValue({});
         const response = await request(app).post("/azia/api/users/info").send({ phone: "", token: "" });
         expect(response.statusCode).toBe(401);
         expect(fn).toBeCalledTimes(1);
