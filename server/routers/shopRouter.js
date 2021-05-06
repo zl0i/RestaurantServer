@@ -7,7 +7,7 @@ router.get('/', async (req, res) => {
     try {        
         res.json(await Shop.find({}));
     } catch (error) {
-        res.status(400).end()
+        res.status(500).end()
     }
 });
 
