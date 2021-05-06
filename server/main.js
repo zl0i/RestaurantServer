@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 const yookassa = require('./src/yokassaAPI')
 
-const dbUser =  process.env.MONGODB_USER || ''
-const dbPassword = process.env.MONGODB_PASSWORD || ''
+const dbUser = process.env.MONGODB_USER || 'admin'
+const dbPassword = process.env.MONGODB_PASSWORD || 'admin'
 const dbUrl = process.env.MONGODB_HOST || 'localhost'
 
 mongoose.set('useCreateIndex', true);
@@ -12,10 +12,13 @@ mongoose.set('useFindAndModify', true);
 mongoose.Promise = Promise
 
 const app = express();
-app.set('port', 3000);
+if (process.env.NODE_ENV !== 'test') {
+    app.set('port', 3000);
+    app.use(morgan(':date[iso] :remote-addr :method :url :status :response-time ms'));
+}
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(morgan(':date[iso] :remote-addr :method :url :status :response-time ms'));
 app.use('/azia/api/users', require('./routers/userRouter'));
 app.use('/azia/api/orders', require('./routers/orderRouter'));
 app.use('/azia/api/shops', require('./routers/shopRouter'));
