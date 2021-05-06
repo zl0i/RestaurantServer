@@ -5,9 +5,9 @@ const router = express.Router()
 
 router.get('/', async (req, res) => {
     try {
-        res.json(await Address.find());
+        res.json(await Address.find({}));
     } catch (error) {
-        res.status(400).end()
+        res.status(500).end()
     }
 });
 
