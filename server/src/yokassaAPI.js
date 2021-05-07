@@ -49,31 +49,31 @@ module.exports = {
     },
     handleHook: function (res, req) {
         //проверка ip
+    },
+    checkStatusPayments: async function checkStatusPayments() {
+        let orders = await ActiveOrders.find({ status: 'wait_payment' });   
+        orders.forEach(async order => {
+            try {
+                let reply = await axios.get(`https://api.yookassa.ru/v3/payments/${order.payment_id}`, {
+                    auth: {
+                        username: shipId,
+                        password: apikey
+                    }
+                });            
+                switch (reply.data.status) {
+                    case 'succeeded': {                   
+                        await ActiveOrders.updateOne({ id: order.id }, { status: 'accepted' })                   
+                        break;
+                    }                
+                    case 'canceled': {                    
+                        await ActiveOrders.deleteOne({ id: order.id })
+                        break;
+                    }
+                }
+            } catch (e) {
+                
+            }
+        })
     }
 }
 
-async function checkStatusPayments() {
-    let orders = await ActiveOrders.find({ status: 'wait_payment' });   
-    orders.forEach(async order => {
-        try {
-            let reply = await axios.get(`https://api.yookassa.ru/v3/payments/${order.payment_id}`, {
-                auth: {
-                    username: shipId,
-                    password: apikey
-                }
-            });            
-            switch (reply.data.status) {
-                case 'succeeded': {                   
-                    await ActiveOrders.updateOne({ id: order.id }, { status: 'accepted' })                   
-                    break;
-                }                
-                case 'canceled': {                    
-                    await ActiveOrders.deleteOne({ id: order.id })
-                    break;
-                }
-            }
-        } catch (e) {
-            console.log(e)
-        }
-    })
-}
