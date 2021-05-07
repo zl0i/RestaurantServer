@@ -1,13 +1,12 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
 const router = express.Router();
 
 const ActiveOrders = require('../models/activeOrders')
-const Users = require('../models/userModel')
 const Shop = require('../models/shopsModel')
-const Address = require('../models/addressModel')
+
 const yookassa = require('../src/yokassaAPI')
+const helpOrders = require('../src/orderHelper')
+const { v4: uuidv4 } = require('uuid');
 
 router.get('/', async (req, res) => {
     try {
@@ -19,78 +18,46 @@ router.get('/', async (req, res) => {
 
 router.post("/", async (req, res) => {
     try {
-        let order = new ActiveOrders();
+        await helpOrders.verifyUserData(req.body.phoneUser, req.body.address);
 
-        if (await ActiveOrders.findOne({ phone: req.body.phoneUser }, { _id: 1 })) {
-            throw new Error("Заказ уже есть")
+        let user = await helpOrders.updateUserAddress(req.body.phoneUser, req.body.address);
+        let shop = await Shop.findOne({ _id: req.body.shop_id });
+
+        let items = await helpOrders.calcCostMenu(req.body.shop_id, req.body.menu);
+
+        await helpOrders.verifyOrderData(items, req.body.menu, shop);
+
+        let order_id = uuidv4();              
+        let delivery_cost = shop.delivery_city_cost[req.body.address.city];
+        
+        let total_cost = items.cost + delivery_cost;
+        let payment = await yookassa.createPaymentOrder(total_cost, order_id, 'Ваш заказ');
+
+        let orderConfig = {
+            order_id: order_id,
+            user_id: user._id,
+            shop_id: shop._id,
+            payment_id: payment.payment_id,
+            menu: req.body.menu,
+            menu_cost: items.cost,
+            delivery_cost: delivery_cost,
+            total_cost: total_cost,
+            address_delivery: req.body.address,
+            phoneOrder: req.body.phoneOrder,
+            comment: req.body.comment
         }
-
-        let user = await Users.findOne({ phone: req.body.phoneUser }, { _id: 1 })
-        order.user_id = user._id
-        user.address = req.body.address;
-        user.save()
-
-        let shop = await Shop.findOne({ _id: req.body.shop_id })
-
-        let items = await Shop.aggregate([
-            { $match: { _id: new mongoose.Types.ObjectId(req.body.shop_id) } },
-            { $unwind: "$items.menu" },
-            { $match: { "items.menu.id": { $in: req.body.menu.map(item => item.id) }, "items.menu.isEnd": false } },
-            { $project: { _id: 1, item_id: "$items.menu.id", cost: "$items.menu.cost" } },
-            { $addFields: { count: { $arrayElemAt: [req.body.menu.map(item => item.count), { $indexOfArray: [req.body.menu.map(item => (item.id)), '$item_id'] }] } } }
-        ]);
-
-        if (items.length !== req.body.menu.length) {
-            throw new Error("Блюдо закончилось")
-        }
-
-        let address = await Address.findOne({
-            city: req.body.address.city,
-            streets: {
-                $elemMatch: {
-                    name: req.body.address.street,
-                    houses: { $elemMatch: { $eq: req.body.address.house } }
-                }
-            }
-        })
-        if (!address) {
-            throw new Error("Адрес не существует")
-        }
-
-        let items_cost = items.reduce((accumulator, value) => {
-            return accumulator += (value.count * value.cost)
-        }, 0)
-        if (items_cost < shop.min_cost_delivery) {
-            throw new Error("Маленькая цена заказа")
-        }
-        let delivery_cost = shop.delivery_city_cost[req.body.address.city]
-
-        order.id = uuidv4();
-        order.menu = req.body.menu;
-        order.items_cost = items_cost
-        order.delivery_cost = delivery_cost
-        order.total = items_cost + delivery_cost;
-        order.shop_id = req.body.shop_id;
-        order.datetime = new Date();
-        order.address = req.body.address;
-        order.phone = req.body.phoneOrder;
-        order.comment = req.body.comment;
-        order.status = "wait_payment";
-
-        let config = await yookassa.createPaymentOrder(order.total, order.id, 'Ваш заказ');
-        order.payment_id = config.payment_id;
-        await order.save();
+        await helpOrders.createOrder(orderConfig)
 
         res.json({
-            payment_token: config.token,
-            order_id: order._id,
-            total: order.total
-        })
+            payment_token: payment.token,
+            order_id: order_id,
+            total: total_cost
+        });
     } catch (e) {
         console.log(e)
         res.status(400).json({
             result: e.message
-        })
+        });
     }
 })
 
@@ -103,10 +70,10 @@ router.delete("/:id", async (req, res) => {
             order.status === 'coocking') {
             await ActiveOrders.deleteOne({ id: req.params.id })
             res.json({
-                "result": "ok"
+                result: "ok"
             })
         } else {
-            throw new Error()
+            throw new Error('Order cannot be returned')
         }
     } catch (e) {
         console.log(e)
