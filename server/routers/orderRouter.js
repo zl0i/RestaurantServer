@@ -76,7 +76,6 @@ router.delete("/:id", async (req, res) => {
             throw new Error('Order cannot be returned')
         }
     } catch (e) {
-        console.log(e)
         res.status(400).json({
             result: e.message
         })
