@@ -2,7 +2,7 @@ version: "3.3"
 
 services:
   db:
-    image: mongo:4.4.1-bionic
+    image: mongo:4.4.4-bionic
     container_name: db    
     volumes:
       - db:/data/db
@@ -93,7 +93,7 @@ services:
       - azia-backend
 
   prometheus:
-    image: prom/prometheus:master
+    image: prom/prometheus:v2.25.2
     container_name: prometheus
     volumes:
       - ./monitoring/prometheus/:/etc/prometheus/
