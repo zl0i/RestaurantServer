@@ -56,7 +56,7 @@ describe('Test send user code', () => {
     };
     axios.get.mockReturnValue(res);
     axios.post.mockReturnValue(res);
-    let fn = (UserupdateOne = jest.fn().mockImplementation(() => Promise.resolve()));
+    let fn = (User.updateOne = jest.fn().mockImplementation(() => Promise.resolve()));
 
     await expect(auth.sendUserCode('+79')).rejects.toThrow('bad number phone');
     await expect(auth.sendUserCode('89000000000')).rejects.toThrow('bad number phone');
@@ -68,11 +68,9 @@ describe('Test send user code', () => {
   });
 
   test('not should send sms code on +79999999999', async () => {
-    let fn = (User.updateOne = jest
-      .fn()
-      .mockImplementation(function (criteria, doc, options, callback) {
-        return Promise.resolve();
-      }));
+    let fn = (User.updateOne = jest.fn().mockImplementation(() => {
+      return Promise.resolve();
+    }));
 
     await auth.sendUserCode('+79999999999');
     expect(axios.get).toBeCalledTimes(0);
@@ -98,11 +96,9 @@ describe('Test check user code', () => {
       token: '',
       save: jest.fn(),
     };
-    let fn = (User.findOne = jest
-      .fn()
-      .mockImplementation(function (criteria, doc, options, callback) {
-        return data;
-      }));
+    let fn = (User.findOne = jest.fn().mockImplementation(() => {
+      return data;
+    }));
     let user = await auth.checkUserCode('+79200000000', '1587');
     expect(fn).toBeCalledTimes(1);
     expect(user).toEqual(data);
@@ -117,11 +113,9 @@ describe('Test check user code', () => {
       token: '',
       save: jest.fn(),
     };
-    let fn = (User.findOne = jest
-      .fn()
-      .mockImplementation(function (criteria, doc, options, callback) {
-        return Promise.resolve(data);
-      }));
+    let fn = (User.findOne = jest.fn().mockImplementation(() => {
+      return Promise.resolve(data);
+    }));
     await expect(auth.checkUserCode('+79200000000', '1588')).rejects.toThrow('code not right');
     expect(fn).toBeCalledTimes(1);
     expect(data.save).toBeCalledTimes(0);
@@ -139,11 +133,9 @@ describe('Test check user token', () => {
       token: '99508ef0-1868-4eb5-9311-a9bc342bff62',
       save: jest.fn(),
     };
-    let fn = (User.findOne = jest
-      .fn()
-      .mockImplementation(function (criteria, doc, options, callback) {
-        return Promise.resolve(data);
-      }));
+    let fn = (User.findOne = jest.fn().mockImplementation(() => {
+      return Promise.resolve(data);
+    }));
     let token = await auth.checkUserToken('+79200000000', data.token);
     expect(fn).toBeCalledTimes(1);
     expect('99508ef0-1868-4eb5-9311-a9bc342bff62').not.toBe(token);
@@ -157,11 +149,9 @@ describe('Test check user token', () => {
       save: jest.fn(),
     };
     let badToken = '99508ef0-1868-4eb5-9311-a9bc342bff63';
-    let fn = (User.findOne = jest
-      .fn()
-      .mockImplementation(function (criteria, doc, options, callback) {
-        return Promise.resolve(data);
-      }));
+    let fn = (User.findOne = jest.fn().mockImplementation(() => {
+      return Promise.resolve(data);
+    }));
 
     await expect(auth.checkUserToken('+79200000000', badToken)).rejects.toThrow('token is bad');
     expect(fn).toBeCalledTimes(1);

@@ -214,11 +214,6 @@ describe('POST /orders', () => {
       },
     };
 
-    let payment = {
-      id: 1,
-      token: '1q2w3e4r5t',
-    };
-
     let items = [{ id: 1, count: 4 }];
     items.cost = 800;
     let total_cost = items.cost + shop.delivery_city_cost[order.address.city];

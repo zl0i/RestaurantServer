@@ -1,7 +1,4 @@
-const Address = require('../models/addressModel');
 const Shop = require('../models/shopsModel');
-const ActiveOrders = require('../models/activeOrders');
-const Users = require('../models/userModel');
 const orderHelper = require('../src/orderHelper');
 const { Promise } = require('mongoose');
 

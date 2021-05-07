@@ -5,7 +5,7 @@ const User = require('../models/userModel');
 const smsApiKey = process.env.SMS_API_KEY || '';
 
 function validatePhone(phone) {
-  if (/^\+?[7][-\(]?\d{3}\)?-?\d{3}-?\d{2}-?\d{2}$/.test(phone)) return true;
+  if (/^\+?[7][-(]?\d{3}\)?-?\d{3}-?\d{2}-?\d{2}$/.test(phone)) return true;
 
   return false;
 }
