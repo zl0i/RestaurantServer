@@ -25,7 +25,7 @@ router.post("/", async (req, res) => {
 
         let items = await helpOrders.calcCostMenu(req.body.shop_id, req.body.menu);
 
-        await helpOrders.verifyOrderData(items, req.body.menu, shop);
+        helpOrders.verifyOrderData(items, req.body.menu, shop);
 
         let order_id = uuidv4();              
         let delivery_cost = shop.delivery_city_cost[req.body.address.city];
@@ -54,7 +54,6 @@ router.post("/", async (req, res) => {
             total: total_cost
         });
     } catch (e) {
-        console.log(e)
         res.status(400).json({
             result: e.message
         });
