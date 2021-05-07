@@ -1,14 +1,14 @@
-const express = require('express')
-const Shop = require('../models/shopsModel')
+const express = require('express');
+const Shop = require('../models/shopsModel');
 
-const router = express.Router()
+const router = express.Router();
 
 router.get('/', async (req, res) => {
-    try {        
-        res.json(await Shop.find({}));
-    } catch (error) {
-        res.status(500).end()
-    }
+  try {
+    res.json(await Shop.find({}));
+  } catch (error) {
+    res.status(500).end();
+  }
 });
 
-module.exports = router; 
+module.exports = router;
