@@ -58,7 +58,7 @@ async function verifyUserData(phone, address) {
     }
 }
 
-async function verifyOrderData(items, req_menu ,shop) {   
+function verifyOrderData(items, req_menu, shop) {
     if (items.length !== req_menu.length) {
         throw new Error("Блюдо закончилось");
     }
@@ -77,19 +77,19 @@ async function createOrder(config) {
     order.menu = config.menu;
     order.items_cost = config.menu_cost
     order.delivery_cost = config.delivery_cost
-    order.total = config.total_cost;    
+    order.total = config.total_cost;
     order.datetime = new Date();
     order.address = config.address_delivery;
     order.phone = config.phoneOrder;
     order.comment = config.comment;
-    order.status = "wait_payment";    
+    order.status = "wait_payment";
     await order.save();
 
     return order;
 }
 
 module.exports = {
-    aggregateMenu,   
+    aggregateMenu,
     updateUserAddress,
     calcCostMenu,
     verifyUserData,
