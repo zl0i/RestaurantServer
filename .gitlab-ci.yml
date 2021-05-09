@@ -1,8 +1,12 @@
+image: docker:19.03.12
+
+services:
+  - docker:19.03.12-dind
+
 stages:
   - build
   - push
   - test
-
 
 build:
   stage: build
