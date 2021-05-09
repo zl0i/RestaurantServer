@@ -1,0 +1,12 @@
+version: "3.3"
+
+services:
+  app:
+    image: node:12.18.4-alpine
+    working_dir: /opt/server/
+    volumes:
+      - ./server/:/opt/server/
+    entrypoint: npm run start:dev
+    volumes:
+      - ./server/:/opt/server/
+    entrypoint: npm test
