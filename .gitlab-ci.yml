@@ -11,8 +11,8 @@ stages:
 build:
   stage: build
   script:
-    - docker build -t $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:${CI_COMMIT_REF_SLUG}_app:$CI_PIPELINE_ID ./server/ 
-    - docker build -t $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:${CI_COMMIT_REF_SLUG}_proxy:$CI_PIPELINE_ID ./proxy/
+    - docker build -t $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}_app:$CI_PIPELINE_ID ./server/ 
+    - docker build -t $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}_proxy:$CI_PIPELINE_ID ./proxy/
 
 test:
   stage: test
