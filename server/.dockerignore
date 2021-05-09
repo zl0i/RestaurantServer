@@ -1,0 +1,8 @@
+.git
+.gitignore
+docker-compose.yml
+node_modules/
+__test__
+Dockerfile
+.eslinttrc.json
+.prettierignore

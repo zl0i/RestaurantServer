@@ -2,9 +2,9 @@ FROM node:12.18.4-alpine
 
 EXPOSE 3000
 
-COPY ./ /opt/server
-
 WORKDIR /opt/server/
+
+COPY ./ ./
 
 RUN npm install --prod
 
