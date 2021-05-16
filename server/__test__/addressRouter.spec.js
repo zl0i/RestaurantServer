@@ -20,7 +20,7 @@ describe('Test get address', () => {
     let fn = (Address.find = jest.fn().mockImplementationOnce(() => Promise.resolve([])));
 
     const response = await request(app).get('/azia/api/address');
-    expect(response.statusCode).toBe(200);
+    expect(response.statusCode).toBe(300);
     expect(response.body).toEqual([]);
     expect(fn).toBeCalledTimes(1);
     expect(fn).toHaveBeenCalledWith({});
