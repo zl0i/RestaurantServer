@@ -6,7 +6,5 @@ services:
     working_dir: /opt/server/
     volumes:
       - ./server/:/opt/server/
-    entrypoint: npm run start:dev
-    volumes:
-      - ./server/:/opt/server/
-    entrypoint: npm test
+    command: sh -c "npm install &&  npm test"
+           
