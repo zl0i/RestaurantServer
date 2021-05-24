@@ -33,5 +33,5 @@ deploy:
     - apk add --no-cache docker-compose
     - echo "deploy....."
   only:
-    - mastet
+    - master
   
