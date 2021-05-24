@@ -13,11 +13,18 @@ build:
   before_script:  
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - docker build -t $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}_app.$CI_PIPELINE_ID ./server/ 
-    - docker push $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}_app.$CI_PIPELINE_ID
+    - docker pull ${CI_REGISTRY_IMAGE}_app:latest
+    - docker build --cache-from ${CI_REGISTRY_IMAGE}_app:latest -t ${CI_REGISTRY_IMAGE}_app:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID ./server/   #azia_app:latest azia_proxy:latest
+    - docker push ${CI_REGISTRY_IMAGE}_app:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
+    - docker push ${CI_REGISTRY_IMAGE}_app:latest
 
-    - docker build -t $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}_proxy.$CI_PIPELINE_ID ./proxy/
-    - docker push $CI_REGISTRY_IMAGE:${CI_COMMIT_REF_SLUG}_proxy.$CI_PIPELINE_ID
+    - docker build -t ${CI_REGISTRY_IMAGE}_proxy:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID ./proxy/
+    - docker push ${CI_REGISTRY_IMAGE}_proxy:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
+    - docker push ${CI_REGISTRY_IMAGE}_proxy:latest
+
+    - docker build -t ${CI_REGISTRY_IMAGE}_prometheus:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID ./monitoring/prometheus/
+    - docker push ${CI_REGISTRY_IMAGE}_prometheus:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
+    - docker push ${CI_REGISTRY_IMAGE}_prometheus:latest
 
 test:
   stage: test
