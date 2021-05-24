@@ -15,14 +15,17 @@ build:
   script:
     - docker build -t ${CI_REGISTRY_IMAGE}/app:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID ./server/
     - docker push ${CI_REGISTRY_IMAGE}/app:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
+    - docker build -t ${CI_REGISTRY_IMAGE}/app:latest ./server/
     - docker push ${CI_REGISTRY_IMAGE}/app:latest
 
     - docker build -t ${CI_REGISTRY_IMAGE}/proxy:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID ./proxy/
     - docker push ${CI_REGISTRY_IMAGE}/proxy:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
+    - docker build -t ${CI_REGISTRY_IMAGE}/proxy:latest ./proxy/
     - docker push ${CI_REGISTRY_IMAGE}/proxy:latest
 
     - docker build -t ${CI_REGISTRY_IMAGE}/prometheus:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID ./monitoring/prometheus/
     - docker push ${CI_REGISTRY_IMAGE}/prometheus:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
+    - docker build -t ${CI_REGISTRY_IMAGE}/prometheus:latest ./monitoring/prometheus/
     - docker push ${CI_REGISTRY_IMAGE}/prometheus:latest
 
 test:
