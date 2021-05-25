@@ -17,9 +17,7 @@ services:
       - 27017:27017
 
   app:
-    build: 
-      context: ./server
-      dockerfile: Dockerfile
+    image: registry.gitlab.com/zl0i/aziaserver/app:latest
     environment:
       MONGODB_HOST: ${APP_MONGODB_HOST}
       SMS_API_KEY: ${APP_SMS_API_KEY}
@@ -32,9 +30,7 @@ services:
     restart: always    
 
   nginx:
-    build: 
-      context: ./proxy
-      dockerfile: Dockerfile
+    image: registry.gitlab.com/zl0i/aziaserver/proxy:latest
     container_name: proxy   
     restart: always
     networks:
@@ -94,11 +90,10 @@ services:
       - azia-backend
 
   prometheus:
-    image: prom/prometheus:v2.25.2
+    image: registry.gitlab.com/zl0i/aziaserver/prometheus:latest
     container_name: prometheus
     user: root
     volumes:
-      - ./monitoring/prometheus/:/etc/prometheus/
       - ./monitoring/prometheus/:/prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
@@ -108,34 +103,10 @@ services:
       - "--storage.tsdb.retention=200h"
       - "--web.enable-lifecycle"
     restart: unless-stopped
-    expose:
+    expose: 
       - 9090
     networks:      
-      - azia-backend
-
-  loki:
-    image: grafana/loki:master-3bb7f52
-    container_name: loki   
-    volumes:
-      - ./monitoring/loki/local-config.yaml:/etc/loki/local-config.yaml
-    command: -config.file=/etc/loki/local-config.yaml
-    expose:
-      - 3100
-    networks:
-      - azia-backend     
-
-  promtail:
-    image: grafana/promtail:2.0.0
-    container_name: promtail
-    volumes:
-      - ./monitoring/promtail/:/var/log
-      - ./monitoring/promtail/:/etc/promtail/
-      - ./monitoring/promtail/positions.yaml:/tmp/positions.yaml
-    command: -config.file=/etc/promtail/config.yml
-    expose:
-      - 9080
-    networks:
-      - azia-backend     
+      - azia-backend    
 
   grafana:
     image: grafana/grafana:7.3.7
