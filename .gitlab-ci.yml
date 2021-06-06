@@ -11,17 +11,17 @@ services:
 build:
   stage: build
   before_script:
+    - mkdir -p ./proxy/ssl/zloi.space/
+    - echo "$SSL_FULLCHAIN" > ./proxy/ssl/zloi.space/fullchain.pem
+    - echo "$SSL_PRIVKEY" > ./proxy/ssl/zloi.space/privkey.pem
+    - echo "$SSL_DHPARAMS" > ./proxy/ssl/ssl-dhparams.pem
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - docker build -t ${CI_REGISTRY_IMAGE}/app:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID ./server/
     - docker push ${CI_REGISTRY_IMAGE}/app:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
     - docker build -t ${CI_REGISTRY_IMAGE}/app:latest ./server/
     - docker push ${CI_REGISTRY_IMAGE}/app:latest
-
-    - mkdir ./ssl/zloi.space/
-    - echo "$SSL_FULLCHAIN" > ./ssl/zloi.space/fullchain.pem
-    - echo "$SSL_PRIVKEY" > ./ssl/zloi.space/privkey.pem
-    - echo "$SSL_DHPARAMS" > ./ssl/ssl-dhparams.pem
+    
     - docker build -t ${CI_REGISTRY_IMAGE}/proxy:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID ./proxy/
     - docker push ${CI_REGISTRY_IMAGE}/proxy:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
     - docker build -t ${CI_REGISTRY_IMAGE}/proxy:latest ./proxy/
