@@ -7,8 +7,6 @@ const dbUser = process.env.MONGODB_USER || '';
 const dbPassword = process.env.MONGODB_PASSWORD || '';
 const dbUrl = process.env.MONGODB_HOST || 'db';
 
-console.log(`mongodb://${dbUser}:${dbPassword}@${dbUrl}:27017/azia?authSource=admin`)
-
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', true);
 mongoose.Promise = Promise;
