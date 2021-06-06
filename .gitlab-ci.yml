@@ -47,12 +47,13 @@ deploy:
     - echo "$DOCKER_CA" > /root/.docker/ca.pem
     - echo "$DOCKER_CERT" > /root/.docker/cert.pem
     - echo "$DOCKER_KEY" > /root/.docker/key.pem
-    - echo "$PROD_ENV" > ./.env  
+    - echo "$PROD_ENV" > .env  
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY 
   script:    
-    - cat ./.env
+    - echo "$PROD_ENV"
+    - ls -la
+    - cat .env
     - docker-compose -f docker-compose.prod.yml pull
-    - docker-compose -f docker-compose.prod.yml stop
     - docker-compose -f docker-compose.prod.yml restart
 #  only:
 #    - master
