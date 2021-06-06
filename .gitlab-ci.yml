@@ -37,10 +37,17 @@ test:
 
 deploy:
   stage: deploy
-  variable:
+  variables:
     DOCKER_HOST: tcp://zloi.space:2376
+    DOCKER_TLS_VERIFY: 1
   before_script:
     - apk add --no-cache docker-compose
+    - mkdir /root/.docker/
+    - echo "$DOCKER_CA" > /root/.docker/ca.pem
+    - echo "$DOCKER_CERT" > /root/.docker/cert.pem
+    - echo "$DOCKER_KEY" > /root/.docker/key.pem   
   script:    
     - docker-compose -f docker-compose.prod.yml pull
     - docker-compose -f docker-compose.prod.yml restart
+#  only:
+#    - master
