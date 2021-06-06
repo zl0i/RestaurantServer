@@ -53,6 +53,10 @@ deploy:
     - echo ${DOCKER_CERT} > /root/.docker/cert.pem
     - echo ${DOCKER_KEY} > /root/.docker/key.pem   
   script:    
+    - ls -la /root/.docker/
+    - cat /root/.docker/ca.pem
+    - cat /root/.docker/cert.pem
+    - cat /root/.docker/key.pem 
     - docker --tlsverify  -H=zloi.space:2376 --tlscacert=/root/.docker/ca.pem --tlscert=/root/.docker/cert.pem --tlskey=/root/.docker/key.pem  ps
     - docker ps 
     - docker-compose -f docker-compose.prod.yml pull
