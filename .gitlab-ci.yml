@@ -40,32 +40,19 @@ deploy:
   stage: deploy
   variables:
     DOCKER_HOST: tcp://zloi.space:2376
-    DOCKER_TLS_VERIFY: 1
-    APP_SMS_API_KEY: ${APP_SMS_API_KEY}
-    APP_MONGODB_HOST: ${APP_MONGODB_HOST}
-    APP_MONGODB_USER: ${APP_MONGODB_USER}
-    APP_MONGODB_PASSWORD: ${APP_MONGODB_PASSWORD}
-    APP_MONGODB_DB: ${APP_MONGODB_DB}
+    DOCKER_TLS_VERIFY: 1   
   before_script:
     - apk add --no-cache docker-compose
     - mkdir /root/.docker/
     - echo "$DOCKER_CA" > /root/.docker/ca.pem
     - echo "$DOCKER_CERT" > /root/.docker/cert.pem
-    - echo "$DOCKER_KEY" > /root/.docker/key.pem  
+    - echo "$DOCKER_KEY" > /root/.docker/key.pem
+    - echo "$PROD_ENV" > ./.env  
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY 
   script:    
-    - export
-    - echo "${DOCKER_CA}"
-    - echo ${DOCKER_CERT}
-    - echo ${DOCKER_KEY}
-    - ls -la /root/.docker/
-    - cat /root/.docker/ca.pem
-    - cat /root/.docker/cert.pem
-    - cat /root/.docker/key.pem 
-    - docker --tlsverify  -H=zloi.space:2376 --tlscacert=/root/.docker/ca.pem --tlscert=/root/.docker/cert.pem --tlskey=/root/.docker/key.pem  ps
-    - docker ps 
+    - cat ./.env
     - docker-compose -f docker-compose.prod.yml pull
     - docker-compose -f docker-compose.prod.yml stop
-    - docker-compose -f docker-compose.prod.yml up -d
+    - docker-compose -f docker-compose.prod.yml restart
 #  only:
 #    - master
