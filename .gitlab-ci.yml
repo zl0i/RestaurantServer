@@ -52,6 +52,6 @@ deploy:
   script:        
     - docker-compose -f docker-compose.prod.yml pull
     - docker-compose -f docker-compose.prod.yml down
-    - docker-compose -f docker-compose.prod.yml --env-file ./.env up
+    - docker-compose -f docker-compose.prod.yml --env-file ./.env up -d
 #  only:
 #    - master
