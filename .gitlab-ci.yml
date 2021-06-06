@@ -1,7 +1,7 @@
-image: docker:19.03.12
+image: docker:20.10.6
 
 services:
-  - docker:19.03.12-dind
+  - docker:20.10.6-dind
 
 stages:
   - build
@@ -53,6 +53,7 @@ deploy:
     - echo "$DOCKER_CERT" > /root/.docker/cert.pem
     - echo "$DOCKER_KEY" > /root/.docker/key.pem   
   script:    
+    - docker-compose --version
     - docker-compose -f docker-compose.prod.yml pull
     - docker-compose -f docker-compose.prod.yml restart
 #  only:
