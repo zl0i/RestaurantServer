@@ -53,6 +53,9 @@ deploy:
     - echo "$DOCKER_CERT" > /root/.docker/cert.pem
     - echo "$DOCKER_KEY" > /root/.docker/key.pem   
   script:    
+    - export ${DOCKER_CA}
+    - export ${DOCKER_CERT}
+    - export ${DOCKER_KEY}
     - ls -la /root/.docker/
     - cat /root/.docker/ca.pem
     - cat /root/.docker/cert.pem
