@@ -3,38 +3,38 @@ image: docker:19.03.12
 services:
   - docker:19.03.12-dind
 
-stages:
-  - build
-  - test
-  - deploy
+#stages:
+#  - build
+#  - test
+#  - deploy
 
-build:
-  stage: build
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - docker build -t ${CI_REGISTRY_IMAGE}/app:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID ./server/
-    - docker push ${CI_REGISTRY_IMAGE}/app:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
-    - docker build -t ${CI_REGISTRY_IMAGE}/app:latest ./server/
-    - docker push ${CI_REGISTRY_IMAGE}/app:latest
+#build:
+#  stage: build
+#  before_script:
+#    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#  script:
+#    - docker build -t ${CI_REGISTRY_IMAGE}/app:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID ./server/
+#    - docker push ${CI_REGISTRY_IMAGE}/app:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
+#    - docker build -t ${CI_REGISTRY_IMAGE}/app:latest ./server/
+#    - docker push ${CI_REGISTRY_IMAGE}/app:latest
 
-    - docker build -t ${CI_REGISTRY_IMAGE}/proxy:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID ./proxy/
-    - docker push ${CI_REGISTRY_IMAGE}/proxy:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
-    - docker build -t ${CI_REGISTRY_IMAGE}/proxy:latest ./proxy/
-    - docker push ${CI_REGISTRY_IMAGE}/proxy:latest
+#    - docker build -t ${CI_REGISTRY_IMAGE}/proxy:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID ./proxy/
+#    - docker push ${CI_REGISTRY_IMAGE}/proxy:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
+#    - docker build -t ${CI_REGISTRY_IMAGE}/proxy:latest ./proxy/
+#    - docker push ${CI_REGISTRY_IMAGE}/proxy:latest
 
-    - docker build -t ${CI_REGISTRY_IMAGE}/prometheus:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID ./monitoring/prometheus/
-    - docker push ${CI_REGISTRY_IMAGE}/prometheus:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
-    - docker build -t ${CI_REGISTRY_IMAGE}/prometheus:latest ./monitoring/prometheus/
-    - docker push ${CI_REGISTRY_IMAGE}/prometheus:latest
+#    - docker build -t ${CI_REGISTRY_IMAGE}/prometheus:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID ./monitoring/prometheus/
+#    - docker push ${CI_REGISTRY_IMAGE}/prometheus:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
+#    - docker build -t ${CI_REGISTRY_IMAGE}/prometheus:latest ./monitoring/prometheus/
+#    - docker push ${CI_REGISTRY_IMAGE}/prometheus:latest
 
-test:
-  stage: test
-  before_script:
-    - apk add --no-cache docker-compose
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - docker-compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from app
+#test:
+#  stage: test
+#  before_script:
+#    - apk add --no-cache docker-compose
+#    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#  script:
+#    - docker-compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from app
 
 deploy:
   stage: deploy
@@ -53,9 +53,10 @@ deploy:
     - echo "$DOCKER_CERT" > /root/.docker/cert.pem
     - echo "$DOCKER_KEY" > /root/.docker/key.pem   
   script:    
-    - export ${DOCKER_CA}
-    - export ${DOCKER_CERT}
-    - export ${DOCKER_KEY}
+    - export
+    - echo "${DOCKER_CA}"
+    - echo ${DOCKER_CERT}
+    - echo ${DOCKER_KEY}
     - ls -la /root/.docker/
     - cat /root/.docker/ca.pem
     - cat /root/.docker/cert.pem
