@@ -3,9 +3,14 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 const yookassa = require('./src/yokassaAPI');
 
-const dbUser = process.env.MONGODB_USER || 'admin';
-const dbPassword = process.env.MONGODB_PASSWORD || 'admin';
-const dbUrl = process.env.MONGODB_HOST || 'localhost';
+const dbUser = process.env.MONGODB_USER || '';
+const dbPassword = process.env.MONGODB_PASSWORD || '';
+const dbUrl = process.env.MONGODB_HOST || '';
+
+console.log(process.env.MONGODB_USER)
+console.log(process.env.MONGODB_PASSWORD)
+console.log(process.env.MONGODB_HOST)
+console.log(process.env.SMS_API_KEY)
 
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', true);
