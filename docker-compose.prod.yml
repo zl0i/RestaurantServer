@@ -94,7 +94,7 @@ services:
     container_name: prometheus
     user: root
     volumes:
-      - ./monitoring/prometheus/:/prometheus
+      - ./monitoring/prometheus/data:/prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
