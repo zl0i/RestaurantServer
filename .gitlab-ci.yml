@@ -56,8 +56,6 @@ test:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - docker-compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from app
-  needs:
-    - build_app
 
 deploy:
   stage: deploy
@@ -79,6 +77,4 @@ deploy:
   only:
     - master
   needs:
-    - build_app
-    - build_prometheus
-    - build_proxy
+    - test   
