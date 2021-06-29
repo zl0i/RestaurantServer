@@ -52,8 +52,24 @@
             </div>
         </a>
     </div>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+   
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-analytics.js"></script>
 
-
+    <script>      
+        var firebaseConfig = {
+            apiKey: "AIzaSyCTvLfpI-aVfTbU6eWgvNX2EOSi_4K3GrU",
+            authDomain: "zloi-space.firebaseapp.com",
+            projectId: "zloi-space",
+            storageBucket: "zloi-space.appspot.com",
+            messagingSenderId: "719482627707",
+            appId: "1:719482627707:web:17692fd7541146ef9e24de",
+            measurementId: "G-J8NSS1G2LL"
+        };        
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
+    </script>
 
 
 </body>
@@ -68,13 +84,13 @@
 
     .github-ref {
         width: 64px;
-        height: 64px;           
+        height: 64px;
         display: inline;
     }
 
     .habr-ref {
         width: 64px;
-        height: 64px;       
+        height: 64px;
         display: inline;
     }
 
