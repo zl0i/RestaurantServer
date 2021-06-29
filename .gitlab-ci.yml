@@ -14,10 +14,7 @@ build_app:
     - docker build -t ${CI_REGISTRY_IMAGE}/app:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID ./server/
     - docker push ${CI_REGISTRY_IMAGE}/app:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
     - docker build -t ${CI_REGISTRY_IMAGE}/app:latest ./server/
-    - docker push ${CI_REGISTRY_IMAGE}/app:latest
-  only:
-    changes:
-      - server/**/*
+    - docker push ${CI_REGISTRY_IMAGE}/app:latest  
 
 build_proxy:
   stage: build
@@ -32,13 +29,7 @@ build_proxy:
     - docker push ${CI_REGISTRY_IMAGE}/proxy:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
     - docker build -t ${CI_REGISTRY_IMAGE}/proxy:latest ./proxy/
     - docker push ${CI_REGISTRY_IMAGE}/proxy:latest
-  only:
-    changes:
-      - proxy/*
-      - proxy/static/*
-      - proxy/static/zloi/*
-      - proxy/static/azia/*
-
+  
 build_prometheus:
   stage: build
   before_script:    
@@ -47,10 +38,7 @@ build_prometheus:
     - docker build -t ${CI_REGISTRY_IMAGE}/prometheus:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID ./monitoring/prometheus/
     - docker push ${CI_REGISTRY_IMAGE}/prometheus:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
     - docker build -t ${CI_REGISTRY_IMAGE}/prometheus:latest ./monitoring/prometheus/
-    - docker push ${CI_REGISTRY_IMAGE}/prometheus:latest
-  only:
-    changes:
-      - monitoring/prometheus/**/*
+    - docker push ${CI_REGISTRY_IMAGE}/prometheus:latest  
 
 test:
   stage: test
@@ -59,6 +47,8 @@ test:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - docker-compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from app
+  needs:
+    - build_app  
 
 deploy:
   stage: deploy
@@ -81,3 +71,5 @@ deploy:
     - master
   needs:
     - test   
+    - build_proxy
+    - build_prometheus
