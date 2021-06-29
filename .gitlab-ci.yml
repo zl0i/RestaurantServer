@@ -17,7 +17,7 @@ build_app:
     - docker push ${CI_REGISTRY_IMAGE}/app:latest
   only:
     changes:
-      - ./server
+      - server/**/*
 
 build_proxy:
   stage: build
@@ -34,7 +34,10 @@ build_proxy:
     - docker push ${CI_REGISTRY_IMAGE}/proxy:latest
   only:
     changes:
-      - ./proxy
+      - proxy/*
+      - proxy/static/*
+      - proxy/static/zloi/*
+      - proxy/static/azia/*
 
 build_prometheus:
   stage: build
@@ -47,7 +50,7 @@ build_prometheus:
     - docker push ${CI_REGISTRY_IMAGE}/prometheus:latest
   only:
     changes:
-      - ./monitoring/prometheus
+      - monitoring/prometheus/**/*
 
 test:
   stage: test
