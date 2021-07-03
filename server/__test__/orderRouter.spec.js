@@ -24,7 +24,7 @@ describe('GET /orders', () => {
   test('should get all active orders', async () => {
     let fn = (ActiveOrders.find = jest.fn().mockImplementation(() => Promise.resolve([])));
 
-    const response = await request(app).get('/azia/api/orders');
+    const response = await request(app).get('/restaurant/api/orders');
     expect(fn).toBeCalledTimes(1);
     expect(fn.mock.calls[0][0]).toEqual({});
     expect(response.statusCode).toBe(200);
@@ -33,7 +33,7 @@ describe('GET /orders', () => {
   test('should error get all active orders', async () => {
     let fn = (ActiveOrders.find = jest.fn().mockImplementation(() => Promise.reject()));
 
-    const response = await request(app).get('/azia/api/orders');
+    const response = await request(app).get('/restaurant/api/orders');
     expect(fn).toBeCalledTimes(1);
     expect(fn.mock.calls[0][0]).toEqual({});
     expect(response.statusCode).toBe(500);
@@ -95,7 +95,7 @@ describe('POST /orders', () => {
       .fn()
       .mockImplementation(() => Promise.resolve()));
 
-    const response = await request(app).post(`/azia/api/orders`).send(order);
+    const response = await request(app).post(`/restaurant/api/orders`).send(order);
 
     expect(response.statusCode).toBe(200);
     expect(verifyUserDataMock).toBeCalledTimes(1);
@@ -136,7 +136,7 @@ describe('POST /orders', () => {
       .fn()
       .mockImplementation(() => Promise.resolve()));
 
-    const response = await request(app).post(`/azia/api/orders`).send(order);
+    const response = await request(app).post(`/restaurant/api/orders`).send(order);
     expect(response.statusCode).toBe(400);
     expect(response.body).toEqual({ result: 'error verify user data' });
     expect(verifyUserDataMock).toBeCalledTimes(1);
@@ -183,7 +183,7 @@ describe('POST /orders', () => {
       .fn()
       .mockImplementation(() => Promise.resolve()));
 
-    const response = await request(app).post(`/azia/api/orders`).send(order);
+    const response = await request(app).post(`/restaurant/api/orders`).send(order);
     expect(response.statusCode).toBe(400);
     expect(response.body).toEqual({ result: 'error verify order data' });
     expect(verifyUserDataMock).toBeCalledTimes(1);
@@ -239,7 +239,7 @@ describe('POST /orders', () => {
       .fn()
       .mockImplementation(() => Promise.resolve()));
 
-    const response = await request(app).post(`/azia/api/orders`).send(order);
+    const response = await request(app).post(`/restaurant/api/orders`).send(order);
 
     expect(verifyUserDataMock).toBeCalledTimes(1);
     expect(updateUserAddressMock).toBeCalledTimes(1);
@@ -278,7 +278,7 @@ describe('DELETE /orders/:id', () => {
         id: '1',
         status: typesOrder[i],
       };
-      const response = await request(app).delete(`/azia/api/orders/${order.id}`);
+      const response = await request(app).delete(`/restaurant/api/orders/${order.id}`);
       expect(findFn).toBeCalledTimes(1);
       expect(findFn.mock.calls[0][0]).toEqual({ id: order.id });
       expect(deleteFn).toBeCalledTimes(1);
@@ -303,7 +303,7 @@ describe('DELETE /orders/:id', () => {
         id: '1',
         status: typesOrder[i],
       };
-      const response = await request(app).delete(`/azia/api/orders/${order.id}`);
+      const response = await request(app).delete(`/restaurant/api/orders/${order.id}`);
       expect(findFn).toBeCalledTimes(1);
       expect(findFn.mock.calls[0][0]).toEqual({ id: order.id });
       expect(deleteFn).toBeCalledTimes(0);

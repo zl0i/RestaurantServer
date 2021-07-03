@@ -1,12 +1,12 @@
 openapi: 3.0.0
 info:
-  title: Azia Admin API
+  title: Restaurant Admin API
   version: 0.0.2
 
 servers:
-  - url: https://62.109.28.233/azia/api
+  - url: https://62.109.28.233/restaurant/api
     description: Stage server
-  - url: https://localhost/azia/api
+  - url: https://localhost/restaurant/api
     description: Dev server
 
 paths:

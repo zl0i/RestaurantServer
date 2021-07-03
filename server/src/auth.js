@@ -23,7 +23,7 @@ module.exports = {
 
       let code = generateCode();
       let reply = await axios.get(
-        `https://sms.ru/sms/send?api_id=${smsApiKey}5&to=${phone}&msg=${code}&json=1&from=Azia`,
+        `https://sms.ru/sms/send?api_id=${smsApiKey}5&to=${phone}&msg=${code}&json=1&from=MyRestaurant`,
       );
       if (reply.data.status_code === 100) {
         await User.updateOne({ phone: phone }, { smsCode: code }, { upsert: true });

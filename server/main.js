@@ -19,14 +19,14 @@ if (process.env.NODE_ENV !== 'test') {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use('/azia/api/users', require('./routers/userRouter'));
-app.use('/azia/api/orders', require('./routers/orderRouter'));
-app.use('/azia/api/shops', require('./routers/shopRouter'));
-app.use('/azia/api/address', require('./routers/addressRouter'));
+app.use('/restaurant/api/users', require('./routers/userRouter'));
+app.use('/restaurant/api/orders', require('./routers/orderRouter'));
+app.use('/restaurant/api/shops', require('./routers/shopRouter'));
+app.use('/restaurant/api/address', require('./routers/addressRouter'));
 
 if (process.env.NODE_ENV !== 'test') {
   mongoose
-    .connect(`mongodb://${dbUser}:${dbPassword}@${dbUrl}:27017/azia?authSource=admin`, {
+    .connect(`mongodb://${dbUser}:${dbPassword}@${dbUrl}:27017/restaurant?authSource=admin`, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     })

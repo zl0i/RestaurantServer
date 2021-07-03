@@ -12,7 +12,7 @@ services:
       - db:/data/db:rw
     restart: always
     networks:
-     - azia-backend  
+     - backend
     ports: 
       - 27017:27017
 
@@ -26,7 +26,7 @@ services:
     expose:
       - 3000
     networks: 
-      - azia-backend
+      - backend
     restart: always    
 
   nginx:
@@ -34,7 +34,7 @@ services:
     container_name: proxy   
     restart: always
     networks:
-      - azia-backend  
+      - backend
     ports:
       - 80:80
       - 443:443  
@@ -55,7 +55,7 @@ services:
     devices:
       - "/dev/kmsg"
     networks:
-      - azia-backend
+      - backend
 
   nodeexporter:
     image: prom/node-exporter:v1.0.1
@@ -74,7 +74,7 @@ services:
     expose:
       - 9100
     networks:
-      - azia-backend
+      - backend
 
   nginxexporter:
     image: nginx/nginx-prometheus-exporter:0.8.0
@@ -87,7 +87,7 @@ services:
     expose:
       - 9113
     networks:      
-      - azia-backend
+      - backend
 
   prometheus:
     image: registry.gitlab.com/zl0i/aziaserver/prometheus:latest
@@ -106,7 +106,7 @@ services:
     expose: 
       - 9090
     networks:      
-      - azia-backend    
+      - backend  
 
   grafana:
     image: grafana/grafana:7.3.7
@@ -121,16 +121,16 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
       - GF_SERVER_SERVE_FROM_SUB_PATH=true
       - GF_SERVER_DOMAIN=zloi.space
-      - GF_SERVER_ROOT_URL=https://zloi.space/azia/server/grafana
+      - GF_SERVER_ROOT_URL=https://zloi.space/restaurant/server/grafana
     restart: unless-stopped
     expose:
       - 3000
     networks:
-      - azia-backend   
+      - backend 
 
 volumes: 
   db: {}
 
 networks: 
-  azia-backend:    
+  backend:    
     driver: bridge

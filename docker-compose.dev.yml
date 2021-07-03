@@ -12,7 +12,7 @@ services:
     volumes: 
       - ./db/fakedata.js:/docker-entrypoint-initdb.d/initdb.js:ro
     networks:
-     - azia-backend  
+     - backend  
     ports:
       - 27017:27017
 
@@ -28,7 +28,7 @@ services:
       MONGODB_USER: ${APP_MONGODB_USER}
       MONGODB_PASSWORD: ${APP_MONGODB_PASSWORD}
     networks:
-     - azia-backend  
+     - backend  
     expose:
       - 3000
     restart: always
@@ -42,12 +42,12 @@ services:
       - ./proxy/ssl/:/etc/ssl/
     restart: always
     networks:
-     - azia-backend  
+     - backend  
     ports:
       - 80:80
       - 443:443
 
 networks: 
-  azia-backend:
-    name: azia-backend
+  backend:
+    name: backend
     driver: bridge
