@@ -2,7 +2,7 @@ version: "3.3"
 
 services:
   app:
-    image: registry.gitlab.com/zl0i/aziaserver/app:latest
+    image: registry.gitlab.com/zl0i/restaurantserver/app:latest
     working_dir: /opt/server/
     volumes:
       - ./server/__test__:/opt/server/__test__

@@ -17,7 +17,7 @@ services:
       - 27017:27017
 
   app:
-    image: registry.gitlab.com/zl0i/aziaserver/app:latest
+    image: registry.gitlab.com/zl0i/restaurantserver/app:latest
     environment:
       MONGODB_HOST: ${APP_MONGODB_HOST}
       SMS_API_KEY: ${APP_SMS_API_KEY}
@@ -30,7 +30,7 @@ services:
     restart: always    
 
   nginx:
-    image: registry.gitlab.com/zl0i/aziaserver/proxy:latest
+    image: registry.gitlab.com/zl0i/restaurantserver/proxy:latest
     container_name: proxy   
     restart: always
     networks:
@@ -90,7 +90,7 @@ services:
       - backend
 
   prometheus:
-    image: registry.gitlab.com/zl0i/aziaserver/prometheus:latest
+    image: registry.gitlab.com/zl0i/restaurantserver/prometheus:latest
     container_name: prometheus
     user: root
     volumes:
