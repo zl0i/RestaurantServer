@@ -113,3 +113,9 @@ dist
 #ssl key
 *.pem
 
+
+#React App
+clientssite/.idea
+clientssite/public
+clientssite/build
+
