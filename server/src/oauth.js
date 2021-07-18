@@ -21,13 +21,13 @@ class OAuthFlow {
             const device = req.query.device
             switch (method) {
                 case "google":
-                    url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${google_client_id}&response_type=code&access_type=offline&state=ya&scope=https://www.googleapis.com/auth/user.emails.read profile`
+                    url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${google_client_id}&response_type=code&access_type=offline&scope=https://www.googleapis.com/auth/user.emails.read profile`
                     break;
                 case "vk":
                     url = `https://oauth.vk.com/authorize?client_id=${vk_client_id}&display=page&scope=offline&response_type=code&v=5.131&state=vk`
                     break;
                 case "yandex":
-                    url = `https://oauth.yandex.ru/authorize?client_id=${ya_client_id}&response_type=code`
+                    url = `https://oauth.yandex.ru/authorize?client_id=${ya_client_id}&response_type=code&state=ya`
                     break;
                 default:
                     res.status(400).end()
