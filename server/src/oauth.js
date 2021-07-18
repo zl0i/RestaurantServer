@@ -7,10 +7,10 @@ const google_client_id = "7891752"
 
 const vk_client_id = "7891752";
 const vk_redirect_uri = "https://zloi.space/restaurant/api/oauth/code";
-const vk_client_secret = "NS9DJKiHXmZujRLUXLdJ";
+const vk_client_secret = process.env.VK_CLIENT_SECRET;
 
 const ya_client_id = "e843c0ced9934cb3b39ee73ed8f1958a";
-const ya_client_secret = '238baa8974e14c7ca33ccd4a1d67a78b';
+const ya_client_secret = process.env.YA_CLIENT_SECRET;
 
 class OAuthFlow {
 
@@ -21,10 +21,10 @@ class OAuthFlow {
             const device = req.query.device
             switch (method) {
                 case "google":
-                    url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${google_client_id}&response_type=code&access_type=offline&scope=https://www.googleapis.com/auth/user.emails.read profile`
+                    url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${google_client_id}&response_type=code&access_type=offline&state=ya&scope=https://www.googleapis.com/auth/user.emails.read profile`
                     break;
                 case "vk":
-                    url = `https://oauth.vk.com/authorize?client_id=${vk_client_id}&display=page&scope=offline&response_type=code&v=5.131`
+                    url = `https://oauth.vk.com/authorize?client_id=${vk_client_id}&display=page&scope=offline&response_type=code&v=5.131&state=vk`
                     break;
                 case "yandex":
                     url = `https://oauth.yandex.ru/authorize?client_id=${ya_client_id}&response_type=code`
@@ -49,23 +49,24 @@ class OAuthFlow {
     static async handleCode(req, res) {
         try {
             const code = req.query.code;
-            console.log(req.hostname);
-            let info = {};
-            switch (req.hostname) {
-                case "vk.com":
+            let info = {}
+            switch (req.query.state) {
+                case 'vk':
                     info = await this.requstInfoVk(code)
                     break;
-                case "yandex.ru":
-                    info = await this.requstInfoYandex(code)
+                case 'ya':
+                    info = await this.requstInfoYandex(code);
                     break;
                 default:
-                    res.end()
+                    res.redirect(`https://zloi.space`)
+                    break;
             }
 
-            let user = new User();     
+            let user = new User();
             Object.assign(user, info);
             user.jwt_token = jwt.sign({ id: 1 }, 'shhhhh');
             user.save();
+
             res.redirect(
                 `https://zloi.space?token=${user.jwt_token}&firstname=${user.firstname}`
             )
