@@ -58,7 +58,7 @@ class OAuthFlow {
                     info = await OAuthFlow.requstInfoYandex(code);
                     break;
                 default:
-                    res.redirect(`https://zloi.space`)
+                    res.redirect(`https://zloi.space?message=error`)
                     break;
             }
 
@@ -77,7 +77,7 @@ class OAuthFlow {
     }
 
     static async requstInfoVk(code) {
-        const token = axios.get('https://oauth.vk.com/access_token', {
+        const token = await axios.get('https://oauth.vk.com/access_token', {
             params: {
                 client_id: vk_client_id,
                 client_secret: vk_client_secret,
@@ -85,6 +85,7 @@ class OAuthFlow {
                 code: code
             }
         });
+        console.log(token)
         const info = await axios.get('https://api.vk.com/method/users.get', {
             params: {
                 user_ids: token.data.user_id,
