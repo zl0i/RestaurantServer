@@ -2,56 +2,28 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const User = new Schema({
-  name: {
+  login: String,
+  firstname: {
     type: String,
     required: false,
   },
-  phone: {
+  lastname: {
     type: String,
-    /*validator: function(text) {
-            return /^\+?[78][-\(]?\d{3}\)?-?\d{3}-?\d{2}-?\d{2}$/.test(text)
-        },*/
-    required: true,
-    unique: true,
+    required: false,
   },
-  smsCode: String,
-  createToken: Date,
-  token: String,
-  address: {
-    street: {
-      type: String,
-      require: false,
-    },
-    house: {
-      type: String,
-      require: false,
-    },
-    flat: {
-      type: String,
-      require: false,
-    },
-  },
-  orders: [
-    {
-      id: {
-        type: Number,
-        require: true,
-      },
-      cost: {
-        type: Number,
-        require: true,
-      },
-      datetime: {
-        type: Date,
-        require: true,
-      },
-      status: {
-        type: String,
-        enum: ['success', 'canseled'],
-        required: true,
-      },
-    },
-  ],
+  phone: String,
+  birthday: Date,
+  jwt_token: String,
+
+  vk_id: String,
+  vk_access_token: String,
+  vk_refresh_token: String,
+  vk_token_expired: Number,
+
+  ya_id: String,
+  ya_access_token: String,
+  ya_refresh_token: String,
+  ya_token_expired: Number,
 });
 
 module.exports = mongoose.model('User', User);

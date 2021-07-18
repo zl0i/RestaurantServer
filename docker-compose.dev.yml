@@ -22,11 +22,7 @@ services:
     volumes:
       - ./server/:/opt/server/
     entrypoint: npm run start:dev
-    environment:
-      MONGODB_HOST: ${APP_MONGODB_HOST}
-      SMS_API_KEY: ${APP_SMS_API_KEY}
-      MONGODB_USER: ${APP_MONGODB_USER}
-      MONGODB_PASSWORD: ${APP_MONGODB_PASSWORD}
+    env_file: ./.env
     networks:
      - backend  
     expose:

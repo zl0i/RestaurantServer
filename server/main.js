@@ -3,9 +3,9 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 const yookassa = require('./src/yokassaAPI');
 
-const dbUser = process.env.MONGODB_USER || '';
-const dbPassword = process.env.MONGODB_PASSWORD || '';
-const dbUrl = process.env.MONGODB_HOST || 'db';
+const dbUser = process.env.APP_MONGODB_USER || '';
+const dbPassword = process.env.APP_MONGODB_PASSWORD || '';
+const dbUrl = 'db';
 
 mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', true);
@@ -23,6 +23,7 @@ app.use('/restaurant/api/users', require('./routers/userRouter'));
 app.use('/restaurant/api/orders', require('./routers/orderRouter'));
 app.use('/restaurant/api/shops', require('./routers/shopRouter'));
 app.use('/restaurant/api/address', require('./routers/addressRouter'));
+app.use('/restaurant/api/oauth', require('./routers/oauthRouter'));
 
 if (process.env.NODE_ENV !== 'test') {
   mongoose
