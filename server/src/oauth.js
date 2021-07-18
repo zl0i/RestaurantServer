@@ -52,10 +52,10 @@ class OAuthFlow {
             let info = {}
             switch (req.query.state) {
                 case 'vk':
-                    info = await this.requstInfoVk(code)
+                    info = await OAuthFlow.requstInfoVk(code)
                     break;
                 case 'ya':
-                    info = await this.requstInfoYandex(code);
+                    info = await OAuthFlow.requstInfoYandex(code);
                     break;
                 default:
                     res.redirect(`https://zloi.space`)
