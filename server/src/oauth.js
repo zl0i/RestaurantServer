@@ -39,7 +39,7 @@ class OAuthFlow {
                 default:
                     res.status(400).end()
             }
-            res.json(url);
+            res.redirect(url);
         } catch (e) {
             console.log(e.message)
             res.status(500).end();
