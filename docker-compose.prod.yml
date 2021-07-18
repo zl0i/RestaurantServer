@@ -18,11 +18,7 @@ services:
 
   app:
     image: registry.gitlab.com/zl0i/restaurantserver/app:latest
-    environment:
-      MONGODB_HOST: ${APP_MONGODB_HOST}
-      SMS_API_KEY: ${APP_SMS_API_KEY}
-      MONGODB_USER: ${APP_MONGODB_USER}
-      MONGODB_PASSWORD: ${APP_MONGODB_PASSWORD}
+    env_file: ./.env
     expose:
       - 3000
     networks: 
