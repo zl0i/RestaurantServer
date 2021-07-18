@@ -81,7 +81,7 @@ class OAuthFlow {
             params: {
                 client_id: vk_client_id,
                 client_secret: vk_client_secret,
-                redirect_uri: 'https://zloi.space',
+                redirect_uri: vk_redirect_uri,
                 code: code
             }
         });
