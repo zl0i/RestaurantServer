@@ -2,21 +2,22 @@ const express = require('express');
 const User = require('../models/userModel');
 const auth = require('../src/auth');
 const ActiveOrders = require('../models/activeOrders');
+const checker = require('../src/schemaChecker');
 
 const router = express.Router();
 
-router.post('/input', async (req, res) => {
+router.post('/input', [checker.check('body', { phone: String })], async (req, res) => {
   try {
     await auth.sendUserCode(req.body.phone);
     res.status(200).json({
       result: 'ok',
     });
   } catch (error) {
-    res.status(400).end();
+    res.status(500).end();
   }
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', [checker.check('body', { phone: String, code: String })], async (req, res) => {
   try {
     let user = await auth.checkUserCode(req.body.phone, req.body.code);
     res.status(200).json({
@@ -35,7 +36,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.post('/info', async (req, res) => {
+router.post('/info', [checker.check('body', { phone: String, token: String })], async (req, res) => {
   try {
     let user = await User.findOne({
       phone: req.body.phone,

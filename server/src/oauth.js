@@ -29,9 +29,8 @@ class OAuthFlow {
                 case "yandex":
                     url = `https://oauth.yandex.ru/authorize?client_id=${ya_client_id}&response_type=code&state=ya`
                     break;
-                default: {                    
+                default: {
                     res.redirect("https://zloi.space?error=method_undefined")
-                    //return;
                 }
             }
             switch (device) {

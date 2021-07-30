@@ -1,9 +1,9 @@
 const router = require('express').Router();
 const oauthFlow = require('../src/oauth');
+const checker = require('../src/schemaChecker');
 
 
-
-router.get('/', oauthFlow.redirectUser);
+router.get('/', [checker.check('params', { method: String, device: String })], oauthFlow.redirectUser);
 
 router.get('/code', oauthFlow.handleCode);
 

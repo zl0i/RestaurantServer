@@ -33,9 +33,11 @@ describe('Test input user', () => {
 
   test('should error input', async () => {
     auth.sendUserCode = jest.fn().mockImplementation(() => Promise.reject());
-    const response = await request(app).post('/restaurant/api/users/input');
+    const response = await request(app)
+      .post('/restaurant/api/users/input')
+      .send({ phone: '+79200000000' });
     expect(auth.sendUserCode).toBeCalledTimes(1);
-    expect(response.statusCode).toBe(400);
+    expect(response.statusCode).toBe(500);
     expect(response.body).toEqual({});
   });
 });
@@ -59,7 +61,7 @@ describe('Test login user', () => {
     let fn = (ActiveOrders.findOne = jest.fn().mockReturnValue({}));
     const response = await request(app)
       .post('/restaurant/api/users/login')
-      .send({ phone: '+79200000000' });
+      .send({ phone: '+79200000000', code: "" });
     expect(auth.checkUserCode).toBeCalledTimes(1);
     expect(fn).toBeCalledTimes(1);
     expect(fn.mock.calls[0][0]['user_id']).toEqual(data._id);
@@ -79,7 +81,7 @@ describe('Test login user', () => {
     let fn = (ActiveOrders.findOne = jest.fn().mockReturnValue({}));
     const response = await request(app)
       .post('/restaurant/api/users/login')
-      .send({ phone: '+79200000000' });
+      .send({ phone: '+79200000000', code: "" });
     expect(auth.checkUserCode).toBeCalledTimes(1);
     expect(fn).toBeCalledTimes(0);
     expect(response.statusCode).toBe(401);
