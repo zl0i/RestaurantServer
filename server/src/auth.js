@@ -38,7 +38,7 @@ module.exports = {
       user.smsCode = '';
       let token = uuidv4();
       user.createToken = new Date();
-      user.token = token;
+      user.jwt_token = token;
       user.save();
       return user;
     } else {

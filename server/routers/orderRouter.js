@@ -28,7 +28,7 @@ router.post('/', async (req, res) => {
     helpOrders.verifyOrderData(items, req.body.menu, shop);
 
     let order_id = uuidv4();
-    let delivery_cost = shop.delivery_city_cost[req.body.address.city];
+    let delivery_cost = 100//shop.delivery_city_cost[req.body.address.city];
 
     let total_cost = items.cost + delivery_cost;
     let payment = await yookassa.createPaymentOrder(total_cost, order_id, 'Ваш заказ');

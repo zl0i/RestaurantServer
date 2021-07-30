@@ -29,20 +29,24 @@ class OAuthFlow {
                 case "yandex":
                     url = `https://oauth.yandex.ru/authorize?client_id=${ya_client_id}&response_type=code&state=ya`
                     break;
-                default:
-                    res.status(400).end()
+                default: {                    
+                    res.redirect("https://zloi.space?error=method_undefined")
+                    //return;
+                }
             }
             switch (device) {
                 case "web":
                     url += `&redirect_uri=${vk_redirect_uri}`
                     break;
-                default:
-                    res.status(400).end()
+                default: {
+                    res.redirect("https://zloi.space?error=device_undefined")
+                    return;
+                }
             }
             res.redirect(url);
         } catch (e) {
             console.log(e.message)
-            res.status(500).end();
+            res.redirect("https://zloi.space?error=method_undefined1");
         }
     }
 

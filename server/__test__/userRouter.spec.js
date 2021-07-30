@@ -48,7 +48,7 @@ describe('Test login user', () => {
   test('should login user', async () => {
     let data = {
       _id: 1,
-      token: '99508ef0-1868-4eb5-9311-a9bc342bff62',
+      jwt_token: '99508ef0-1868-4eb5-9311-a9bc342bff62',
       activeOrder: {},
       orders: new Array(),
       address: {},
@@ -67,7 +67,7 @@ describe('Test login user', () => {
     expect(response.body).toEqual({
       result: 'ok',
       phone: '+79200000000',
-      token: data.token,
+      token: data.jwt_token,
       history: [],
       activeOrder: {},
       address: {},
@@ -115,13 +115,13 @@ describe('Test info user', () => {
     expect(userMock).toBeCalledTimes(1);
     expect(userMock.mock.calls[0][0]).toEqual({
       phone: user.phone,
-      token: user.token,
+      jwt_token: user.token,
     });
     expect(orderMock).toBeCalledTimes(1);
     expect(orderMock.mock.calls[0][0]).toEqual({ user_id: user._id });
     expect(response.body).toEqual({
       phone: user.phone,
-      token: user.token,
+      token: user.jwt_token,
       history: [],
       activeOrder: order,
       address: user.address,

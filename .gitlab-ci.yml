@@ -68,6 +68,7 @@ deploy:
     - docker-compose -f docker-compose.prod.yml down
     - docker-compose -f docker-compose.prod.yml --env-file ./.env up -d
     - docker system prune -f
+    - docker volume prune -f
   only:
     - master
   needs:

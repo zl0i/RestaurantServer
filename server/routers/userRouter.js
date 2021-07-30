@@ -22,7 +22,7 @@ router.post('/login', async (req, res) => {
     res.status(200).json({
       result: 'ok',
       phone: req.body.phone,
-      token: user.token,
+      token: user.jwt_token,
       history: user.orders.reverse(),
       activeOrder: await ActiveOrders.findOne(
         { user_id: user._id },
@@ -39,11 +39,11 @@ router.post('/info', async (req, res) => {
   try {
     let user = await User.findOne({
       phone: req.body.phone,
-      token: req.body.token,
+      jwt_token: req.body.token,
     });
     res.status(200).json({
       phone: user.phone,
-      token: user.token,
+      token: user.jwt_token,
       history: user.orders.reverse(),
       activeOrder: await ActiveOrders.findOne(
         { user_id: user._id },

@@ -107,7 +107,7 @@ describe('POST /orders', () => {
     expect(calcCostMenuMock.mock.calls[0]).toEqual([order.shop_id, order.menu]);
     expect(verifyOrderDataMock).toBeCalledTimes(1);
     expect(verifyOrderDataMock.mock.calls[0]).toEqual([items, order.menu, shop]);
-    expect(uuidv4Mock).toBeCalledTimes;
+    expect(uuidv4Mock).toBeCalledTimes(1);
     expect(createPaymentMock).toBeCalledTimes(1);
     expect(createPaymentMock.mock.calls[0]).toEqual([total_cost, order.id, 'Ваш заказ']);
     expect(createOrderMock).toBeCalledTimes(1);
@@ -250,7 +250,7 @@ describe('POST /orders', () => {
     expect(calcCostMenuMock.mock.calls[0]).toEqual([order.shop_id, order.menu]);
     expect(verifyOrderDataMock).toBeCalledTimes(1);
     expect(verifyOrderDataMock.mock.calls[0]).toEqual([items, order.menu, shop]);
-    expect(uuidv4Mock).toBeCalledTimes;
+    expect(uuidv4Mock).toBeCalledTimes(1);
     expect(createPaymentMock).toBeCalledTimes(1);
     expect(createPaymentMock.mock.calls[0]).toEqual([total_cost, order.id, 'Ваш заказ']);
     expect(createOrderMock).toBeCalledTimes(0);

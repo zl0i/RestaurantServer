@@ -103,7 +103,7 @@ describe('Test check user code', () => {
     expect(fn).toBeCalledTimes(1);
     expect(user).toEqual(data);
     expect(user.smsCode.length).toBe(0);
-    expect(user.token).toBeTruthy();
+    expect(user.jwt_token).toBeTruthy();
     expect(data.save).toBeCalledTimes(1);
   });
 

@@ -12,6 +12,19 @@ const User = new Schema({
     required: false,
   },
   phone: String,
+  smsCode: String,
+  address: {
+    type: Object,
+    default: {
+      city: "",
+      street: "",
+      flat: ""
+    }
+  },
+  orders: {
+    type: Array,
+    default: []
+  },
   birthday: Date,
   jwt_token: String,
 
