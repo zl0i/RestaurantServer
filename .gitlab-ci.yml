@@ -15,6 +15,8 @@ build_app:
     - docker push ${CI_REGISTRY_IMAGE}/app:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
     - docker build -t ${CI_REGISTRY_IMAGE}/app:latest ./server/
     - docker push ${CI_REGISTRY_IMAGE}/app:latest  
+  only:
+    - master
 
 build_proxy:
   stage: build
@@ -29,6 +31,8 @@ build_proxy:
     - docker push ${CI_REGISTRY_IMAGE}/proxy:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
     - docker build -t ${CI_REGISTRY_IMAGE}/proxy:latest ./proxy/
     - docker push ${CI_REGISTRY_IMAGE}/proxy:latest
+  only:
+    - master
   
 build_prometheus:
   stage: build
@@ -39,6 +43,8 @@ build_prometheus:
     - docker push ${CI_REGISTRY_IMAGE}/prometheus:${CI_COMMIT_REF_SLUG}.$CI_PIPELINE_ID
     - docker build -t ${CI_REGISTRY_IMAGE}/prometheus:latest ./monitoring/prometheus/
     - docker push ${CI_REGISTRY_IMAGE}/prometheus:latest  
+  only:
+    - master
 
 test:
   stage: test
@@ -49,6 +55,8 @@ test:
     - docker-compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from app
   needs:
     - build_app  
+  only:
+    - master
 
 deploy:
   stage: deploy
