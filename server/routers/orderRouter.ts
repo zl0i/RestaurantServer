@@ -1,22 +1,20 @@
-const express = require('express');
+import express from 'express';
+import { Orders } from '../entity/orders';
+import scopeValidator from '../middleware/scopeVaildator'
+
+
 const router = express.Router();
 
-const ActiveOrders = require('../models/activeOrders');
-const Shop = require('../models/shopsModel');
-
-const yookassa = require('../src/yokassaAPI');
-const helpOrders = require('../src/orderHelper');
-const { v4: uuidv4 } = require('uuid');
-const checker = require('../middleware/schemaChecker')
-
-router.get('/', async (req, res) => {
+router.get('/', [scopeValidator('orders:get')], async (req: express.Request, res: express.Response) => {
   try {
-    res.json(await ActiveOrders.find({}, { __v: false }));
+    res.json(await Orders.find(req.context?.condition));
   } catch (e) {
     res.status(500).json({ result: 'error' });
   }
 });
 
+
+/*
 router.post('/', [checker.check('body', { phoneUser: String, phoneOrder: String, address: Object, menu: Array, shop_id: String, comment: String })],
   async (req, res) => {
     try {
@@ -83,4 +81,6 @@ router.delete('/:id', async (req, res) => {
     });
   }
 });
-module.exports = router;
+*/
+
+export default router

@@ -1,5 +1,6 @@
-const axios = require('axios').default;
-const ActiveOrders = require('../models/activeOrders');
+
+import Orders from '../models/Orders';
+import axios from 'axios';
 
 const shipId = process.env.SHIP_ID || '54401';
 const apikey = process.env.YOKASSA_APIKEY || 'test_Fh8hUAVVBGUGbjmlzba6TB0iyUbos_lueTHE-axOwM0';
@@ -7,7 +8,7 @@ const apikey = process.env.YOKASSA_APIKEY || 'test_Fh8hUAVVBGUGbjmlzba6TB0iyUbos
 let checker;
 
 module.exports = {
-  createPaymentOrder: async function (total, order_id, description) {
+  createPaymentOrder: async function (total: number, order_id: any, description: string) {
     let reply = await axios({
       method: 'post',
       url: 'https://api.yookassa.ru/v3/payments',
@@ -53,7 +54,7 @@ module.exports = {
 };
 
 async function checkStatusPayments() {
-  let orders = await ActiveOrders.find({ status: 'wait_payment' });
+  let orders = await Orders.find({ status: 'wait_payment' });
   orders.forEach(async (order) => {
     try {
       let reply = await axios.get(`https://api.yookassa.ru/v3/payments/${order.payment_id}`, {

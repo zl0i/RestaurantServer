@@ -1,24 +1,25 @@
-const axios = require('axios').default;
-const Cleint = require('../models/clientsModel');
-const qs = require('querystring');
-const jwt = require('jsonwebtoken');
+import express from 'express'
+import axios from 'axios';
+
+import qs from 'querystring';
+import jwt from 'jsonwebtoken';
 
 const google_client_id = "7891752"
 
 const vk_client_id = "7891752";
 const vk_redirect_uri = "https://zloi.space/restaurant/api/oauth/code";
-const vk_client_secret = process.env.VK_CLIENT_SECRET;
+const vk_client_secret = process.env['VK_CLIENT_SECRET'];
 
 const ya_client_id = "e843c0ced9934cb3b39ee73ed8f1958a";
-const ya_client_secret = process.env.YA_CLIENT_SECRET;
+const ya_client_secret = process.env['YA_CLIENT_SECRET'];
 
-class OAuthFlow {
+export default class OAuthFlow {
 
-    static async redirectUser(req, res) {
+    static async redirectUser(req: express.Request, res: express.Response) {
         try {
-            let url;
-            const method = req.query.method
-            const device = req.query.device
+            let url: string;
+            const method: string = String(req.query['method'])
+            const device: string = String(req.query['device'])
             switch (method) {
                 case "google":
                     url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${google_client_id}&response_type=code&access_type=offline&scope=https://www.googleapis.com/auth/user.emails.read profile`
@@ -35,7 +36,7 @@ class OAuthFlow {
             }
             switch (device) {
                 case "web":
-                    url += `&redirect_uri=${vk_redirect_uri}`
+                    url = url + `&redirect_uri=${vk_redirect_uri}`
                     break;
                 default: {
                     res.redirect("https://zloi.space?error=device_undefined")
@@ -49,11 +50,11 @@ class OAuthFlow {
         }
     }
 
-    static async handleCode(req, res) {
+    static async handleCode(req: express.Request, res: express.Response) {
         try {
-            const code = req.query.code;
+            const code = String(req.query['code']);
             let info = {}
-            switch (req.query.state) {
+            switch (req.query['state']) {
                 case 'vk':
                     info = await OAuthFlow.requstInfoVk(code)
                     break;
@@ -65,7 +66,6 @@ class OAuthFlow {
                     break;
             }
 
-            let user = new Cleint();
             Object.assign(user, info);
             user.jwt_token = jwt.sign({ id: 1 }, 'shhhhh');
             user.save();
@@ -79,7 +79,7 @@ class OAuthFlow {
         }
     }
 
-    static async requstInfoVk(code) {
+    static async requstInfoVk(code: string) {
         const token = await axios.get('https://oauth.vk.com/access_token', {
             params: {
                 client_id: vk_client_id,
@@ -88,7 +88,6 @@ class OAuthFlow {
                 code: code
             }
         });
-        console.log(token)
         const info = await axios.get('https://api.vk.com/method/users.get', {
             params: {
                 user_ids: token.data.user_id,
@@ -110,7 +109,7 @@ class OAuthFlow {
         }
     }
 
-    static async requstInfoYandex(code) {
+    static async requstInfoYandex(code: string) {
         const token = await axios.post('https://oauth.yandex.ru/token', qs.stringify({
             grant_type: 'authorization_code',
             code: code,
@@ -140,5 +139,3 @@ class OAuthFlow {
         }
     }
 }
-
-module.exports = OAuthFlow;

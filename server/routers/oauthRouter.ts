@@ -7,4 +7,4 @@ router.get('/', [checker.check('params', { method: String, device: String })], o
 
 router.get('/code', oauthFlow.handleCode);
 
-module.exports = router;
+export default router;
