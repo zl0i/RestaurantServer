@@ -1,15 +1,6 @@
 const request = require('supertest');
-const { app, server } = require('../main');
-const mongoose = require('mongoose');
-const yookassa = require('../src/yokassaAPI');
+const { app } = require('../server');
 const Address = require('../models/addressModel');
-
-yookassa.startCheckStatusPayments = jest.fn();
-mongoose.connect = jest.fn().mockImplementation(() => Promise.resolve());
-
-afterAll(() => {
-  server.close();
-});
 
 describe('Test get address', () => {
   afterEach(() => {

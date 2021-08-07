@@ -1,6 +1,5 @@
 const request = require('supertest');
-const { app, server } = require('../main');
-const mongoose = require('mongoose');
+const { app } = require('../server');
 const yookassa = require('../src/yokassaAPI');
 const orderHelper = require('../src/orderHelper');
 let { v4: uuidv4 } = require('uuid');
@@ -8,13 +7,7 @@ let { v4: uuidv4 } = require('uuid');
 const ActiveOrders = require('../models/activeOrders');
 const Shop = require('../models/shopsModel');
 
-yookassa.startCheckStatusPayments = jest.fn();
-mongoose.connect = jest.fn().mockImplementation(() => Promise.resolve());
 jest.mock('uuid');
-
-afterAll(() => {
-  server.close();
-});
 
 describe('GET /orders', () => {
   afterEach(() => {
@@ -49,11 +42,13 @@ describe('POST /orders', () => {
     let order = {
       id: 52,
       phoneUser: '+79200000000',
+      phoneOrder: '+79200000000',
       address: {
         city: 'Moscow',
       },
-      shop_id: 3,
+      shop_id: '3',
       menu: [{ id: 4, count: 5 }],
+      comment: ""
     };
 
     let user = { _id: 1 };
@@ -122,11 +117,13 @@ describe('POST /orders', () => {
     let order = {
       id: 52,
       phoneUser: '+79200000000',
+      phoneOrder: '+79200000000',
       address: {
         city: 'Moscow',
       },
-      shop_id: 3,
+      shop_id: '3',
       menu: [{ id: 4, count: 5 }],
+      comment: ""
     };
 
     let verifyUserDataMock = (orderHelper.verifyUserData = jest.fn().mockImplementation(() => {
@@ -147,11 +144,13 @@ describe('POST /orders', () => {
     let order = {
       id: 52,
       phoneUser: '+79200000000',
+      phoneOrder: '+79200000000',
       address: {
         city: 'Moscow',
       },
-      shop_id: 3,
+      shop_id: '3',
       menu: [{ id: 4, count: 5 }],
+      comment: ""
     };
 
     let user = { _id: 1 };
@@ -198,11 +197,13 @@ describe('POST /orders', () => {
     let order = {
       id: 52,
       phoneUser: '+79200000000',
+      phoneOrder: '+79200000000',
       address: {
         city: 'Moscow',
       },
-      shop_id: 3,
+      shop_id: '3',
       menu: [{ id: 4, count: 5 }],
+      comment: ""
     };
 
     let user = { _id: 1 };
@@ -241,6 +242,7 @@ describe('POST /orders', () => {
 
     const response = await request(app).post(`/restaurant/api/orders`).send(order);
 
+    expect(response.statusCode).toBe(400);
     expect(verifyUserDataMock).toBeCalledTimes(1);
     expect(updateUserAddressMock).toBeCalledTimes(1);
     expect(updateUserAddressMock.mock.calls[0]).toEqual([order.phoneUser, order.address]);
@@ -254,7 +256,7 @@ describe('POST /orders', () => {
     expect(createPaymentMock).toBeCalledTimes(1);
     expect(createPaymentMock.mock.calls[0]).toEqual([total_cost, order.id, 'Ваш заказ']);
     expect(createOrderMock).toBeCalledTimes(0);
-    expect(response.statusCode).toBe(400);
+   
     expect(response.body).toEqual({ result: 'error create payment' });
   });
 });

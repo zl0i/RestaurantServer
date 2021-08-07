@@ -1,8 +1,8 @@
 const express = require('express');
-const User = require('../models/userModel');
+const Cleint = require('../models/clientsModel');
 const auth = require('../src/auth');
 const ActiveOrders = require('../models/activeOrders');
-const checker = require('../src/schemaChecker');
+const checker = require('../middleware/schemaChecker');
 
 const router = express.Router();
 
@@ -38,7 +38,7 @@ router.post('/login', [checker.check('body', { phone: String, code: String })], 
 
 router.post('/info', [checker.check('body', { phone: String, token: String })], async (req, res) => {
   try {
-    let user = await User.findOne({
+    let user = await Cleint.findOne({
       phone: req.body.phone,
       jwt_token: req.body.token,
     });

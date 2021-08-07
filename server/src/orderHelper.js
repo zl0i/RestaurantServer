@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Address = require('../models/addressModel');
 const Shop = require('../models/shopsModel');
 const ActiveOrders = require('../models/activeOrders');
-const Users = require('../models/userModel');
+const Cleint = require('../models/clientsModel');
 
 async function isExistAddress(adr) {
   let address = await Address.findOne({
@@ -22,7 +22,7 @@ async function isExistOrder(phoneUser) {
 }
 
 async function updateUserAddress(phoneUser, adr) {
-  let user = await Users.findOne({ phone: phoneUser }, { _id: 1 });
+  let user = await Cleint.findOne({ phone: phoneUser }, { _id: 1 });
   user.address = adr;
   user.save();
   return user;

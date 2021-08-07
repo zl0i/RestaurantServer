@@ -1,8 +1,9 @@
 const axios = require('axios').default;
-const { v4: uuidv4 } = require('uuid');
-const User = require('../models/userModel');
+const Cleint = require('../models/clientsModel');
+var jwt = require('jsonwebtoken');
 
 const smsApiKey = process.env.SMS_API_KEY || '';
+const secret_key = process.env.APP_SECRET || 'shhhh'
 
 function validatePhone(phone) {
   if (/^\+?[7][-(]?\d{3}\)?-?\d{3}-?\d{2}-?\d{2}$/.test(phone)) return true;
@@ -17,7 +18,7 @@ function generateCode() {
 module.exports = {
   sendUserCode: async (phone) => {
     if (phone == '+79999999999') {
-      await User.updateOne({ phone: phone }, { smsCode: '9674' }, { upsert: true });
+      await Cleint.updateOne({ phone: phone }, { smsCode: '9674' }, { upsert: true });
     } else {
       if (!validatePhone(phone)) throw new Error('bad number phone');
 
@@ -26,19 +27,18 @@ module.exports = {
         `https://sms.ru/sms/send?api_id=${smsApiKey}5&to=${phone}&msg=${code}&json=1&from=MyRestaurant`,
       );
       if (reply.data.status_code === 100) {
-        await User.updateOne({ phone: phone }, { smsCode: code }, { upsert: true });
+        await Cleint.updateOne({ phone: phone }, { smsCode: code }, { upsert: true });
       } else {
         throw new Error('sms not send');
       }
     }
   },
   checkUserCode: async (phone, code) => {
-    let user = await User.findOne({ phone: phone });
+    let user = await Cleint.findOne({ phone: phone });
     if (user.smsCode === code && code !== '') {
-      user.smsCode = '';
-      let token = uuidv4();
+      user.smsCode = '';      
       user.createToken = new Date();
-      user.jwt_token = token;
+      user.jwt_token = jwt.sign({ id: user._id, role: 'user' }, secret_key);
       user.save();
       return user;
     } else {
@@ -46,10 +46,10 @@ module.exports = {
     }
   },
   checkUserToken: async (phone, token) => {
-    let user = await User.findOne({ phone: phone }, { phone: 1, token: 1 });
+    let user = await Cleint.findOne({ phone: phone }, { phone: 1, token: 1 });
     if (token == user.token) {
       user.createToken = new Date();
-      user.token = uuidv4();
+      user.token = jwt.sign({ id: user._id, role: 'user' }, secret_key);
       user.save();
       return user.token;
     } else {

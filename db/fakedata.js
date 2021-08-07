@@ -1,16 +1,16 @@
 conn = new Mongo()
-db = conn.getDB("azia")
+db = conn.getDB("restaurant")
 
-db.createCollection("users")
+db.createCollection("clients")
 
-db.users.insertMany([
+db.clients.insertMany([
     {
         _id: new ObjectId("607c02ab590df4349e468a0e"),
         name: "Dima",
         phone: "+79999999994",
         address: { street: "Главная улица", house: "1б", flat: "1" },
         orders: [],
-        token: "86aa8e30-2e12-49fd-ba96-4c62d04e51b2",
+        jwt_token: "86aa8e30-2e12-49fd-ba96-4c62d04e51b2",
         createToken: "2021-04-18T11:37:44.904Z"
     },
     {
@@ -26,7 +26,7 @@ db.users.insertMany([
                 status: "success"
             }
         ],
-        token: "86aa8e30-2e12-49fd-ba96-4c62d04e51b8",
+        jwt_token: "86aa8e30-2e12-49fd-ba96-4c62d04e51b8",
         createToken: "2021-04-18T11:37:44.904Z"
     },
     {
@@ -37,7 +37,7 @@ db.users.insertMany([
         orders: [],
         createToken: "2021-04-18T11:37:44.904Z",
         orders: [],
-        token: "86aa8e30-2e12-49fd-ba96-4c62d04e51b6"
+        jwt_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwN2MxYTA2M2JhOWYwZTEzNzMwYjBjZCIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNjI3NzE0MTE1fQ.pPNoO_bTOV5rvASJM2mTefvB91UWIMyGpm11vtOhsYM"
     }
 ])
 

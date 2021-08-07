@@ -1,17 +1,8 @@
 const request = require('supertest');
-const { app, server } = require('../main');
-const mongoose = require('mongoose');
+const { app } = require('../server');
 const auth = require('../src/auth');
-const yookassa = require('../src/yokassaAPI');
 const ActiveOrders = require('../models/activeOrders');
-const User = require('../models/userModel');
-
-yookassa.startCheckStatusPayments = jest.fn();
-mongoose.connect = jest.fn().mockImplementation(() => Promise.resolve());
-
-afterAll(() => {
-  server.close();
-});
+const Cleint = require('../models/clientsModel');
 
 describe('Test input user', () => {
   afterEach(() => {
@@ -22,7 +13,7 @@ describe('Test input user', () => {
     auth.sendUserCode = jest.fn().mockImplementation(() => Promise.resolve());
 
     const response = await request(app)
-      .post('/restaurant/api/users/input')
+      .post('/restaurant/api/clients/input')
       .send({ phone: '+79200000000' });
     expect(auth.sendUserCode).toBeCalledTimes(1);
     expect(response.statusCode).toBe(200);
@@ -34,7 +25,7 @@ describe('Test input user', () => {
   test('should error input', async () => {
     auth.sendUserCode = jest.fn().mockImplementation(() => Promise.reject());
     const response = await request(app)
-      .post('/restaurant/api/users/input')
+      .post('/restaurant/api/clients/input')
       .send({ phone: '+79200000000' });
     expect(auth.sendUserCode).toBeCalledTimes(1);
     expect(response.statusCode).toBe(500);
@@ -60,7 +51,7 @@ describe('Test login user', () => {
     });
     let fn = (ActiveOrders.findOne = jest.fn().mockReturnValue({}));
     const response = await request(app)
-      .post('/restaurant/api/users/login')
+      .post('/restaurant/api/clients/login')
       .send({ phone: '+79200000000', code: "" });
     expect(auth.checkUserCode).toBeCalledTimes(1);
     expect(fn).toBeCalledTimes(1);
@@ -78,9 +69,9 @@ describe('Test login user', () => {
 
   test('should error login user', async () => {
     auth.checkUserCode = jest.fn().mockImplementation(() => Promise.reject());
-    let fn = (ActiveOrders.findOne = jest.fn().mockReturnValue({}));
+    let fn = ActiveOrders.findOne = jest.fn().mockImplementationOnce(() => Promise.reject());
     const response = await request(app)
-      .post('/restaurant/api/users/login')
+      .post('/restaurant/api/clients/login')
       .send({ phone: '+79200000000', code: "" });
     expect(auth.checkUserCode).toBeCalledTimes(1);
     expect(fn).toBeCalledTimes(0);
@@ -107,11 +98,11 @@ describe('Test info user', () => {
       cost: 250,
       datetime: '',
     };
-    let userMock = (User.findOne = jest.fn().mockReturnValue(user));
-    let orderMock = (ActiveOrders.findOne = jest.fn().mockReturnValue(order));
+    let userMock = (Cleint.findOne = jest.fn().mockImplementationOnce(() => Promise.resolve(user)));
+    let orderMock = (ActiveOrders.findOne = jest.fn().mockImplementationOnce(() => Promise.resolve(order)));
 
     const response = await request(app)
-      .post('/restaurant/api/users/info')
+      .post('/restaurant/api/clients/info')
       .send({ phone: user.phone, token: user.token });
     expect(response.statusCode).toBe(200);
     expect(userMock).toBeCalledTimes(1);
@@ -131,8 +122,8 @@ describe('Test info user', () => {
   });
 
   test('should error info user', async () => {
-    let fn = (User.findOne = jest.fn().mockReturnValue({}));
-    const response = await request(app).post('/restaurant/api/users/info').send({ phone: '', token: '' });
+    let fn = Cleint.findOne = jest.fn().mockImplementationOnce(() => Promise.resolve({}));
+    const response = await request(app).post('/restaurant/api/clients/info').send({ phone: '', token: '' });
     expect(response.statusCode).toBe(401);
     expect(fn).toBeCalledTimes(1);
   });

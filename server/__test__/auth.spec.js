@@ -1,11 +1,8 @@
 const auth = require('../src/auth');
 const axios = require('axios').default;
-const mongoose = require('mongoose');
-
-const User = require('../models/userModel');
+const Cleint = require('../models/clientsModel');
 
 jest.mock('axios');
-mongoose.connect = jest.fn().mockImplementation(() => Promise.resolve());
 
 describe('Test send user code', () => {
   afterEach(() => {
@@ -18,7 +15,7 @@ describe('Test send user code', () => {
         status_code: 100,
       },
     };
-    let fn = (User.updateOne = jest.fn().mockImplementation(() => Promise.resolve()));
+    let fn = (Cleint.updateOne = jest.fn().mockImplementation(() => Promise.resolve()));
     axios.get.mockImplementation((url) => {
       let path = new URL(url);
       expect(path.searchParams.get('msg').length).toBe(4);
@@ -40,7 +37,7 @@ describe('Test send user code', () => {
         status_code: 400,
       },
     };
-    let fn = (User.updateOne = jest.fn().mockImplementation(() => Promise.resolve()));
+    let fn = (Cleint.updateOne = jest.fn().mockImplementation(() => Promise.resolve()));
     axios.get.mockReturnValue(res);
 
     await expect(auth.sendUserCode('+79200000000')).rejects.toThrow('sms not send');
@@ -56,7 +53,7 @@ describe('Test send user code', () => {
     };
     axios.get.mockReturnValue(res);
     axios.post.mockReturnValue(res);
-    let fn = (User.updateOne = jest.fn().mockImplementation(() => Promise.resolve()));
+    let fn = (Cleint.updateOne = jest.fn().mockImplementation(() => Promise.resolve()));
 
     await expect(auth.sendUserCode('+79')).rejects.toThrow('bad number phone');
     await expect(auth.sendUserCode('89000000000')).rejects.toThrow('bad number phone');
@@ -68,7 +65,7 @@ describe('Test send user code', () => {
   });
 
   test('not should send sms code on +79999999999', async () => {
-    let fn = (User.updateOne = jest.fn().mockImplementation(() => {
+    let fn = (Cleint.updateOne = jest.fn().mockImplementation(() => {
       return Promise.resolve();
     }));
 
@@ -76,7 +73,6 @@ describe('Test send user code', () => {
     expect(axios.get).toBeCalledTimes(0);
     expect(axios.post).toBeCalledTimes(0);
     expect(fn).toBeCalledTimes(1);
-    console.log(fn.mock.calls[0]);
     expect(fn.mock.calls[0]).toEqual([
       { phone: '+79999999999' },
       { smsCode: '9674' },
@@ -96,7 +92,7 @@ describe('Test check user code', () => {
       token: '',
       save: jest.fn(),
     };
-    let fn = (User.findOne = jest.fn().mockImplementation(() => {
+    let fn = (Cleint.findOne = jest.fn().mockImplementation(() => {
       return data;
     }));
     let user = await auth.checkUserCode('+79200000000', '1587');
@@ -113,7 +109,7 @@ describe('Test check user code', () => {
       token: '',
       save: jest.fn(),
     };
-    let fn = (User.findOne = jest.fn().mockImplementation(() => {
+    let fn = (Cleint.findOne = jest.fn().mockImplementation(() => {
       return Promise.resolve(data);
     }));
     await expect(auth.checkUserCode('+79200000000', '1588')).rejects.toThrow('code not right');
@@ -133,7 +129,7 @@ describe('Test check user token', () => {
       token: '99508ef0-1868-4eb5-9311-a9bc342bff62',
       save: jest.fn(),
     };
-    let fn = (User.findOne = jest.fn().mockImplementation(() => {
+    let fn = (Cleint.findOne = jest.fn().mockImplementation(() => {
       return Promise.resolve(data);
     }));
     let token = await auth.checkUserToken('+79200000000', data.token);
@@ -149,7 +145,7 @@ describe('Test check user token', () => {
       save: jest.fn(),
     };
     let badToken = '99508ef0-1868-4eb5-9311-a9bc342bff63';
-    let fn = (User.findOne = jest.fn().mockImplementation(() => {
+    let fn = (Cleint.findOne = jest.fn().mockImplementation(() => {
       return Promise.resolve(data);
     }));
 

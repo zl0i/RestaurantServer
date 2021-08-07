@@ -7,6 +7,7 @@ const Shop = require('../models/shopsModel');
 const yookassa = require('../src/yokassaAPI');
 const helpOrders = require('../src/orderHelper');
 const { v4: uuidv4 } = require('uuid');
+const checker = require('../middleware/schemaChecker')
 
 router.get('/', async (req, res) => {
   try {
@@ -16,49 +17,50 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
-  try {
-    await helpOrders.verifyUserData(req.body.phoneUser, req.body.address);
+router.post('/', [checker.check('body', { phoneUser: String, phoneOrder: String, address: Object, menu: Array, shop_id: String, comment: String })],
+  async (req, res) => {
+    try {
+      await helpOrders.verifyUserData(req.body.phoneUser, req.body.address);
 
-    let user = await helpOrders.updateUserAddress(req.body.phoneUser, req.body.address);
-    let shop = await Shop.findOne({ _id: req.body.shop_id });
+      let user = await helpOrders.updateUserAddress(req.body.phoneUser, req.body.address);
+      let shop = await Shop.findOne({ _id: req.body.shop_id });
 
-    let items = await helpOrders.calcCostMenu(req.body.shop_id, req.body.menu);
+      let items = await helpOrders.calcCostMenu(req.body.shop_id, req.body.menu);
 
-    helpOrders.verifyOrderData(items, req.body.menu, shop);
+      helpOrders.verifyOrderData(items, req.body.menu, shop);
 
-    let order_id = uuidv4();
-    let delivery_cost = 100//shop.delivery_city_cost[req.body.address.city];
+      let order_id = uuidv4();
+      let delivery_cost = 100//shop.delivery_city_cost[req.body.address.city];
 
-    let total_cost = items.cost + delivery_cost;
-    let payment = await yookassa.createPaymentOrder(total_cost, order_id, 'Ваш заказ');
+      let total_cost = items.cost + delivery_cost;
+      let payment = await yookassa.createPaymentOrder(total_cost, order_id, 'Ваш заказ');
 
-    let orderConfig = {
-      order_id: order_id,
-      user_id: user._id,
-      shop_id: shop._id,
-      payment_id: payment.payment_id,
-      menu: req.body.menu,
-      menu_cost: items.cost,
-      delivery_cost: delivery_cost,
-      total_cost: total_cost,
-      address_delivery: req.body.address,
-      phoneOrder: req.body.phoneOrder,
-      comment: req.body.comment,
-    };
-    await helpOrders.createOrder(orderConfig);
+      let orderConfig = {
+        order_id: order_id,
+        user_id: user._id,
+        shop_id: shop._id,
+        payment_id: payment.payment_id,
+        menu: req.body.menu,
+        menu_cost: items.cost,
+        delivery_cost: delivery_cost,
+        total_cost: total_cost,
+        address_delivery: req.body.address,
+        phoneOrder: req.body.phoneOrder,
+        comment: req.body.comment,
+      };
+      await helpOrders.createOrder(orderConfig);
 
-    res.json({
-      payment_token: payment.token,
-      order_id: order_id,
-      total: total_cost,
-    });
-  } catch (e) {
-    res.status(400).json({
-      result: e.message,
-    });
-  }
-});
+      res.json({
+        payment_token: payment.token,
+        order_id: order_id,
+        total: total_cost,
+      });
+    } catch (e) {
+      res.status(400).json({
+        result: e.message,
+      });
+    }
+  });
 
 router.delete('/:id', async (req, res) => {
   try {

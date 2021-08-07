@@ -1,5 +1,5 @@
 const axios = require('axios').default;
-const User = require('../models/userModel');
+const Cleint = require('../models/clientsModel');
 const qs = require('querystring');
 const jwt = require('jsonwebtoken');
 
@@ -65,7 +65,7 @@ class OAuthFlow {
                     break;
             }
 
-            let user = new User();
+            let user = new Cleint();
             Object.assign(user, info);
             user.jwt_token = jwt.sign({ id: 1 }, 'shhhhh');
             user.save();
