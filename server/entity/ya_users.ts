@@ -9,17 +9,17 @@ export class ya_users extends BaseEntity {
     id_user: number;
 
     @Column({default: ""})
-    yandex_id: string;
+    id: string;
 
     @Column({default: ""})
-    yandex_login: string;
+    login: string;
 
     @Column({default: ""})
-    yandex_email: string;
+    email: string;
 
     @Column({default: ""})
-    yandex_access_token: string;
+    access_token: string;
 
     @Column({default: ""})
-    yandex_refresh_token: string;
+    refresh_token: string;
 }

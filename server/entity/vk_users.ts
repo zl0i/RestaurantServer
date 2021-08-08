@@ -9,9 +9,14 @@ export class vk_users extends BaseEntity {
     id_user: number;
 
     @Column({default: ""})
-    vk_id: string;
+    id: string;
 
     @Column({default: ""})
-    vk_token: string;
+    login: string;
 
+    @Column({default: ""})
+    access_token: string;
+
+    @Column({default: ""})
+    refresh_token: string;
 }

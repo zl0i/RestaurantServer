@@ -23,10 +23,11 @@ export function body(schema: object) {
     }
 }
 
-export function params(schema: object) {
+export function query(schema: object) {
     return (req: express.Request, res: express.Response, next: Function): void => {
         try {
-            typeChecker(req.params, schema)
+            
+            typeChecker(req.query, schema)
             next();
         } catch (e) {
             res.status(400).json({

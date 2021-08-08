@@ -1,11 +1,10 @@
 import axios from 'axios';
 import jwt from 'jsonwebtoken'
-import { Users } from '../entity/user';
 import express from 'express'
-import HttpError from './httpError';
+import HttpError from '../lib/httpError';
+import { Users } from '../entity/user';
 import { Tokens } from '../entity/tokens';
-import { token_permissions } from '../entity/token_permissions';
-import { user_permissions } from '../entity/user_permissions';
+import PermissionsBuilder from '../lib/permissionsBuilder'
 
 const smsApiKey = process.env['SMS_API_KEY'] || '';
 const secret_key = process.env['APP_SECRET'] || 'shhhh'
@@ -14,13 +13,13 @@ const secret_key = process.env['APP_SECRET'] || 'shhhh'
 export default class DefaultAuth {
 
   static validatePhone(phone: string): boolean {
-    if (/^\+?[7][-(]?\d{3}\)?-?\d{3}-?\d{2}-?\d{2}$/.test(phone))
+    if (/\+7[0-9]{10}/.test(phone))
       return true;
 
     return false;
   }
 
-  static generateCode(): String {
+  static generateCode(): string {
     return Number(Math.round(Math.random() * 8999 + 1000)).toString()
   }
 
@@ -29,31 +28,20 @@ export default class DefaultAuth {
   static async viaPhone(req: express.Request, res: express.Response) {
     try {
       const phone: string = req.body.phone
-      const code = await DefaultAuth.sendSMSCode(phone)
+      const code: string = await DefaultAuth.sendSMSCode(phone)
       const user = await Users.findOne({ phone: phone })
+
 
       if (user) {
         user.sms_code = code
         await user.save()
-        const token = await Tokens.findOne({ id_user: user.id })
-        if (token) {
-          await token_permissions.delete({ id_token: token.id })
-          token.remove()
-        }
+        await PermissionsBuilder.deleteTokenByUser(user.id)
       } else {
         const newUsers = new Users()
         newUsers.phone = phone
         newUsers.sms_code = code
         await newUsers.save()
-        await user_permissions.insert([ //to do distinct class
-          { id_user: newUsers.id, resource: 'orders', action: 'create' },
-          { id_user: newUsers.id, resource: 'orders', action: 'get', scope: 'me' },
-          { id_user: newUsers.id, resource: 'orders', action: 'update', scope: 'me' },
-          { id_user: newUsers.id, resource: 'orders', action: 'delete', scope: 'me' },
-          { id_user: newUsers.id, resource: 'points', action: 'get' },
-          { id_user: newUsers.id, resource: 'menu', action: 'get' },
-          { id_user: newUsers.id, resource: 'users', action: 'get', scope: 'me' },
-        ])
+        PermissionsBuilder.createRolePermissions(newUsers.id, "guest")
       }
 
       res.json({
@@ -74,22 +62,14 @@ export default class DefaultAuth {
 
       const user = await DefaultAuth.validateCode(phone, code)
       user.sms_code = ''
-      user.save()
+      await user.save()
 
       const token = new Tokens()
       token.id_user = user.id
       token.token = jwt.sign({ user_id: user.id, role: 'role' }, secret_key)
       await token.save()
-      const permissions = await user_permissions.find({ id_user: user.id })
-      permissions.forEach(el => {
-        token_permissions.insert({ //to do distinct class
-          id_token: token.id,
-          resource: el.resource,
-          action: el.action,
-          scope: el.scope,
-          conditions: el.scope
-        })
-      })
+      await PermissionsBuilder.createRolePermissions(user.id, "client")
+      await PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
 
       res.json({
         result: "ok",
@@ -97,6 +77,7 @@ export default class DefaultAuth {
       })
 
     } catch (error) {
+      console.log(error)
       res.status(error.status).json({
         result: 'error',
         message: error.message
@@ -105,12 +86,16 @@ export default class DefaultAuth {
   }
 
   static async viaPassword(_req: express.Request, res: express.Response) {
-    res.end()
+    res.status(404).end()
+  }
+
+  static async viaToken(_req: express.Request, res: express.Response) {
+    res.status(404).end()
   }
 
 
 
-  static async sendSMSCode(phone: string): Promise<String> {
+  static async sendSMSCode(phone: string): Promise<string> {
 
     if (phone == '+79100000000')
       return '9674'
@@ -141,13 +126,4 @@ export default class DefaultAuth {
       throw new HttpError(401, 'code not right');
     }
   }
-
-
 }
-
-
-
-
-
-
-

@@ -1,8 +1,12 @@
 import express from 'express'
 import axios from 'axios';
-
 import qs from 'querystring';
 import jwt from 'jsonwebtoken';
+import { vk_users } from '../entity/vk_users';
+import { ya_users } from '../entity/ya_users';
+import PermissionsBuilder from '../lib/permissionsBuilder';
+import { Users } from '../entity/user';
+import { Tokens } from '../entity/tokens';
 
 const google_client_id = "7891752"
 
@@ -13,7 +17,24 @@ const vk_client_secret = process.env['VK_CLIENT_SECRET'];
 const ya_client_id = "e843c0ced9934cb3b39ee73ed8f1958a";
 const ya_client_secret = process.env['YA_CLIENT_SECRET'];
 
+const secret_key = process.env['APP_SECRET'] || 'shhhh'
+
+interface IUserInfo {
+    id: string
+    access_token: string,
+    refresh_token: string
+    token_expired: number,
+
+    login: string,
+    name: string
+    lastname: string,
+    birthday: Date,
+    phone: string,
+    email: string
+}
+
 export default class OAuthFlow {
+
 
     static async redirectUser(req: express.Request, res: express.Response) {
         try {
@@ -53,33 +74,65 @@ export default class OAuthFlow {
     static async handleCode(req: express.Request, res: express.Response) {
         try {
             const code = String(req.query['code']);
-            let info = {}
+            let info: IUserInfo;
             switch (req.query['state']) {
                 case 'vk':
                     info = await OAuthFlow.requstInfoVk(code)
                     break;
                 case 'ya':
-                    info = await OAuthFlow.requstInfoYandex(code);
+                    info = await OAuthFlow.requstInfoYandex(code)
                     break;
                 default:
                     res.redirect(`https://zloi.space?message=error`)
                     break;
             }
 
-            Object.assign(user, info);
-            user.jwt_token = jwt.sign({ id: 1 }, 'shhhhh');
-            user.save();
+            const user = new Users()
+            user.name = info.name;
+            user.lastname = info.lastname
+            user.phone = info.phone
+            user.verify_phone = true
+            user.birthday = info.birthday
+            //TO DO if phone is undefined, than permission is guest and redirect to request phone page 
+            await user.save()
+            PermissionsBuilder.createRolePermissions(user.id, "client")
 
-            res.redirect(
-                `https://zloi.space?token=${user.jwt_token}&firstname=${user.firstname}`
-            )
+            switch (req.query['state']) {
+                case 'vk':
+                    await vk_users.insert({
+                        id: info.id,
+                        id_user: user.id,
+                        login: info.login,
+                        refresh_token: info.refresh_token,
+                        access_token: info.access_token,
+
+                    })
+                    break;
+                case 'ya':
+                    await ya_users.insert({
+                        id: info.id,
+                        id_user: user.id,
+                        login: info.login,
+                        refresh_token: info.refresh_token,
+                        access_token: info.access_token,
+
+                    })
+                    break;
+            }
+            const token = new Tokens()
+            token.id_user - user.id
+            token.token = jwt.sign({ id_user: user.id }, secret_key)
+            await token.save()
+            PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
+
+            res.redirect(`https://zloi.space?token=${token.token}`)
         } catch (error) {
             console.log(error.message)
             res.status(500).end();
         }
     }
 
-    static async requstInfoVk(code: string) {
+    static async requstInfoVk(code: string): Promise<IUserInfo> {
         const token = await axios.get('https://oauth.vk.com/access_token', {
             params: {
                 client_id: vk_client_id,
@@ -97,19 +150,21 @@ export default class OAuthFlow {
             }
         });
         return {
-            vk_id: token.data.user_id,
-            vk_access_token: token.data.access_token,
-            vk_refresh_token: "",
-            vk_token_expired: -1,
+            id: token.data.user_id,
+            access_token: token.data.access_token,
+            refresh_token: "",
+            token_expired: -1,
 
             login: info.data.response[0].domain,
-            firstname: info.data.response[0].first_name,
+            name: info.data.response[0].first_name,
             lastname: info.data.response[0].last_name,
-            birthday: new Date(info.data.response[0].bdate)
+            birthday: new Date(info.data.response[0].bdate),
+            phone: info.data.response[0].phone,
+            email: ""
         }
     }
 
-    static async requstInfoYandex(code: string) {
+    static async requstInfoYandex(code: string): Promise<IUserInfo> {
         const token = await axios.post('https://oauth.yandex.ru/token', qs.stringify({
             grant_type: 'authorization_code',
             code: code,
@@ -126,16 +181,17 @@ export default class OAuthFlow {
         });
 
         return {
-            ya_id: info.data.id,
-            ya_access_token: token.data.access_token,
-            ya_refresh_token: token.data.refresh_token,
-            ya_token_expired: token.data.expires_in,
+            id: info.data.id,
+            access_token: token.data.access_token,
+            refresh_token: token.data.refresh_token,
+            token_expired: token.data.expires_in,
 
             login: info.data.login,
-            firstname: info.data.first_name,
+            name: info.data.first_name,
             lastname: info.data.last_name,
             birthday: new Date(info.data.birthday),
-            email: info.data.default_email
+            email: info.data.default_email,
+            phone: info.data.phone
         }
     }
 }

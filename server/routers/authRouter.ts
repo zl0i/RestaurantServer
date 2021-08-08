@@ -1,6 +1,6 @@
 import express from 'express';
 import { body } from '../middleware/schemaChecker';
-import DefaultAuth from '../src/auth';
+import DefaultAuth from '../src/defautAuth';
 
 const router = express.Router();
 
@@ -10,12 +10,6 @@ router.post('/code', [body({ phone: String, code: String })], DefaultAuth.viaCod
 
 router.post('/password', [body({ login: String, password: String })], DefaultAuth.viaPassword);
 
-router.post('/token', [body({ token: String })], async (_req: express.Request, res: express.Response) => {
-    try {
-        res.status(401).end()
-    } catch (error) {
-        res.status(401).end();
-    }
-});
+router.post('/token', [body({ token: String })], DefaultAuth.viaToken);
 
 export default router

@@ -1,10 +1,11 @@
-const router = require('express').Router();
-const oauthFlow = require('../src/oauth');
-const checker = require('../middleware/schemaChecker');
+import {Router} from 'express';
+import OAuthFlow from '../src/oauthFlow';
+import { query } from '../middleware/schemaChecker';
 
+const router = Router()
 
-router.get('/', [checker.check('params', { method: String, device: String })], oauthFlow.redirectUser);
+router.get('/', [query({ method: String, device: String })], OAuthFlow.redirectUser);
 
-router.get('/code', oauthFlow.handleCode);
+router.get('/code', OAuthFlow.handleCode);
 
 export default router;
