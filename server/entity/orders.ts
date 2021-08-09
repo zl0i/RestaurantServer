@@ -3,7 +3,7 @@ import { Points } from "./points";
 import { Users } from "./user";
 
 @Entity()
-export class Orders extends BaseEntity {
+export default class Orders extends BaseEntity {
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -22,4 +22,21 @@ export class Orders extends BaseEntity {
     @OneToOne(() => Users)
     @Column()
     id_user: number
+
+
+    @Column('text')
+    status: OrderStatus
+
+    @Column({default: null})
+    payment_id: string
+}
+
+
+export enum OrderStatus {
+    wait_payment = 'wait_payment',
+    paymented = 'paymented',
+    cancel_payment = 'cancel_payment',
+    cooking = 'cooking',
+    delivering = 'delivered',
+    completed = 'completed'
 }

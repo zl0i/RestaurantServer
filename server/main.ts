@@ -1,5 +1,5 @@
 
-//import yookassa from './src/yokassaAPI';
+import YookassaAPI from './src/yokassaAPI';
 import app from './server';
 import "reflect-metadata";
 import * as db from "typeorm";
@@ -25,8 +25,9 @@ db.createConnection({
   process.exit(1);
 })
 
+const yookassaApi = new YookassaAPI()
 
 app.listen(app.get('port'), () => {
   console.log(`[OK] Server is running on ${app.get('port')} port`);
-  //yookassa.startCheckStatusPayments();
+  yookassaApi.startCheckStatusPayments()
 });

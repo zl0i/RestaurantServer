@@ -1,6 +1,7 @@
 import express from 'express';
-import { Orders } from '../entity/orders';
+import Orders from '../entity/orders';
 import scopeValidator from '../middleware/scopeVaildator'
+import YokassaAPI from '../src/yokassaAPI';
 
 
 const router = express.Router();
@@ -12,6 +13,8 @@ router.get('/', [scopeValidator('orders:get')], async (req: express.Request, res
     res.status(500).json({ result: 'error' });
   }
 });
+
+router.post('/payment', YokassaAPI.handleHook)
 
 
 /*

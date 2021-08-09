@@ -1,15 +1,32 @@
 
-import Orders from '../models/Orders';
+import express from 'express'
 import axios from 'axios';
+import Orders, { OrderStatus } from '../entity/orders';
 
 const shipId = process.env.SHIP_ID || '54401';
 const apikey = process.env.YOKASSA_APIKEY || 'test_Fh8hUAVVBGUGbjmlzba6TB0iyUbos_lueTHE-axOwM0';
 
-let checker;
+export default class YokassaAPI {
 
-module.exports = {
-  createPaymentOrder: async function (total: number, order_id: any, description: string) {
-    let reply = await axios({
+  private isStart: boolean = false
+  private timer: NodeJS.Timer
+
+  startCheckStatusPayments(minutes?: number) {
+    if (this.isStart)
+      return;
+
+    this.isStart = true
+    let interval = minutes * 60 * 1000 || 60000;
+    this.timer = setInterval(YokassaAPI.checkStatusPayments, interval);
+  }
+
+  stopCheckStatusPayments() {
+    this.isStart = false
+    clearInterval(this.timer);
+  }
+
+  static async createPaymentOrder(total: number, order_id: number, description: string) {
+    const reply = await axios({
       method: 'post',
       url: 'https://api.yookassa.ru/v3/payments',
       headers: {
@@ -37,44 +54,39 @@ module.exports = {
       token: reply.data.confirmation.confirmation_token,
       payment_id: reply.data.id,
     };
-  },
-  checkStatusPayments: checkStatusPayments,
-  startCheckStatusPayments: function (minutes) {
-    if (checker) return;
+  }
 
-    let interval = minutes * 60 * 1000 || 60000;
-    checker = setInterval(checkStatusPayments, interval);
-  },
-  stopCheckStatusPayments: function () {
-    clearInterval(checker);
-  },
-  handleHook: function () {
-    //проверка ip
-  },
-};
 
-async function checkStatusPayments() {
-  let orders = await Orders.find({ status: 'wait_payment' });
-  orders.forEach(async (order) => {
-    try {
-      let reply = await axios.get(`https://api.yookassa.ru/v3/payments/${order.payment_id}`, {
-        auth: {
-          username: shipId,
-          password: apikey,
-        },
-      });
-      switch (reply.data.status) {
-        case 'succeeded': {
-          await ActiveOrders.updateOne({ id: order.id }, { status: 'accepted' });
-          break;
+  static async checkStatusPayments() {
+    const orders = await Orders.find({ status: OrderStatus.wait_payment });
+    orders.forEach(async (order) => {
+      try {
+        const reply = await axios.get(`https://api.yookassa.ru/v3/payments/${order.payment_id}`, {
+          auth: {
+            username: shipId,
+            password: apikey,
+          }
+        }); 
+        switch (reply.data.status) {
+          case 'succeeded':
+            await Orders.update({ id: order.id }, { status: OrderStatus.paymented });
+            break;
+          case 'canceled':
+            await Orders.update({ id: order.id }, { status: OrderStatus.cancel_payment });
+            break;
         }
-        case 'canceled': {
-          await ActiveOrders.deleteOne({ id: order.id });
-          break;
-        }
+      } catch (e) {
+        console.log(e);
       }
-    } catch (e) {
-      console.log(e);
-    }
-  });
+    });
+  }
+
+  static async handleHook(_req: express.Request, res: express.Response) {
+    //check ip
+    res.end()
+  }
 }
+
+
+
+
