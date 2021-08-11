@@ -1,8 +1,6 @@
 import axios from "axios";
-import Orders, { OrderStatus } from "../entity/orders";
+import Orders from "../entity/orders";
 import YokassaAPI from "../src/yokassaAPI";
-
-
 
 describe('Test YokassaAPI:', () => {
     test('checkStatusPayments', async () => {

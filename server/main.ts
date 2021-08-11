@@ -15,7 +15,7 @@ db.createConnection({
   password: dbPassword,
   database: "restaurant",
   entities: [
-    "./entity/*.ts"
+    "./entity/*[.ts|.js]"
   ],
 }).then(async (connection) => {
   console.log('[OK] DB is connected');

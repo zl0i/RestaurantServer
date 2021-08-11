@@ -1,6 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToOne } from "typeorm";
-import Points from "./points";
-
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm";
 
 @Entity()
 export default class OrderDelivery extends BaseEntity {
