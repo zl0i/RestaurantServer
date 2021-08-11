@@ -59,7 +59,7 @@ export default class OrderBuilder {
 
     const order = new Orders();
     order.id_point = point.id
-    order.id_user = 1
+    order.id_user = this._user.id
     order.date = new Date();
     order.status = OrderStatus.accepted;
     order.phone = this._phone
