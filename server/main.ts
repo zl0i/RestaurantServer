@@ -1,8 +1,8 @@
 
-import YookassaAPI from './src/yokassaAPI';
-import app from './server';
 import "reflect-metadata";
+import app from './server';
 import * as db from "typeorm";
+import YookassaAPI from './src/yokassaAPI';
 
 const dbUser: string = process.env['APP_MONGODB_USER'] || 'root';
 const dbPassword: string = process.env['APP_MONGODB_PASSWORD'] || 'admin';
@@ -15,12 +15,13 @@ db.createConnection({
   password: dbPassword,
   database: "restaurant",
   entities: [
-    "./entity/**/*.ts"
+    "./entity/*.ts"
   ],
-}).then(() => {
+}).then(async (connection) => {
   console.log('[OK] DB is connected');
+  await connection.synchronize();
 }).catch((err) => {
-  console.error('MongoDB is not connected');
+  console.error('[ERROR] DB isn\'t connected');
   console.error(err.message);
   process.exit(1);
 })

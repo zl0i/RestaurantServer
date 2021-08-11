@@ -97,7 +97,7 @@ export default class DefaultAuth {
 
   static async sendSMSCode(phone: string): Promise<string> {
 
-    if (phone == '+79100000000')
+    if (phone == '+79999999999')
       return '9674'
 
     if (!this.validatePhone(phone))

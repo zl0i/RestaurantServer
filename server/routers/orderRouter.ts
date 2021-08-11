@@ -1,8 +1,9 @@
 import express from 'express';
 import Orders from '../entity/orders';
 import scopeValidator from '../middleware/scopeVaildator'
+import { body } from '../middleware/schemaChecker';
 import YokassaAPI from '../src/yokassaAPI';
-
+import OrderBuilder from '../src/orderBuilder';
 
 const router = express.Router();
 
@@ -14,55 +15,28 @@ router.get('/', [scopeValidator('orders:get')], async (req: express.Request, res
   }
 });
 
+router.post(
+  '/',
+  [body({ id_point: Number, menu: Array }), scopeValidator('orders:create')],
+  async (req: express.Request, res: express.Response) => {
+    try {
+      const order = await new OrderBuilder(req.context.user, req.body.menu, req.body.id_point)
+        .address(req.body.address)
+        .phone(req.body.phone)
+        .build()
+      res.json({
+        id_order: order.order_id,
+        payment_token: order.payment_token
+      })
+    } catch (error) {
+      res.status(500).json(error.message)
+    }
+  })
+
 router.post('/payment', YokassaAPI.handleHook)
 
 
 /*
-router.post('/', [checker.check('body', { phoneUser: String, phoneOrder: String, address: Object, menu: Array, shop_id: String, comment: String })],
-  async (req, res) => {
-    try {
-      await helpOrders.verifyUserData(req.body.phoneUser, req.body.address);
-
-      let user = await helpOrders.updateUserAddress(req.body.phoneUser, req.body.address);
-      let shop = await Shop.findOne({ _id: req.body.shop_id });
-
-      let items = await helpOrders.calcCostMenu(req.body.shop_id, req.body.menu);
-
-      helpOrders.verifyOrderData(items, req.body.menu, shop);
-
-      let order_id = uuidv4();
-      let delivery_cost = 100//shop.delivery_city_cost[req.body.address.city];
-
-      let total_cost = items.cost + delivery_cost;
-      let payment = await yookassa.createPaymentOrder(total_cost, order_id, 'Ваш заказ');
-
-      let orderConfig = {
-        order_id: order_id,
-        user_id: user._id,
-        shop_id: shop._id,
-        payment_id: payment.payment_id,
-        menu: req.body.menu,
-        menu_cost: items.cost,
-        delivery_cost: delivery_cost,
-        total_cost: total_cost,
-        address_delivery: req.body.address,
-        phoneOrder: req.body.phoneOrder,
-        comment: req.body.comment,
-      };
-      await helpOrders.createOrder(orderConfig);
-
-      res.json({
-        payment_token: payment.token,
-        order_id: order_id,
-        total: total_cost,
-      });
-    } catch (e) {
-      res.status(400).json({
-        result: e.message,
-      });
-    }
-  });
-
 router.delete('/:id', async (req, res) => {
   try {
     let order = await ActiveOrders.findOne({ id: req.params.id });

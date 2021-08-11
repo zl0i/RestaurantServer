@@ -1,6 +1,14 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToOne } from "typeorm";
-import { Points } from "./points";
-import { Users } from "./user";
+
+export enum OrderStatus {
+    accepted = 'accepted',
+    wait_payment = 'wait_payment',
+    paymented = 'paymented',
+    cancel_payment = 'cancel_payment',
+    cooking = 'cooking',
+    delivering = 'delivered',
+    completed = 'completed'
+}
 
 @Entity()
 export default class Orders extends BaseEntity {
@@ -8,35 +16,27 @@ export default class Orders extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    cost: number
+    @Column({ default: null })
+    total: number
 
     @Column({ default: null })
     date: Date
 
-    @OneToOne(() => Points)
     @Column()
     id_point: number
 
-
-    @OneToOne(() => Users)
     @Column()
     id_user: number
 
-
-    @Column('text')
+    @Column({ default: OrderStatus.accepted })
     status: OrderStatus
 
-    @Column({default: null})
+    @Column({ default: '' })
     payment_id: string
-}
 
+    @Column({ default: '' })
+    comment: string
 
-export enum OrderStatus {
-    wait_payment = 'wait_payment',
-    paymented = 'paymented',
-    cancel_payment = 'cancel_payment',
-    cooking = 'cooking',
-    delivering = 'delivered',
-    completed = 'completed'
+    @Column({ default: '', length: 12 })
+    phone: string
 }

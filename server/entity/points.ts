@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm";
 
 @Entity()
-export class Points extends BaseEntity {
+export default class Points extends BaseEntity {
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -12,9 +12,15 @@ export class Points extends BaseEntity {
     @Column()
     address: string
 
-    @Column()
+    @Column({default: null})
     lat: number
 
-    @Column()
+    @Column({default: null})
     lon: string
+
+    @Column({default: 0})
+    delivery_cost: number
+
+    @Column({default: false})
+    is_delivering: boolean
 }

@@ -1,5 +1,5 @@
 import express from 'express';
-import { Points } from '../entity/points';
+import Points  from '../entity/points';
 
 const router = express.Router();
 

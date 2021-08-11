@@ -6,6 +6,11 @@ import Orders, { OrderStatus } from '../entity/orders';
 const shipId = process.env.SHIP_ID || '54401';
 const apikey = process.env.YOKASSA_APIKEY || 'test_Fh8hUAVVBGUGbjmlzba6TB0iyUbos_lueTHE-axOwM0';
 
+export interface IPayment {
+  confirmation_token: string
+  payment_id: string
+}
+
 export default class YokassaAPI {
 
   private isStart: boolean = false
@@ -25,7 +30,7 @@ export default class YokassaAPI {
     clearInterval(this.timer);
   }
 
-  static async createPaymentOrder(total: number, order_id: number, description: string) {
+  static async createPaymentOrder(total: number, order_id: number, description: string): Promise<IPayment> {
     const reply = await axios({
       method: 'post',
       url: 'https://api.yookassa.ru/v3/payments',
@@ -47,11 +52,11 @@ export default class YokassaAPI {
         },
         capture: true,
         description: description,
-      },
+      }
     });
 
     return {
-      token: reply.data.confirmation.confirmation_token,
+      confirmation_token: reply.data.confirmation.confirmation_token,
       payment_id: reply.data.id,
     };
   }
@@ -66,7 +71,7 @@ export default class YokassaAPI {
             username: shipId,
             password: apikey,
           }
-        }); 
+        });
         switch (reply.data.status) {
           case 'succeeded':
             await Orders.update({ id: order.id }, { status: OrderStatus.paymented });
@@ -76,7 +81,7 @@ export default class YokassaAPI {
             break;
         }
       } catch (e) {
-        console.log(e);
+        //console.log(e.message);
       }
     });
   }

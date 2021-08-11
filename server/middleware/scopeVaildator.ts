@@ -9,6 +9,7 @@ declare global {
         interface Request {
             context?: {
                 condition?: object
+                user: Users
             }
         }
     }
@@ -21,7 +22,7 @@ export default function check(atribute: string) {
             if (!token)
                 res.status(401).json({ message: "Token not found" })
 
-            const user = await Users.findOne({ id: token?.id_user }) 
+            const user = await Users.findOne({ id: token?.id_user })
             if (!user) {
                 res.status(401).json({ message: "User not found" })
             }
@@ -30,8 +31,11 @@ export default function check(atribute: string) {
             const permissions = await token_permissions.findOne({ resource: resource, action: action, id_token: token?.id })
 
             if (permissions) {
-                if (!req.context)
-                    req.context = {}
+                if (!req.context) {
+                    req.context = {
+                        user: user
+                    }
+                }
 
                 req.context.condition = new ScopeBuilder()
                     .resource(resource || '')
