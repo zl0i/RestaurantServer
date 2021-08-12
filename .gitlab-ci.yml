@@ -19,7 +19,6 @@ test:
     - docker-compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from app
   only:
     - master
-    - typescript
 
 build_app:
   stage: build
@@ -32,7 +31,6 @@ build_app:
     - test
   only:
     - master
-    - typescript
 
 build_proxy:
   stage: build
@@ -47,7 +45,6 @@ build_proxy:
     - docker push ${CI_REGISTRY_IMAGE}/proxy:latest
   only:
     - master
-    - typescript
 
 build_prometheus:
   stage: build
@@ -58,7 +55,6 @@ build_prometheus:
     - docker push ${CI_REGISTRY_IMAGE}/prometheus:latest
   only:
     - master
-    - typescript
 
 deploy:
   stage: deploy
@@ -81,7 +77,6 @@ deploy:
     - docker volume prune -f
   only:
     - master
-    - typescript
   needs:
     - test
     - build_proxy
