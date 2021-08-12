@@ -1,4 +1,5 @@
 import express from 'express';
+import { In } from 'typeorm';
 import Menu from '../entity/menu';
 import Points from '../entity/points';
 
@@ -8,7 +9,7 @@ router.get('/', async (_req: express.Request, res: express.Response) => {
   try {
     const arr: Array<any> = new Array();
     const shops = await Points.find()
-    const menu = await Menu.findByIds(shops)
+    const menu = await Menu.find({ id_point: In(shops.map(s => s.id)) })
     shops.forEach(s => {
       arr.push({
         ...s,
