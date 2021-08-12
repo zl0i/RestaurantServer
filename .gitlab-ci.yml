@@ -78,6 +78,6 @@ deploy:
   only:
     - master
   needs:
-    - test
+    - build_app
     - build_proxy
     - build_prometheus
