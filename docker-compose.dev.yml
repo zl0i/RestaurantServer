@@ -2,48 +2,51 @@ version: "3.3"
 
 services:
   db:
-    image: mongo:4.4.4-bionic
-    container_name: db 
+    image: mysql:8.0.24
+    container_name: db
     restart: always
+    volumes:
+      - db:/var/lib/mysql     
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${APP_MONGODB_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${APP_MONGODB_PASSWORD}
-      MONGO_INITDB_DATABASE:  ${APP_MONGODB_DB}
-    volumes: 
-      - ./db/fakedata.js:/docker-entrypoint-initdb.d/initdb.js:ro
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    command: --default-authentication-plugin=mysql_native_password
     networks:
-     - backend  
+      - backend
     ports:
-      - 27017:27017
+      - 3306:3306     
 
   app:
     image: node:12.18.4-alpine
     working_dir: /opt/server/
+    restart: always
     volumes:
       - ./server/:/opt/server/
     entrypoint: npm run start:dev
     env_file: ./.env
     networks:
-     - backend  
+      - backend
     expose:
       - 3000
-    restart: always
 
   nginx:
     image: nginx:1.19.2-alpine
     container_name: proxy
     volumes:
       - ./proxy/dev.conf:/etc/nginx/conf.d/default.conf
-      - ./proxy/static/:/var/www/static/     
+      - ./proxy/static/:/var/www/static/
       - ./proxy/ssl/:/etc/ssl/
     restart: always
     networks:
-     - backend  
+      - backend
     ports:
       - 80:80
       - 443:443
 
-networks: 
+networks:
   backend:
     name: backend
     driver: bridge
+
+volumes:
+  db: {}
