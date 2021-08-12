@@ -6,5 +6,6 @@ services:
     working_dir: /opt/server/
     volumes:
       - ./server/__test__:/opt/server/__test__
+      - ./server/package.json:/opt/server/package.json
     command: sh -c "npm install && npm test"
            
