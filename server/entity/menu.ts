@@ -14,7 +14,7 @@ export default class Menu extends BaseEntity {
     @Column()
     name: string
 
-    @Column()
+    @Column({ default: null })
     icon: string
 
     @Column()

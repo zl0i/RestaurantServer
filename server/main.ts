@@ -18,7 +18,6 @@ db.createConnection({
   entities: [
     "./entity/*[.ts|.js]"
   ],
-  debug: db_host === 'localhost',
   synchronize: true
 }).then(() => {
   console.log('[OK] DB is connected');
