@@ -2,10 +2,9 @@ version: "3.3"
 
 services:
   app:
-    image: registry.gitlab.com/zl0i/restaurantserver/app:latest
+    image: node:12.18.4-alpine
     working_dir: /opt/server/
     volumes:
-      - ./server/__test__:/opt/server/__test__
-      - ./server/package.json:/opt/server/package.json
+      - ./server/:/opt/server/
     command: sh -c "npm install && npm test"
            
