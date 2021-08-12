@@ -4,22 +4,24 @@ import app from './server';
 import * as db from "typeorm";
 import YookassaAPI from './src/yokassaAPI';
 
-const dbUser: string = process.env['APP_MONGODB_USER'] || 'root';
-const dbPassword: string = process.env['APP_MONGODB_PASSWORD'] || 'admin';
+const db_host: string = process.env['DB_HOST'] || 'localhost'
+const db_password: string = process.env['DB_PASSWORD'] || 'admin';
+const db_name: string = process.env['DB_NAME'] || 'restaurant'
 
 db.createConnection({
   type: "mysql",
-  host: "localhost",
+  host: db_host,
   port: 3306,
-  username: dbUser,
-  password: dbPassword,
-  database: "restaurant",
+  username: 'root',
+  password: db_password,
+  database: db_name,
   entities: [
     "./entity/*[.ts|.js]"
   ],
-}).then(async (connection) => {
+  debug: db_host === 'localhost',
+  synchronize: true
+}).then(() => {
   console.log('[OK] DB is connected');
-  await connection.synchronize();
 }).catch((err) => {
   console.error('[ERROR] DB isn\'t connected');
   console.error(err.message);

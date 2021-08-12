@@ -9,7 +9,8 @@
     "test:watch": "cross-env NODE_ENV=test jest --testTimeout=10000 --watch",
     "start:dev": "nodemon --watch \"./**\" --ext \"ts,json\" --ignore \"./**/*.spec.ts\" --exec \"npx ts-node main.ts\"",
     "prettier": "prettier --write .",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
