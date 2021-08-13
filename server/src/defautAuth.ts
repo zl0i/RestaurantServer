@@ -1,6 +1,7 @@
 import axios from 'axios';
 import jwt from 'jsonwebtoken'
 import express from 'express'
+import bcrypt from 'bcryptjs'
 import HttpError from '../lib/httpError';
 import { Users } from '../entity/user';
 import { Tokens } from '../entity/tokens';
@@ -82,8 +83,29 @@ export default class DefaultAuth {
     }
   }
 
-  static async viaPassword(_req: express.Request, res: express.Response) {
-    res.status(404).end()
+  static async viaPassword(req: express.Request, res: express.Response) {
+    try {
+      const user = await Users.findOne({ login: req.body.login })
+      if (bcrypt.compareSync(req.body.password, user.password)) {
+        await PermissionsBuilder.deleteTokenByUserId(user.id)
+        const token = new Tokens()
+        token.id_user = user.id
+        token.token = jwt.sign({ user_id: user.id, role: 'role' }, secret_key)
+        await token.save()
+        await PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
+        res.json({
+          result: "ok",
+          token: token.token
+        })
+      } else {
+        res.status(401).json({
+          result: 'error',
+          message: 'login or password isn\'t correct'
+        })
+      }
+    } catch (error) {
+      res.status(500).end()
+    }
   }
 
   static async viaToken(_req: express.Request, res: express.Response) {
