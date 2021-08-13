@@ -15,7 +15,7 @@ export interface IScope {
     point?: Array<number>,
     own?: boolean
 }
-
+// TO DO get rename to read
 export default class PermissionsBuilder {
     constructor() { }
 
@@ -71,7 +71,7 @@ export default class PermissionsBuilder {
                     { id_user: id_user, resource: 'points', action: 'get' },
                     { id_user: id_user, resource: 'points', action: 'update' },
                     { id_user: id_user, resource: 'menu', action: 'create' },
-                    { id_user: id_user, resource: 'menu', action: 'updates' },
+                    { id_user: id_user, resource: 'menu', action: 'update' },
                     { id_user: id_user, resource: 'menu', action: 'get' },
                     { id_user: id_user, resource: 'menu', action: 'delete' },
                 ])

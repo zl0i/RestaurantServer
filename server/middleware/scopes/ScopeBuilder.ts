@@ -1,5 +1,6 @@
 import { Users } from "../../entity/user"
 import BasicScope from "./basicScope"
+import MenuScope from "./menuScope"
 import OrderScope from "./orderScope"
 import UserScope from "./userScope"
 
@@ -38,15 +39,18 @@ export default class ScopeBuilder {
     }
 
     init(): ScopeBuilder {
-        switch (this._resource) {
+        switch (this._resource) { //TO DO create enum
             case 'orders':
                 this._scopeClass = new OrderScope(this._user)
                 break;
             case 'users':
                 this._scopeClass = new UserScope(this._user)
                 break;
+            case 'menu':
+                this._scopeClass = new MenuScope(this._user)
+                break;
             default:
-                throw new Error('undefined resource: ' + this._resource)
+                throw new Error('ScopeBuilder: undefined resource ' + this._resource)
         }
         return this
     }

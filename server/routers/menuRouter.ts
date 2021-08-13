@@ -1,0 +1,95 @@
+import express from 'express';
+import scopeValidator from '../middleware/scopeVaildator'
+import Menu, { MenuStatus } from '../entity/menu';
+import { body } from '../middleware/schemaChecker';
+import MenuCategory from '../entity/menu_category';
+
+const router = express.Router();
+
+router.get('/', [scopeValidator('menu:get')], async (req: express.Request, res: express.Response) => {
+    try {
+        if (req.query.id_point) {
+            const menu = await Menu.find({ id_point: Number(req.query.id_point), status: MenuStatus.active })
+            res.json(menu)
+        } else {
+            const menu = await Menu.find({ status: MenuStatus.active })
+            res.json(menu)
+        }
+    } catch (error) {
+        console.log(error)
+        res.status(500).end();
+    }
+});
+
+router.post('/',
+    [
+        body({ id_category: Number, name: String, cost: Number, icon: String, description: String }),
+        scopeValidator('menu:create')
+    ],
+    async (req: express.Request, res: express.Response) => {
+        try {
+            const category = await MenuCategory.findOne({ id: req.body.id_category })
+            if (category) {
+                const item = new Menu()
+                item.name = req.body.name
+                item.cost = req.body.cost
+                item.icon = req.body.icon
+                item.id_category = category.id
+                item.id_point = category.id_point
+                item.description = req.body.description
+                await item.save()
+                res.json(item)
+            } else {
+                res.status(400).json({
+                    result: 'error',
+                    message: "Категория не найдена"
+                })
+            }
+        } catch (e) {
+            res.status(500).end()
+        }
+    }
+)
+
+router.patch('/:id',
+    [
+        body({ id_category: Number, name: String, cost: Number, icon: String, description: String }),
+        scopeValidator('menu:update')
+    ],
+    async (req: express.Request, res: express.Response) => {
+        try {
+            const category = await MenuCategory.findOne({ id: req.body.id_category })
+            if (category) {
+                const item = await Menu.findOne({ id: Number(req.params.id) })
+                item.name = req.body.name
+                item.cost = req.body.cost
+                item.icon = req.body.icon
+                item.id_category = category.id
+                item.id_point = category.id_point
+                item.description = req.body.description
+                await item.save()
+                res.json(item)
+            } else {
+                res.status(400).json({
+                    result: 'error',
+                    message: "Категория не найдена"
+                })
+            }
+        } catch (e) {
+            res.status(500).end()
+        }
+    }
+)
+
+router.delete('/:id', [scopeValidator('menu:delete')], async (req: express.Request, res: express.Response) => {
+    try {
+        await Menu.delete({ id: Number(req.params.id) })
+        res.json({
+            result: 'ok'
+        })
+    } catch (e) {
+        res.status(500).end()
+    }
+})
+
+export default router;
