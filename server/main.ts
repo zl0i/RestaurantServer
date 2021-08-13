@@ -24,12 +24,14 @@ db.createConnection({
 }).then(async () => {
   console.log('[OK] DB is connected');
 
-  const admin = await Users.findOne({ login: 'admin'})
-  if(!admin) {
-    admin.password = '$2a$05$njMr04iy.MTsL/aG49i8/e5dxzsdKf3I1IgBWEkoVAsPrS3VZwd5m'
-    await admin.save()
-  } 
-  PermissionsBuilder.setUserRolePermissions(admin.id, UserRoles.admin)
+  const admin = await Users.findOne({ login: 'admin' })
+  if (!admin) {
+    const newAdmin = new Users()
+    newAdmin.login = 'admin'
+    newAdmin.password = '$2a$05$njMr04iy.MTsL/aG49i8/e5dxzsdKf3I1IgBWEkoVAsPrS3VZwd5m'
+    await newAdmin.save()
+    PermissionsBuilder.setUserRolePermissions(newAdmin.id, UserRoles.admin)
+  }
 }).catch((err) => {
   console.error('[ERROR] DB isn\'t connected');
   console.error(err.message);
