@@ -1,12 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm";
 
-export enum MenuStatus {
-    active = 'active',
-    inactive = 'unactive'
-}
 
 @Entity()
-export default class Menu extends BaseEntity {
+export default class MenuCategory extends BaseEntity {
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -18,16 +14,7 @@ export default class Menu extends BaseEntity {
     icon: string
 
     @Column()
-    cost: number
-
-    @Column()
     id_point: number
-
-    @Column()
-    id_category: number
-
-    @Column({ default: MenuStatus.active })
-    status: MenuStatus
 
     @Column({ default: '' })
     description: string
