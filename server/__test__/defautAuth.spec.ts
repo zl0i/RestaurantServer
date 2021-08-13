@@ -34,7 +34,7 @@ describe('Test /auth/phone', () => {
     Users.findOne = jest.fn().mockReturnValue(Promise.resolve(null))
     Users.prototype.save = jest.fn().mockImplementation(() => Promise.resolve())
     DefaultAuth.sendSMSCode = jest.fn().mockReturnValue(Promise.resolve('4654'))
-    PermissionsBuilder.createRolePermissions = jest.fn().mockReturnValue(Promise.resolve())
+    PermissionsBuilder.setUserRolePermissions = jest.fn().mockReturnValue(Promise.resolve())
 
     const response = await request(app)
       .post('/restaurant/api/auth/phone')
@@ -45,7 +45,7 @@ describe('Test /auth/phone', () => {
     expect(Users.findOne).toBeCalledTimes(1)
     expect(Users.prototype.save).toBeCalledTimes(1)
     expect(DefaultAuth.sendSMSCode).toBeCalledTimes(1)
-    expect(PermissionsBuilder.createRolePermissions).toBeCalledTimes(1)
+    expect(PermissionsBuilder.setUserRolePermissions).toBeCalledTimes(1)
   })
 
   test('old user', async () => {
@@ -56,7 +56,7 @@ describe('Test /auth/phone', () => {
     }
     Users.findOne = jest.fn().mockReturnValue(Promise.resolve(user))
     DefaultAuth.sendSMSCode = jest.fn().mockReturnValue(Promise.resolve('4654'))
-    PermissionsBuilder.deleteTokenByUser = jest.fn().mockReturnValue(Promise.resolve())
+    PermissionsBuilder.deleteTokenByUserId = jest.fn().mockReturnValue(Promise.resolve())
 
     const response = await request(app)
       .post('/restaurant/api/auth/phone')
@@ -67,7 +67,7 @@ describe('Test /auth/phone', () => {
     expect(Users.findOne).toBeCalledTimes(1)
     expect(user.save).toBeCalledTimes(1)
     expect(DefaultAuth.sendSMSCode).toBeCalledTimes(1)
-    expect(PermissionsBuilder.deleteTokenByUser).toBeCalledTimes(1)
+    expect(PermissionsBuilder.deleteTokenByUserId).toBeCalledTimes(1)
   })
 })
 
@@ -83,7 +83,7 @@ describe('/auth/code', () => {
     DefaultAuth.validateCode = jest.fn().mockReturnValue(Promise.resolve(user))
     Tokens.prototype.save = jest.fn().mockReturnValue(Promise.resolve())
     DefaultAuth.sendSMSCode = jest.fn().mockReturnValue(Promise.resolve('4654'))
-    PermissionsBuilder.createRolePermissions = jest.fn().mockReturnValue(Promise.resolve())
+    PermissionsBuilder.setUserRolePermissions = jest.fn().mockReturnValue(Promise.resolve())
     PermissionsBuilder.createTokenPermissionsByUser = jest.fn().mockReturnValue(Promise.resolve())
 
     const response = await request(app)
@@ -94,7 +94,7 @@ describe('/auth/code', () => {
     expect(response.body).toHaveProperty('token')
     expect(user.save).toBeCalledTimes(1)
     expect(DefaultAuth.validateCode).toBeCalledTimes(1)
-    expect(PermissionsBuilder.createRolePermissions).toBeCalledTimes(1)
+    expect(PermissionsBuilder.setUserRolePermissions).toBeCalledTimes(1)
     expect(PermissionsBuilder.createTokenPermissionsByUser).toBeCalledTimes(1)
   })
 })

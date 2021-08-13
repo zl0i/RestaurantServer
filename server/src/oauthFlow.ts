@@ -4,7 +4,7 @@ import qs from 'querystring';
 import jwt from 'jsonwebtoken';
 import { vk_users } from '../entity/vk_users';
 import { ya_users } from '../entity/ya_users';
-import PermissionsBuilder from '../lib/permissionsBuilder';
+import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder';
 import { Users } from '../entity/user';
 import { Tokens } from '../entity/tokens';
 
@@ -95,7 +95,7 @@ export default class OAuthFlow {
             user.birthday = info.birthday
             //TO DO if phone is undefined, than permission is guest and redirect to request phone page 
             await user.save()
-            PermissionsBuilder.createRolePermissions(user.id, "client")
+            PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.client)
 
             switch (req.query['state']) {
                 case 'vk':

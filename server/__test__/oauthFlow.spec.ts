@@ -41,7 +41,7 @@ describe('/oauth/code', () => {
 
         OAuthFlow.requstInfoVk = jest.fn().mockReturnValue(Promise.resolve({}))
         Users.prototype.save = jest.fn().mockReturnValue(Promise.resolve())
-        PermissionsBuilder.createRolePermissions = jest.fn().mockReturnValue(Promise.resolve())
+        PermissionsBuilder.setUserRolePermissions = jest.fn().mockReturnValue(Promise.resolve())
         PermissionsBuilder.createTokenPermissionsByUser = jest.fn().mockReturnValue(Promise.resolve())
         vk_users.insert = jest.fn().mockReturnValue(Promise.resolve())
         Tokens.prototype.save = jest.fn().mockReturnValue(Promise.resolve())
@@ -59,7 +59,7 @@ describe('/oauth/code', () => {
         expect(Users.prototype.save).toBeCalledTimes(1)
         expect(vk_users.insert).toBeCalledTimes(1)
         expect(Tokens.prototype.save).toBeCalledTimes(1)
-        expect(PermissionsBuilder.createRolePermissions).toBeCalledTimes(1)
+        expect(PermissionsBuilder.setUserRolePermissions).toBeCalledTimes(1)
         expect(PermissionsBuilder.createTokenPermissionsByUser).toBeCalledTimes(1)
 
     })

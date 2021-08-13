@@ -3,7 +3,7 @@ import { Users } from '../entity/user';
 import { body } from '../middleware/schemaChecker';
 import scopeValidator from '../middleware/scopeVaildator'
 import bcrypt from 'bcryptjs'
-import PermissionsBuilder from '../lib/permissionsBuilder';
+import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder';
 
 const router = express.Router();
 
@@ -24,7 +24,7 @@ router.post('/', [body({ login: String, password: String }), scopeValidator('use
     user.login = req.body.login
     user.password = bcrypt.hashSync(req.body.password, 5)
     await user.save()
-    PermissionsBuilder.createRolePermissions(user.id, 'guest')
+    PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.admin)
 
     res.status(200).json({
       result: "ok"
@@ -34,6 +34,5 @@ router.post('/', [body({ login: String, password: String }), scopeValidator('use
     res.status(500).end();
   }
 });
-
 
 export default router

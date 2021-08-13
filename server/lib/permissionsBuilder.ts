@@ -2,32 +2,65 @@ import { user_permissions } from "../entity/user_permissions"
 import { token_permissions } from '../entity/token_permissions';
 import { Tokens } from "../entity/tokens";
 
+export enum UserRoles {
+    guest,
+    client,
+    point_admin,
+    //network_admin,
+    admin,
+    custom
+}
 
+export interface IScope {
+    point?: Array<number>,
+    own?: boolean
+}
 
 export default class PermissionsBuilder {
     constructor() { }
 
-    static async createRolePermissions(id_user: number, role: string) { //TO DO create enum
+    static async setUserRolePermissions(id_user: number, role: UserRoles, scope?: IScope) { //TO DO if roles are issued than do nothing
+        await user_permissions.delete({ id_user: id_user })
+
+        if (scope) {
+            const resource = Object.keys(scope)[0]
+            const stringScope = `${resource}[${scope[resource].join(',')}]`
+            console.log(stringScope)
+        }
 
         switch (role) {
-            case 'guest':
+            case UserRoles.guest:
                 await user_permissions.insert([
                     { id_user: id_user, resource: 'users', action: 'get', scope: 'me' },
                     { id_user: id_user, resource: 'points', action: 'get' },
                     { id_user: id_user, resource: 'menu', action: 'get' },
                 ])
                 break;
-            case 'client':
-                await user_permissions.insert([           //TO DO update permission for old users        
+            case UserRoles.client:
+                await user_permissions.insert([
                     { id_user: id_user, resource: 'orders', action: 'create' },
                     { id_user: id_user, resource: 'orders', action: 'get', scope: 'me' },
                     { id_user: id_user, resource: 'orders', action: 'update', scope: 'me' },
                     { id_user: id_user, resource: 'orders', action: 'delete', scope: 'me' },
                 ])
                 break;
-
-            case 'admin':
-                await user_permissions.insert([           
+            case UserRoles.point_admin:
+                await user_permissions.insert([
+                    { id_user: id_user, resource: 'users', action: 'get', scope: 'points[1]' },
+                    { id_user: id_user, resource: 'orders', action: 'create' },
+                    { id_user: id_user, resource: 'orders', action: 'get' },
+                    { id_user: id_user, resource: 'orders', action: 'update' },
+                    { id_user: id_user, resource: 'orders', action: 'delete' },
+                    { id_user: id_user, resource: 'points', action: 'get' },
+                    { id_user: id_user, resource: 'points', action: 'update' },
+                    { id_user: id_user, resource: 'menu', action: 'create' },
+                    { id_user: id_user, resource: 'menu', action: 'updates' },
+                    { id_user: id_user, resource: 'menu', action: 'get' },
+                    { id_user: id_user, resource: 'menu', action: 'delete' },
+                ])
+                break;
+            case UserRoles.admin:
+                await user_permissions.insert([
                     { id_user: id_user, resource: 'users', action: 'create' },
                     { id_user: id_user, resource: 'users', action: 'get' },
                     { id_user: id_user, resource: 'users', action: 'delete' },
@@ -36,7 +69,11 @@ export default class PermissionsBuilder {
                     { id_user: id_user, resource: 'orders', action: 'update' },
                     { id_user: id_user, resource: 'orders', action: 'delete' },
                     { id_user: id_user, resource: 'points', action: 'get' },
+                    { id_user: id_user, resource: 'points', action: 'update' },
+                    { id_user: id_user, resource: 'menu', action: 'create' },
+                    { id_user: id_user, resource: 'menu', action: 'updates' },
                     { id_user: id_user, resource: 'menu', action: 'get' },
+                    { id_user: id_user, resource: 'menu', action: 'delete' },
                 ])
                 break;
         }
@@ -67,7 +104,7 @@ export default class PermissionsBuilder {
         })
     }
 
-    static async deleteTokenByUser(id_user: number) {
+    static async deleteTokenByUserId(id_user: number) {
         const token = await Tokens.findOne({ id_user: id_user })
         if (token) {
             await token_permissions.delete({ id_token: token.id })

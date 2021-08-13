@@ -4,7 +4,7 @@ import express from 'express'
 import HttpError from '../lib/httpError';
 import { Users } from '../entity/user';
 import { Tokens } from '../entity/tokens';
-import PermissionsBuilder from '../lib/permissionsBuilder'
+import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder'
 
 const smsApiKey = process.env['SMS_API_KEY'] || '';
 const secret_key = process.env['APP_SECRET'] || 'shhhh'
@@ -23,25 +23,22 @@ export default class DefaultAuth {
     return Number(Math.round(Math.random() * 8999 + 1000)).toString()
   }
 
-
-
   static async viaPhone(req: express.Request, res: express.Response) {
     try {
       const phone: string = req.body.phone
       const code: string = await DefaultAuth.sendSMSCode(phone)
       const user = await Users.findOne({ phone: phone })
 
-
       if (user) {
         user.sms_code = code
         await user.save()
-        await PermissionsBuilder.deleteTokenByUser(user.id)
+        await PermissionsBuilder.deleteTokenByUserId(user.id)
       } else {
         const newUsers = new Users()
         newUsers.phone = phone
         newUsers.sms_code = code
         await newUsers.save()
-        PermissionsBuilder.createRolePermissions(newUsers.id, "guest")
+        PermissionsBuilder.setUserRolePermissions(newUsers.id, UserRoles.guest)
       }
 
       res.json({
@@ -68,7 +65,7 @@ export default class DefaultAuth {
       token.id_user = user.id
       token.token = jwt.sign({ user_id: user.id, role: 'role' }, secret_key)
       await token.save()
-      await PermissionsBuilder.createRolePermissions(user.id, "client")
+      await PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.client)
       await PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
 
       res.json({
