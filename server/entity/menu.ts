@@ -29,7 +29,7 @@ export default class Menu extends BaseEntity {
     @Column({ default: MenuStatus.active })
     status: MenuStatus
 
-    @Column({ default: '' })
+    @Column({ default: '', length: 1000 })
     description: string
 }
 

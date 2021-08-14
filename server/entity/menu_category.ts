@@ -16,7 +16,7 @@ export default class MenuCategory extends BaseEntity {
     @Column()
     id_point: number
 
-    @Column({ default: '' })
+    @Column({ default: '', length: 1000 })
     description: string
 }
 
