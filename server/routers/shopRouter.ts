@@ -21,9 +21,11 @@ router.get('/', async (_req: express.Request, res: express.Response) => {
       })
     }
     res.json(arr)
-  } catch (error) {
-    console.log(error)
-    res.status(500).end();
+  } catch (e) {
+    console.log(e)
+    res.status(500).json({
+        message: e.message
+    })
   }
 });
 

@@ -15,9 +15,11 @@ router.get('/', [scopeValidator('menu:get')], async (req: express.Request, res: 
             const menu = await MenuCategory.find({})
             res.json(menu)
         }
-    } catch (error) {
-        console.log(error)
-        res.status(500).end();
+    } catch (e) {
+        console.log(e)
+        res.status(500).json({
+            message: e.message
+        })
     }
 });
 
@@ -36,7 +38,10 @@ router.post('/',
             await category.save()
             res.json(category)
         } catch (e) {
-            res.status(500).end()
+            console.log(e)
+            res.status(500).json({
+                message: e.message
+            })
         }
     }
 )
@@ -56,7 +61,10 @@ router.patch('/:id',
             await category.save()
             res.json(category)
         } catch (e) {
-            res.status(500).end()
+            console.log(e)
+            res.status(500).json({
+                message: e.message
+            })
         }
     }
 )
@@ -77,7 +85,10 @@ router.delete('/:id', [scopeValidator('menu:delete')], async (req: express.Reque
         })
 
     } catch (e) {
-        res.status(500).end()
+        console.log(e)
+        res.status(500).json({
+            message: e.message
+        })
     }
 })
 
