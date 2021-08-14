@@ -20,12 +20,12 @@ export default function check(atribute: string) {
         try {
             const token = await Tokens.findOne({ token: req.headers.authorization?.split(" ")[1] })
             if (!token)
-                res.status(401).json({ message: "Token not found" })
+                return res.status(401).json({ message: "Token not found" })
 
             const user = await Users.findOne({ id: token?.id_user })
-            if (!user) {
-                res.status(401).json({ message: "User not found" })
-            }
+            if (!user)
+                return res.status(401).json({ message: "User not found" })
+
 
             const [resource, action] = atribute.split(":")
             const permissions = await token_permissions.findOne({ resource: resource, action: action, id_token: token?.id })
