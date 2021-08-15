@@ -1,14 +1,18 @@
 import express from 'express'
 import redis from 'redis'
 
-const client = redis.createClient({
-    host: 'redis'
-})
+let client: redis.RedisClient;
 
-client.on("error", function (error) {
-    console.log('[ERROR] Redis isn\'t connected')
-    console.error(error);
-});
+if (process.env['NODE_ENV'] !== 'test') {
+    client = redis.createClient({
+        host: 'redis'
+    })
+
+    client.on("error", function (error) {
+        console.log('[ERROR] Redis isn\'t connected')
+        console.error(error);
+    });
+}
 
 export function cache(seconds: number) {
     return (req: express.Request, res: express.Response, next: Function) => {
@@ -35,4 +39,4 @@ export function cache(seconds: number) {
     }
 }
 
-export default client
+//export client
