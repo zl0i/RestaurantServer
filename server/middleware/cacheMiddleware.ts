@@ -29,8 +29,8 @@ export function cache(seconds: number) {
             } else {
                 res.json = new Proxy(res.json, {
                     apply(target, thisArg, args) {
-                        client.set(key, JSON.stringify(args), 'EX', seconds)
-                        target.call(thisArg, args)
+                        client.set(key, JSON.stringify(args[0]), 'EX', seconds)
+                        target.call(thisArg, args[0])
                     }
                 });
                 next()
