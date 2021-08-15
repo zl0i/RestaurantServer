@@ -4,12 +4,18 @@ import scopeValidator from '../middleware/scopeVaildator'
 import { body } from '../middleware/schemaChecker';
 import YokassaAPI from '../src/yokassaAPI';
 import OrderBuilder from '../src/orderBuilder';
+import { cache } from '../redis';
+import { In } from 'typeorm';
 
 const router = express.Router();
 
-router.get('/', [scopeValidator('orders:get')], async (req: express.Request, res: express.Response) => {
+router.get('/', [scopeValidator('orders:get'), cache(60)], async (req: express.Request, res: express.Response) => {
   try {
-    res.json(await Orders.find(req.context?.condition));
+    const condition: object = {}
+    if (req.context?.condition.value.length > 0) {
+      condition[req.context?.condition?.key] = In(req.context?.condition.value)
+    }
+    res.json(await Orders.find(condition));
   } catch (e) {
     res.status(500).json({ result: 'error' });
   }

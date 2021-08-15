@@ -1,5 +1,10 @@
 import { Users } from "../../entity/user";
 
+export interface ICondition {
+    key: string,
+    value: Array<number>
+}
+
 export default abstract class BasicScope {
     constructor(user: Users) {
         this._user = user
@@ -7,6 +12,6 @@ export default abstract class BasicScope {
 
     protected _user: Users
 
-    abstract me(): object
-    abstract points(ids: Array<number>): object
+    abstract me(): ICondition
+    abstract points(ids: Array<number>): ICondition
 }

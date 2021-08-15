@@ -1,5 +1,5 @@
 import { Users } from "../../entity/user"
-import BasicScope from "./basicScope"
+import BasicScope, { ICondition } from "./basicScope"
 import MenuScope from "./menuScope"
 import OrderScope from "./orderScope"
 import UserScope from "./userScope"
@@ -55,14 +55,14 @@ export default class ScopeBuilder {
         return this
     }
 
-    build(): object {
+    build(): ICondition {
         switch (this._scope) {
             case 'me':
                 return this._scopeClass.me()
             case 'points':
                 return this._scopeClass.points(this._params)
             default:
-                return {}
+                return { key: '', value: [] }
         }
     }
 

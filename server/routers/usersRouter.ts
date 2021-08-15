@@ -4,13 +4,18 @@ import { body } from '../middleware/schemaChecker';
 import scopeValidator from '../middleware/scopeVaildator'
 import bcrypt from 'bcryptjs'
 import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder';
+import { cache } from '../redis';
+import { In } from 'typeorm';
 
 const router = express.Router();
 
-router.get('/', [body({ token: String }), scopeValidator('users:get')], async (req: express.Request, res: express.Response) => {
+router.get('/', [scopeValidator('users:get'), cache(600)], async (req: express.Request, res: express.Response) => {
   try {
-    console.log(req.context?.condition)
-    res.status(200).json(await Users.find(req.context?.condition));
+    const condition: object = {}
+    if (req.context?.condition.value.length > 0) {
+      condition[req.context?.condition?.key] = In(req.context?.condition.value)
+    }
+    res.status(200).json(await Users.find(condition));
   } catch (error) {
     console.log(error)
     res.status(500).end();
@@ -19,7 +24,6 @@ router.get('/', [body({ token: String }), scopeValidator('users:get')], async (r
 
 router.post('/', [body({ login: String, password: String }), scopeValidator('users:create')], async (req: express.Request, res: express.Response) => {
   try {
-    console.log(req.context?.condition)
     const user = new Users()
     user.login = req.body.login
     user.password = bcrypt.hashSync(req.body.password, 5)

@@ -3,10 +3,11 @@ import { In } from 'typeorm';
 import Menu from '../entity/menu';
 import MenuCategory from '../entity/menu_category';
 import Points from '../entity/points';
+import { cache } from '../redis'
 
 const router = express.Router();
 
-router.get('/', async (_req: express.Request, res: express.Response) => {
+router.get('/', [cache(3600)], async (_req: express.Request, res: express.Response) => {
   try {
     const arr: Array<any> = new Array();
     const shops = await Points.find()
@@ -24,7 +25,7 @@ router.get('/', async (_req: express.Request, res: express.Response) => {
   } catch (e) {
     console.log(e)
     res.status(500).json({
-        message: e.message
+      message: e.message
     })
   }
 });

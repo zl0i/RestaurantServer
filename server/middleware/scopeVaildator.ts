@@ -2,14 +2,17 @@ import express from 'express'
 import { Tokens } from '../entity/tokens'
 import { token_permissions } from '../entity/token_permissions'
 import { Users } from '../entity/user'
+import { ICondition } from './scopes/basicScope'
 import ScopeBuilder from './scopes/ScopeBuilder'
 
 declare global {
     namespace Express {
         interface Request {
             context?: {
-                condition?: object
                 user: Users
+                permission: string
+                condition?: ICondition,
+                isOwn: boolean
             }
         }
     }
@@ -26,16 +29,16 @@ export default function check(atribute: string) {
             if (!user)
                 return res.status(401).json({ message: "User not found" })
 
-
             const [resource, action] = atribute.split(":")
             const permissions = await token_permissions.findOne({ resource: resource, action: action, id_token: token?.id })
 
+            req.context = {
+                permission: `${resource}:${action}:${permissions.scope}`,
+                isOwn: permissions.scope === 'me',
+                user: user
+            }
+
             if (permissions) {
-                if (!req.context) {
-                    req.context = {
-                        user: user
-                    }
-                }
 
                 req.context.condition = new ScopeBuilder()
                     .resource(resource || '')

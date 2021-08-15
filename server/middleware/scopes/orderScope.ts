@@ -1,17 +1,16 @@
 import { Users } from '../../entity/user'
-import { In } from 'typeorm'
-import BasicScope from './basicScope'
+import BasicScope, { ICondition } from './basicScope'
 
 export default class OrderScope extends BasicScope {
     constructor(user: Users) {
         super(user)
     }
 
-    me(): object {
-        return { id_user: this._user.id }
+    me(): ICondition {
+        return { key: 'id_user', value: [this._user.id] }
     }
 
-    points(ids: Array<number>): object {
-        return { id_point: In(ids) }
+    points(ids: Array<number>): ICondition {
+        return { key: 'id_point', value: ids }
     }
 }

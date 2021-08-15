@@ -16,6 +16,17 @@ services:
     ports:
       - 3306:3306
 
+  redis:
+    image: redis:6.2.5-alpine
+    container_name: redis
+    restart: always
+    volumes: 
+      - redis:/data
+    networks: 
+      - backend
+    expose:
+      - 6379
+
   app:
     image: registry.gitlab.com/zl0i/restaurantserver/app:latest
     restart: always
@@ -125,6 +136,7 @@ services:
 
 volumes:
   db: {}
+  redis: {}
 
 networks:
   backend:
