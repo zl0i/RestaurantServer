@@ -16,6 +16,7 @@ export function cache(seconds: number) {
         if (req.context?.isOwn)
             return next()
 
+        res.set('Cache-Control', `privete, max-age=${seconds}`);
         const key: string = (req.context?.permission || req.baseUrl)
 
         client.get(key, (err, value) => {

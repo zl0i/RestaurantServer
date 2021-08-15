@@ -3,7 +3,7 @@ import { In } from 'typeorm';
 import Menu from '../entity/menu';
 import MenuCategory from '../entity/menu_category';
 import Points from '../entity/points';
-import { cache } from '../redis'
+import { cache } from '../middleware/cacheMiddleware'
 
 const router = express.Router();
 

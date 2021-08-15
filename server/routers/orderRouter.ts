@@ -4,7 +4,7 @@ import scopeValidator from '../middleware/scopeVaildator'
 import { body } from '../middleware/schemaChecker';
 import YokassaAPI from '../src/yokassaAPI';
 import OrderBuilder from '../src/orderBuilder';
-import { cache } from '../redis';
+import { cache } from '../middleware/cacheMiddleware';
 import { In } from 'typeorm';
 
 const router = express.Router();

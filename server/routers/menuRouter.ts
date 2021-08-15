@@ -3,7 +3,7 @@ import scopeValidator from '../middleware/scopeVaildator'
 import Menu, { MenuStatus } from '../entity/menu';
 import { body } from '../middleware/schemaChecker';
 import MenuCategory from '../entity/menu_category';
-import { cache } from '../redis';
+import { cache } from '../middleware/cacheMiddleware';
 
 const router = express.Router();
 
