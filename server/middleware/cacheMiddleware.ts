@@ -23,7 +23,7 @@ export function cache(seconds: number) {
         res.set('Cache-Control', `privete, max-age=${seconds}`);
         const key: string = (req.context?.permission || req.baseUrl)
 
-        client.get(key, (err, value) => {
+        client.get(key, (_err: Error, value: string) => {
             if (value != null) {
                 res.json(JSON.parse(value))
             } else {
@@ -38,5 +38,3 @@ export function cache(seconds: number) {
         })
     }
 }
-
-//export client

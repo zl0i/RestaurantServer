@@ -7,6 +7,7 @@ import shopRouter from './routers/shopRouter'
 import oauthRouter from './routers/oauthRouter'
 import menuRouter from './routers/menuRouter'
 import categoryRouter from './routers/categoryRouter'
+import imageRouter from './routers/imagesRouter'
 
 const app = express();
 if (process.env['NODE_ENV'] !== 'test') {
@@ -16,6 +17,7 @@ if (process.env['NODE_ENV'] !== 'test') {
 app.set('port', 3000);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use('/restaurant/images', imageRouter);
 app.use('/restaurant/api/auth', authRouter);
 app.use('/restaurant/api/users', usersRouter);
 app.use('/restaurant/api/orders', orderRouter);
