@@ -21,15 +21,28 @@ export function cache(seconds: number) {
             return next()
 
         res.set('Cache-Control', `privete, max-age=${seconds}`);
-        const key: string = (req.context?.permission || req.baseUrl)
+        const key: string = (req.context?.permission || req.baseUrl + req.url)
 
         client.get(key, (_err: Error, value: string) => {
             if (value != null) {
-                res.json(JSON.parse(value))
+                const obj = JSON.parse(value)
+                res[obj.method](obj.data)
             } else {
                 res.json = new Proxy(res.json, {
                     apply(target, thisArg, args) {
-                        client.set(key, JSON.stringify(args[0]), 'EX', seconds)
+                        client.set(key,  JSON.stringify({
+                            method: 'json',
+                            data: args[0]
+                        }), 'EX', seconds)
+                        target.call(thisArg, args[0])
+                    }
+                });
+                res.redirect = new Proxy(res.redirect, {
+                    apply(target, thisArg, args) {
+                        client.set(key, JSON.stringify({
+                            method: 'redirect',
+                            data: args[0]
+                        }), 'EX', seconds)
                         target.call(thisArg, args[0])
                     }
                 });
