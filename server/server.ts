@@ -1,4 +1,5 @@
 import express from 'express';
+import fileUpload from 'express-fileupload'
 import morgan from 'morgan';
 import authRouter from './routers/authRouter'
 import usersRouter from './routers/usersRouter'
@@ -16,6 +17,7 @@ if (process.env['NODE_ENV'] !== 'test') {
 
 app.set('port', 3000);
 app.use(express.json());
+app.use(fileUpload());
 app.use(express.urlencoded({ extended: false }));
 app.use('/restaurant/images', imageRouter);
 app.use('/restaurant/api/auth', authRouter);

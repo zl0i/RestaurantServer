@@ -16,6 +16,21 @@ services:
     ports:
       - 3306:3306
 
+  minio:
+    image: minio/minio:RELEASE.2021-08-25T00-41-18Z
+    container_name: minio
+    command: server /data --console-address ":9001" 
+    volumes: 
+      - storage:/data
+    environment:
+      - MINIO_ACCESS_KEY=${STORAGE_USER}
+      - MINIO_SECRET_KEY=${STORAGE_PASSWORD}
+    networks:
+      - backend
+    ports: 
+      - '9000:9000'
+      - '9001:9001'
+
   redis:
     image: redis:6.2.5-alpine
     container_name: redis
@@ -137,6 +152,7 @@ services:
 volumes:
   db: {}
   redis: {}
+  storage: {}
 
 networks:
   backend:
