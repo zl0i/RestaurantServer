@@ -26,7 +26,7 @@ minioClient.bucketExists('restaurant', (err, res) => {
 
 export default class ObjectStorage {
 
-    static listImages(req: express.Request, res: express.Response) {        
+    static listImages(req: express.Request, res: express.Response) {
         const stream = minioClient.listObjects('restaurant', '', true)
         res.setHeader('Content-Type', 'application/json')
         res.write('[')
@@ -62,22 +62,33 @@ export default class ObjectStorage {
         })
     }
 
-
-    static uploadImage(file: fileUpload.UploadedFile): Promise<string> {
-        /*var metaData = {
-            'Content-Type': 'image/jpeg',
-            'Cache-Control': 'public,max-age=72000'
-        }*/
-        const fileName = file.md5.slice(-6) + "-" + file.name
+    static uploadImage(file: fileUpload.UploadedFile, prefix: string | number = ''): Promise<string | Error> {
+        const fileName = file.md5.slice(-6) + '-' + prefix + '-' + file.name
 
         return new Promise((resolve, reject) => {
-            minioClient.putObject('restaurant', fileName, file.data, function (err, objInfo) {
-                if (err) {
-                    console.log(err)
+            minioClient.putObject('restaurant', fileName, file.data, function (err, _objInfo) {
+                if (err)
                     return reject(err)
-                }
+
                 resolve(fileName)
             })
         })
+    }
+
+    static deleteImage(filename: string): Promise<boolean | Error> {
+        return new Promise((resolve, reject) => {
+            minioClient.removeObject('restaurant', filename, function (err) {
+                if (err)
+                    reject(err)
+
+                resolve(true)
+            })
+        })
+    }
+
+    static async replaceImage(oldname: string, file: fileUpload.UploadedFile, prefix: string | number = ''): Promise<string | Error> {
+        if (oldname != null)
+            await ObjectStorage.deleteImage(oldname)
+        return await ObjectStorage.uploadImage(file, prefix)
     }
 }
