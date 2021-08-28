@@ -20,6 +20,7 @@ services:
     image: minio/minio:RELEASE.2021-08-25T00-41-18Z
     container_name: minio
     command: server /data --console-address ":9001" 
+    restart: always
     volumes: 
       - storage:/data
     environment:

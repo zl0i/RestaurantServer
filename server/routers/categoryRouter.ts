@@ -4,6 +4,8 @@ import Menu from '../entity/menu';
 import { body } from '../middleware/schemaChecker';
 import MenuCategory from '../entity/menu_category';
 import { cache } from '../middleware/cacheMiddleware';
+import ObjectStorage from '../src/storage'
+import { UploadedFile } from 'express-fileupload';
 
 const router = express.Router();
 
@@ -26,17 +28,21 @@ router.get('/', [scopeValidator('menu:get'), cache(600)], async (req: express.Re
 
 router.post('/',
     [
-        body({ name: String, icon: String, description: String, id_point: Number }),
+        body({ name: String, description: String, id_point: String }),
         scopeValidator('menu:create')
     ],
     async (req: express.Request, res: express.Response) => {
         try {
             const category = new MenuCategory()
             category.name = req.body.name
-            category.icon = req.body.icon
-            category.id_point = req.body.id_point
+            category.id_point = Number(req.body.id_point)
             category.description = req.body.description
             await category.save()
+            if (!!req.files?.icon) {
+                const file = req.files.icon as UploadedFile
+                category.icon = await ObjectStorage.uploadImage(file, category.id) as string
+                await category.save()
+            }
             res.json(category)
         } catch (e) {
             console.log(e)
@@ -49,15 +55,18 @@ router.post('/',
 
 router.patch('/:id',
     [
-        body({ name: String, icon: String, description: String, id_point: Number }),
+        body({ name: String, description: String, id_point: String }),
         scopeValidator('menu:update')
     ],
     async (req: express.Request, res: express.Response) => {
         try {
             const category = await MenuCategory.findOne({ id: Number(req.params.id) })
+            if (!!req.files?.icon) {
+                const file = req.files.icon as UploadedFile
+                category.icon = await ObjectStorage.replaceImage(category.icon, file, category.id) as string
+            }
             category.name = req.body.name
-            category.icon = req.body.icon
-            category.id_point = req.body.id_point
+            category.id_point = Number(req.body.id_point)
             category.description = req.body.description
             await category.save()
             res.json(category)
@@ -80,11 +89,12 @@ router.delete('/:id', [scopeValidator('menu:delete')], async (req: express.Reque
             })
         }
 
-        await MenuCategory.delete({ id: Number(req.params.id) })
+        const category = await MenuCategory.findOne({ id: Number(req.params.id) })
+        await ObjectStorage.deleteImage(category.icon)
+        await category.remove()
         res.json({
             result: 'ok'
         })
-
     } catch (e) {
         console.log(e)
         res.status(500).json({
