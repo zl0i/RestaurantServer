@@ -63,41 +63,42 @@ router.post('/',
     }
 )
 
-router.patch('/:id',
-    [
-        body({ id_category: String, name: String, cost: String, description: String }),
-        scopeValidator('menu:update')
-    ],
-    async (req: express.Request, res: express.Response) => {
-        try {
+router.patch('/:id', [scopeValidator('menu:update')], async (req: express.Request, res: express.Response) => {
+    try {
+        const item = await Menu.findOne({ id: Number(req.params.id) })
+        if (!!req.files?.icon) {
+            const file = req.files.icon as UploadedFile
+            item.icon = await ObjectStorage.replaceImage(item.icon, file, item.id) as string
+        }
+        if (req.body.name) {
+            item.name = req.body.name
+        }
+        if (req.body.cost) {
+            item.cost = Number(req.body.cost)
+        }
+        if (req.body.id_category) {
             const category = await MenuCategory.findOne({ id: req.body.id_category })
             if (category) {
-                const item = await Menu.findOne({ id: Number(req.params.id) })
-                if (!!req.files?.icon) {
-                    const file = req.files.icon as UploadedFile
-                    item.icon = await ObjectStorage.replaceImage(item.icon, file, item.id) as string
-                }
-                item.name = req.body.name
-                item.cost = Number(req.body.cost)
                 item.id_category = category.id
-                item.id_point = category.id_point
-                item.description = req.body.description
-                await item.save()
-                res.json(item)
             } else {
-                res.status(400).json({
+                return res.status(400).json({
                     result: 'error',
-                    message: "Категория не найдена"
+                    message: 'Категория не найдена'
                 })
             }
-        } catch (e) {
-            console.log(e)
-            res.status(500).json({
-                message: e.message
-            })
         }
+        if (req.body.description) {
+            item.description = req.body.description
+        }
+        await item.save()
+        res.json(item)
+    } catch (e) {
+        console.log(e)
+        res.status(500).json({
+            message: e.message
+        })
     }
-)
+})
 
 router.delete('/:id', [scopeValidator('menu:delete')], async (req: express.Request, res: express.Response) => {
     try {
