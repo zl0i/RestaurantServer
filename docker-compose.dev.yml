@@ -6,7 +6,7 @@ services:
     container_name: db
     restart: always
     volumes:
-      - db:/var/lib/mysql     
+      - db:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
@@ -14,12 +14,11 @@ services:
     networks:
       - backend
     ports:
-      - 3306:3306  
+      - 3306:3306
 
   minio:
-    image: minio/minio:RELEASE.2021-08-25T00-41-18Z
+    image: bitnami/minio:2021.6.17
     container_name: minio
-    command: server /data --console-address ":9001" 
     restart: always
     volumes: 
       - storage:/data
@@ -28,9 +27,8 @@ services:
       - MINIO_SECRET_KEY=${STORAGE_PASSWORD}
     networks:
       - backend
-    ports: 
-      - '9000:9000'
-      - '9001:9001'
+    expose:
+      - 9000
 
   redis:
     image: redis:6.2.5-alpine

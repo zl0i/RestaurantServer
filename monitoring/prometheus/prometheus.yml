@@ -35,7 +35,6 @@ scrape_configs:
     metrics_path: /minio/v2/metrics/cluster
     bearer_token: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjQ3ODM4MDgwODEsImlzcyI6InByb21ldGhldXMiLCJzdWIiOiJ6bG9pIn0.VuhT85ynNR-ry0cwecYzwz1t6Xw-0RnD7ru7UpB0zZWnBw8gfjQ2f6hKyIIHEg3KplF46wCJtjfew62Sf_e1Mg
     scrape_interval: 15s
-    scheme: http
     static_configs:
     - targets: ['minio:9000']
       
