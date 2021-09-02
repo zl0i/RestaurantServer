@@ -55,7 +55,6 @@ router.post('/',
 
 router.patch('/:id',
     [
-        body({ name: String, description: String, id_point: String }),
         scopeValidator('menu:update')
     ],
     async (req: express.Request, res: express.Response) => {
@@ -65,9 +64,12 @@ router.patch('/:id',
                 const file = req.files.icon as UploadedFile
                 category.icon = await ObjectStorage.replaceImage(category.icon, file, category.id) as string
             }
-            category.name = req.body.name
-            category.id_point = Number(req.body.id_point)
-            category.description = req.body.description
+            if (req.body.name) {
+                category.name = req.body.name
+            }
+            if (req.body.description) {
+                category.description = req.body.description
+            }
             await category.save()
             res.json(category)
         } catch (e) {
