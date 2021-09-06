@@ -1,15 +1,17 @@
-import { Entity, Column, BaseEntity, PrimaryColumn, OneToOne } from "typeorm";
-import { Users } from "./user";
+import { Entity, Column, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
+
 
 @Entity()
 export class vk_users extends BaseEntity {
 
-    @OneToOne(() => Users)
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column()
     id_user: number;
 
-    @Column({default: ""})
-    id: string;
+    @Column()
+    sid: string;
 
     @Column({default: ""})
     login: string;

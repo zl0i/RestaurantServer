@@ -1,25 +1,27 @@
-import { Entity, Column, BaseEntity, PrimaryColumn, OneToOne } from "typeorm";
-import { Users } from "./user";
+import { Entity, Column, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
+
 
 @Entity()
 export class ya_users extends BaseEntity {
 
-    @OneToOne(() => Users)
-    @PrimaryColumn()
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column()
     id_user: number;
 
-    @Column({default: ""})
-    id: string;
+    @Column()
+    sid: string;
 
-    @Column({default: ""})
+    @Column({ default: "" })
     login: string;
 
-    @Column({default: ""})
+    @Column({ default: "" })
     email: string;
 
-    @Column({default: ""})
+    @Column({ default: "" })
     access_token: string;
 
-    @Column({default: ""})
+    @Column({ default: "" })
     refresh_token: string;
 }

@@ -73,19 +73,21 @@ export default class OAuthFlow {
 
     static async handleCode(req: express.Request, res: express.Response) {
         try {
-            const code = String(req.query['code']);
+            const code = req.query['code'] as string;
             let info: IUserInfo;
-            switch (req.query['state']) {
+            switch (req.query['state'] as string) {
                 case 'vk':
                     info = await OAuthFlow.requstInfoVk(code)
                     break;
                 case 'ya':
+                    console.log('tut')
                     info = await OAuthFlow.requstInfoYandex(code)
                     break;
                 default:
                     res.redirect(`https://zloi.space?message=error`)
                     break;
             }
+            console.log(info)
 
             const user = new Users()
             user.name = info.name;
@@ -100,22 +102,20 @@ export default class OAuthFlow {
             switch (req.query['state']) {
                 case 'vk':
                     await vk_users.insert({
-                        id: info.id,
+                        sid: info.id,
                         id_user: user.id,
                         login: info.login,
                         refresh_token: info.refresh_token,
-                        access_token: info.access_token,
-
+                        access_token: info.access_token
                     })
                     break;
                 case 'ya':
                     await ya_users.insert({
-                        id: info.id,
+                        sid: info.id,
                         id_user: user.id,
                         login: info.login,
                         refresh_token: info.refresh_token,
-                        access_token: info.access_token,
-
+                        access_token: info.access_token
                     })
                     break;
             }
@@ -179,6 +179,7 @@ export default class OAuthFlow {
                 Authorization: `OAuth ${token.data.access_token}`
             }
         });
+
 
         return {
             id: info.data.id,
