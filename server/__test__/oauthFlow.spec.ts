@@ -51,7 +51,7 @@ describe('/oauth/code', () => {
         const url = new URL(response.headers.location)
         const params = new URLSearchParams(url.searchParams)
         expect(response.statusCode).toBe(302)
-        expect(url.hostname).toBe('zloi.space')
+        expect(url.hostname).toBe('gossy.link')
         expect(params.get('token')).toBeTruthy()
         expect(Users.prototype.save).toBeCalledTimes(1)
         expect(oauth_users.findOne).toBeCalledTimes(1)
