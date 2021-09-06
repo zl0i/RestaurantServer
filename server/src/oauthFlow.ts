@@ -80,14 +80,12 @@ export default class OAuthFlow {
                     info = await OAuthFlow.requstInfoVk(code)
                     break;
                 case 'ya':
-                    console.log('tut')
                     info = await OAuthFlow.requstInfoYandex(code)
                     break;
                 default:
                     res.redirect(`https://zloi.space?message=error`)
                     break;
             }
-            console.log(info)
 
             const user = new Users()
             user.name = info.name;
@@ -98,7 +96,6 @@ export default class OAuthFlow {
             //TO DO if phone is undefined, than permission is guest and redirect to request phone page 
             await user.save()
             PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.client)
-            console.log(user)
             switch (req.query['state']) {
                 case 'vk':
                     await vk_users.insert({
