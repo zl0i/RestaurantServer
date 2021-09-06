@@ -119,7 +119,7 @@ export default class OAuthFlow {
             await token.save()
             PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
 
-            res.redirect(`https://zloi.space?token=${token.token}`)
+            res.redirect(`https://gossy.link?token=${token.token}`)
         } catch (error) {
             console.log(error.message)
             res.status(500).end();
