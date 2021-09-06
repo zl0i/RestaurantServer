@@ -7,7 +7,7 @@ import { Users } from '../entity/user';
 import { Tokens } from '../entity/tokens';
 import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder'
 
-const smsApiKey = process.env['SMS_API_KEY'] || '';
+const smsApiKey = process.env['APP_SMS_API_KEY'] || '';
 const secret_key = process.env['APP_SECRET'] || 'shhhh'
 
 
@@ -60,6 +60,7 @@ export default class DefaultAuth {
 
       const user = await DefaultAuth.validateCode(phone, code)
       user.sms_code = ''
+      user.verify_phone = true
       await user.save()
 
       const token = new Tokens()
@@ -86,7 +87,7 @@ export default class DefaultAuth {
   static async viaPassword(req: express.Request, res: express.Response) {
     try {
       const user = await Users.findOne({ login: req.body.login })
-      if (bcrypt.compareSync(req.body.password, user.password)) {
+      if (user && bcrypt.compareSync(req.body.password, user.password)) {
         await PermissionsBuilder.deleteTokenByUserId(user.id)
         const token = new Tokens()
         token.id_user = user.id
@@ -115,8 +116,7 @@ export default class DefaultAuth {
 
 
   static async sendSMSCode(phone: string): Promise<string> {
-
-    if (phone == '+79999999999')
+    if (phone == '+79999999999' || smsApiKey == 'test')
       return '9674'
 
     if (!this.validatePhone(phone))

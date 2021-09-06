@@ -67,7 +67,7 @@ export default class OAuthFlow {
             res.redirect(url);
         } catch (e) {
             console.log(e.message)
-            res.redirect("https://zloi.space?error=method_undefined1");
+            res.redirect("https://zloi.space?error=method_undefined");
         }
     }
 
