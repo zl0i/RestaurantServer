@@ -97,7 +97,7 @@ export default class OAuthFlow {
             user.birthday = info.birthday
             //TO DO if phone is undefined, than permission is guest and redirect to request phone page 
             await user.save()
-            await PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.client)
+            PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.client)
             console.log(user)
             switch (req.query['state']) {
                 case 'vk':
@@ -120,7 +120,7 @@ export default class OAuthFlow {
                     break;
             }
             const token = new Tokens()
-            token.id_user - user.id
+            token.id_user = user.id
             token.token = jwt.sign({ id_user: user.id }, secret_key)
             await token.save()
             PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
