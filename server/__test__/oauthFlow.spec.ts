@@ -1,9 +1,8 @@
 import app from "../server";
 import request from "supertest";
-import OAuthFlow from "../src/oauthFlow";
 import { Users } from "../entity/user";
 import PermissionsBuilder from "../lib/permissionsBuilder";
-import { vk_users } from "../entity/vk_users";
+import { oauth_users } from "../entity/oauth_users";
 import { Tokens } from "../entity/tokens";
 
 describe('/oauth', () => {
@@ -39,25 +38,24 @@ describe('/oauth/code', () => {
 
     test('right way', async () => {
 
-        OAuthFlow.requstInfoVk = jest.fn().mockReturnValue(Promise.resolve({}))
         Users.prototype.save = jest.fn().mockReturnValue(Promise.resolve())
         PermissionsBuilder.setUserRolePermissions = jest.fn().mockReturnValue(Promise.resolve())
         PermissionsBuilder.createTokenPermissionsByUser = jest.fn().mockReturnValue(Promise.resolve())
-        vk_users.insert = jest.fn().mockReturnValue(Promise.resolve())
+        oauth_users.findOne = jest.fn().mockResolvedValue(null)
+        oauth_users.insert = jest.fn().mockReturnValue(Promise.resolve())
         Tokens.prototype.save = jest.fn().mockReturnValue(Promise.resolve())
 
-
         const response = await request(app)
-            .get('/restaurant/api/oauth/code?code=1&state=vk')
+            .get('/restaurant/api/oauth/code?code=1&state=df')
 
         const url = new URL(response.headers.location)
         const params = new URLSearchParams(url.searchParams)
         expect(response.statusCode).toBe(302)
         expect(url.hostname).toBe('zloi.space')
         expect(params.get('token')).toBeTruthy()
-        expect(OAuthFlow.requstInfoVk).toBeCalledTimes(1)
         expect(Users.prototype.save).toBeCalledTimes(1)
-        expect(vk_users.insert).toBeCalledTimes(1)
+        expect(oauth_users.findOne).toBeCalledTimes(1)
+        expect(oauth_users.insert).toBeCalledTimes(1)
         expect(Tokens.prototype.save).toBeCalledTimes(1)
         expect(PermissionsBuilder.setUserRolePermissions).toBeCalledTimes(1)
         expect(PermissionsBuilder.createTokenPermissionsByUser).toBeCalledTimes(1)

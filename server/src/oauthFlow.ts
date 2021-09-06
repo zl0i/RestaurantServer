@@ -2,11 +2,10 @@ import express from 'express'
 import axios from 'axios';
 import qs from 'querystring';
 import jwt from 'jsonwebtoken';
-import { vk_users } from '../entity/vk_users';
-import { ya_users } from '../entity/ya_users';
 import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder';
 import { Users } from '../entity/user';
 import { Tokens } from '../entity/tokens';
+import { oauth_users } from '../entity/oauth_users';
 
 const google_client_id = "7891752"
 
@@ -82,40 +81,38 @@ export default class OAuthFlow {
                 case 'ya':
                     info = await OAuthFlow.requstInfoYandex(code)
                     break;
-                default:
+                case 'df':
+                    info = OAuthFlow.defaultInfo()
+                    break;
+                default:                    
                     res.redirect(`https://zloi.space?message=error`)
                     break;
             }
 
-            const user = new Users()
-            user.name = info.name;
-            user.lastname = info.lastname
-            user.phone = info.phone
-            user.verify_phone = true
-            user.birthday = info.birthday
-            //TO DO if phone is undefined, than permission is guest and redirect to request phone page 
-            await user.save()
-            PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.client)
-            switch (req.query['state']) {
-                case 'vk':
-                    await vk_users.insert({
-                        sid: info.id,
-                        id_user: user.id,
-                        login: info.login,
-                        refresh_token: info.refresh_token,
-                        access_token: info.access_token
-                    })
-                    break;
-                case 'ya':
-                    await ya_users.insert({
-                        sid: info.id,
-                        id_user: user.id,
-                        login: info.login,
-                        refresh_token: info.refresh_token,
-                        access_token: info.access_token
-                    })
-                    break;
+            //TO DO if phone is undefined, than permission is guest and redirect to request phone page
+            const oauth_user = await oauth_users.findOne({ oauth_id: info.id })
+            let user: Users
+            if (oauth_user) {
+                user = await Users.findOne({ id: oauth_user.id_user })
+            } else {
+                user = new Users()
+                user.name = info.name;
+                user.lastname = info.lastname
+                user.phone = info.phone
+                user.verify_phone = true
+                user.birthday = info.birthday
+                await user.save()
+                await PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.client)
+                await oauth_users.insert({
+                    oauth_id: info.id,
+                    id_user: user.id,
+                    login: info.login,
+                    refresh_token: info.refresh_token,
+                    access_token: info.access_token,
+                    service: req.query['state'] as string
+                })
             }
+
             const token = new Tokens()
             token.id_user = user.id
             token.token = jwt.sign({ id_user: user.id }, secret_key)
@@ -168,7 +165,6 @@ export default class OAuthFlow {
             client_id: ya_client_id,
             client_secret: ya_client_secret
         }));
-
         const info = await axios.get('https://login.yandex.ru/info', {
             headers: {
                 format: 'json',
@@ -176,8 +172,6 @@ export default class OAuthFlow {
                 Authorization: `OAuth ${token.data.access_token}`
             }
         });
-
-
         return {
             id: info.data.id,
             access_token: token.data.access_token,
@@ -190,6 +184,22 @@ export default class OAuthFlow {
             birthday: new Date(info.data.birthday),
             email: info.data.default_email,
             phone: info.data.phone
+        }
+    }
+
+    static defaultInfo(): IUserInfo {
+        return {
+            id: "694225478",
+            access_token: "example_access_token",
+            refresh_token: "example_refresh_token",
+            token_expired: -1,
+
+            login: 'example_login',
+            name: 'example_name',
+            lastname: 'example_lastname',
+            birthday: new Date(),
+            email: 'example@mail.com',
+            phone: '+79999999999'
         }
     }
 }
