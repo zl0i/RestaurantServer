@@ -97,8 +97,8 @@ export default class OAuthFlow {
             user.birthday = info.birthday
             //TO DO if phone is undefined, than permission is guest and redirect to request phone page 
             await user.save()
-            PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.client)
-
+            await PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.client)
+            console.log(user)
             switch (req.query['state']) {
                 case 'vk':
                     await vk_users.insert({
