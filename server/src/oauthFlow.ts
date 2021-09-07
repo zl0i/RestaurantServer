@@ -207,9 +207,11 @@ export default class OAuthFlow {
         console.log(token.status, token.data)
         const info = await axios.get('https://people.googleapis.com/v1/people/me', {
             headers: {
+                Authorization: `Bearer ${token.data.access_token}`
+            },
+            params: {
                 key: google_api_key,
                 personFields: 'birthdays,names,genders,emailAddresses,phoneNumbers',
-                Authorization: `Bearer ${token.data.access_token}`
             }
         });
         console.log(info.status, info.data)
