@@ -197,15 +197,13 @@ export default class OAuthFlow {
     }
 
     static async requstInfoGoogle(code: string): Promise<IUserInfo> {
-        const token = await axios.post('https://oauth2.googleapis.com/token', {
-            params: {
-                grant_type: 'authorization_code',
-                code: code,
-                client_id: google_client_id,
-                client_secret: google_client_secret,
-                redirect_uri: redirect_uri
-            }
-        });
+        const token = await axios.post('https://oauth2.googleapis.com/token', qs.stringify({
+            grant_type: 'authorization_code',
+            code: code,
+            client_id: google_client_id,
+            client_secret: google_client_secret,
+            redirect_uri: redirect_uri
+        }));
         console.log(token.status, token.data)
         const info = await axios.get('https://people.googleapis.com/v1/people/me', {
             headers: {
@@ -222,7 +220,7 @@ export default class OAuthFlow {
             refresh_token: token.data.refresh_token,
             token_expired: token.data.expires_in,
 
-            login: '', 
+            login: '',
             name: info.data.names[0].givenName,
             lastname: info.data.names[0].familyName,
             birthday: new Date(date.year, date.month, date.day),
