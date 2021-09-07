@@ -37,7 +37,6 @@ describe('/oauth', () => {
 describe('/oauth/code', () => {
 
     test('right way', async () => {
-
         Users.prototype.save = jest.fn().mockReturnValue(Promise.resolve())
         PermissionsBuilder.setUserRolePermissions = jest.fn().mockReturnValue(Promise.resolve())
         PermissionsBuilder.createTokenPermissionsByUser = jest.fn().mockReturnValue(Promise.resolve())
@@ -59,6 +58,5 @@ describe('/oauth/code', () => {
         expect(Tokens.prototype.save).toBeCalledTimes(1)
         expect(PermissionsBuilder.setUserRolePermissions).toBeCalledTimes(1)
         expect(PermissionsBuilder.createTokenPermissionsByUser).toBeCalledTimes(1)
-
     })
 })

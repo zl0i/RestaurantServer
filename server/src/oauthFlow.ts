@@ -7,10 +7,15 @@ import { Users } from '../entity/user';
 import { Tokens } from '../entity/tokens';
 import { oauth_users } from '../entity/oauth_users';
 
-const google_client_id = "7891752"
+const redirect_uri = "https://zloi.space/restaurant/api/oauth/code";
+const project_uri = "https://gossy.link"
+
+const google_client_id = "335026942851-6sueatn9m6hgdasg9tsm2djmq2k3fgl8.apps.googleusercontent.com"
+const google_client_secret = process.env['GOOGLE_CLIENT_SECRET'];
+const google_scopes = "https://www.googleapis.com/auth/profile.emails.read https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/user.birthday.read https://www.googleapis.com/auth/user.phonenumbers.read https://www.googleapis.com/auth/user.gender.read"
+const google_api_key = process.env["GOOGLE_API_KEY"]
 
 const vk_client_id = "7891752";
-const vk_redirect_uri = "https://zloi.space/restaurant/api/oauth/code";
 const vk_client_secret = process.env['VK_CLIENT_SECRET'];
 
 const ya_client_id = "e843c0ced9934cb3b39ee73ed8f1958a";
@@ -42,7 +47,7 @@ export default class OAuthFlow {
             const device: string = String(req.query['device'])
             switch (method) {
                 case "google":
-                    url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${google_client_id}&response_type=code&access_type=offline&scope=https://www.googleapis.com/auth/user.emails.read profile`
+                    url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${google_client_id}&response_type=code&access_type=offline&scope=${google_scopes}&state=go`
                     break;
                 case "vk":
                     url = `https://oauth.vk.com/authorize?client_id=${vk_client_id}&display=page&scope=offline&response_type=code&v=5.131&state=vk`
@@ -51,22 +56,22 @@ export default class OAuthFlow {
                     url = `https://oauth.yandex.ru/authorize?client_id=${ya_client_id}&response_type=code&state=ya`
                     break;
                 default: {
-                    res.redirect("https://zloi.space?error=method_undefined")
+                    res.redirect(`${project_uri}?error=method_undefined`)
                 }
             }
             switch (device) {
                 case "web":
-                    url = url + `&redirect_uri=${vk_redirect_uri}`
+                    url = url + `&redirect_uri=${redirect_uri}`
                     break;
                 default: {
-                    res.redirect("https://zloi.space?error=device_undefined")
+                    res.redirect(`${project_uri}?error=device_undefined`)
                     return;
                 }
             }
             res.redirect(url);
         } catch (e) {
             console.log(e.message)
-            res.redirect("https://zloi.space?error=method_undefined");
+            res.redirect(`${project_uri}?error=method_undefined`);
         }
     }
 
@@ -81,16 +86,19 @@ export default class OAuthFlow {
                 case 'ya':
                     info = await OAuthFlow.requstInfoYandex(code)
                     break;
+                case 'go':
+                    info = await OAuthFlow.requstInfoGoogle(code)
+                    break;
                 case 'df':
                     info = OAuthFlow.defaultInfo()
                     break;
-                default:                    
-                    res.redirect(`https://zloi.space?message=error`)
+                default:
+                    res.redirect(`${project_uri}?message=error`)
                     break;
             }
 
             //TO DO if phone is undefined, than permission is guest and redirect to request phone page
-            const oauth_user = await oauth_users.findOne({ oauth_id: info.id })
+            const oauth_user = await oauth_users.findOne({ oauth_id: info.id, service: req.query['state'] as string })
             let user: Users
             if (oauth_user) {
                 user = await Users.findOne({ id: oauth_user.id_user })
@@ -131,7 +139,7 @@ export default class OAuthFlow {
             params: {
                 client_id: vk_client_id,
                 client_secret: vk_client_secret,
-                redirect_uri: vk_redirect_uri,
+                redirect_uri: redirect_uri,
                 code: code
             }
         });
@@ -184,6 +192,39 @@ export default class OAuthFlow {
             birthday: new Date(info.data.birthday),
             email: info.data.default_email,
             phone: info.data.phone
+        }
+    }
+
+    static async requstInfoGoogle(code: string): Promise<IUserInfo> {
+        const token = await axios.post('https://oauth2.googleapis.com/token', {
+            params: {
+                grant_type: 'authorization_code',
+                code: code,
+                client_id: google_client_id,
+                client_secret: google_client_secret,
+                redirect_uri: redirect_uri
+            }
+        });
+        const info = await axios.get('https://people.googleapis.com/v1/people/me', {
+            headers: {
+                key: google_api_key,
+                personFields: 'birthdays,names,genders,emailAddresses,phoneNumbers',
+                Authorization: `Bearer ${token.data.access_token}`
+            }
+        });
+        const date = info.data.birthdays[0].date
+        return {
+            id: info.data.names[0].metadata.source.id,
+            access_token: token.data.access_token,
+            refresh_token: token.data.refresh_token,
+            token_expired: token.data.expires_in,
+
+            login: '', 
+            name: info.data.names[0].givenName,
+            lastname: info.data.names[0].familyName,
+            birthday: new Date(date.year, date.month, date.day),
+            email: info.data.emailAddresses[0].value,
+            phone: ''
         }
     }
 
