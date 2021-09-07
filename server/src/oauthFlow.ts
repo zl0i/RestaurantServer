@@ -88,7 +88,6 @@ export default class OAuthFlow {
                     break;
                 case 'go':
                     info = await OAuthFlow.requstInfoGoogle(code)
-                    console.log(info)
                     break;
                 case 'df':
                     info = OAuthFlow.defaultInfo()
@@ -130,7 +129,7 @@ export default class OAuthFlow {
 
             res.redirect(`https://gossy.link?token=${token.token}`)
         } catch (error) {
-            console.log(error)
+            console.log(error.message)
             res.status(500).end();
         }
     }
@@ -204,7 +203,6 @@ export default class OAuthFlow {
             client_secret: google_client_secret,
             redirect_uri: redirect_uri
         }));
-        console.log(token.status, token.data)
         const info = await axios.get('https://people.googleapis.com/v1/people/me', {
             headers: {
                 Authorization: `Bearer ${token.data.access_token}`
@@ -214,7 +212,6 @@ export default class OAuthFlow {
                 personFields: 'birthdays,names,genders,emailAddresses,phoneNumbers',
             }
         });
-        console.log(info.status, info.data)
         const date = info.data.birthdays[0].date
         return {
             id: info.data.names[0].metadata.source.id,
