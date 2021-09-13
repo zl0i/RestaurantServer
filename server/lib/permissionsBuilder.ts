@@ -1,6 +1,7 @@
 import { user_permissions } from "../entity/user_permissions"
 import { token_permissions } from '../entity/token_permissions';
 import { Tokens } from "../entity/tokens";
+import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 
 export enum UserRoles {
     guest,
@@ -21,62 +22,85 @@ export default class PermissionsBuilder {
 
     static async setUserRolePermissions(id_user: number, role: UserRoles, scope?: IScope) { //TO DO if roles are issued than do nothing
         await user_permissions.delete({ id_user: id_user })
+        let stringScope = ''
 
         if (scope) {
             const resource = Object.keys(scope)[0]
-            const stringScope = `${resource}[${scope[resource].join(',')}]`
-            console.log(stringScope)
+            stringScope = `${resource}[${scope[resource].join(',')}]`
         }
 
+        await user_permissions.delete({ id_user: id_user })
+
+        let permission: any = {};
+
         switch (role) {
-            case UserRoles.guest:
-                await user_permissions.insert([
-                    { id_user: id_user, resource: 'users', action: 'get', scope: 'me' },
-                    { id_user: id_user, resource: 'points', action: 'get' },
-                    { id_user: id_user, resource: 'menu', action: 'get' },
-                ])
-                break;
-            case UserRoles.client:
-                await user_permissions.insert([
-                    { id_user: id_user, resource: 'orders', action: 'create' },
-                    { id_user: id_user, resource: 'orders', action: 'get', scope: 'me' },
-                    { id_user: id_user, resource: 'orders', action: 'update', scope: 'me' },
-                    { id_user: id_user, resource: 'orders', action: 'delete', scope: 'me' },
-                ])
+            case UserRoles.admin:
+                permission.users = {
+                    'create': { scope: "" },
+                    'read': { scope: "" },
+                    'update': { scope: "" },
+                    'delete': { scope: "" }
+                }
+                permission.orders = {
+                    'create': { scope: "" },
+                    'read': { scope: "" },
+                    'update': { scope: "" },
+                    'delete': { scope: "" }
+                }
+                permission.points = {
+                    'create': { scope: "" },
+                    'read': { scope: "" },
+                    'update': { scope: "" },
+                    'delete': { scope: "" }
+                }
+                permission.menu = {
+                    'create': { scope: "" },
+                    'read': { scope: "" },
+                    'update': { scope: "" },
+                    'delete': { scope: "" }
+                }
                 break;
             case UserRoles.point_admin:
-                await user_permissions.insert([
-                    { id_user: id_user, resource: 'users', action: 'get', scope: 'points[1]' },
-                    { id_user: id_user, resource: 'orders', action: 'create' },
-                    { id_user: id_user, resource: 'orders', action: 'get' },
-                    { id_user: id_user, resource: 'orders', action: 'update' },
-                    { id_user: id_user, resource: 'orders', action: 'delete' },
-                    { id_user: id_user, resource: 'points', action: 'get' },
-                    { id_user: id_user, resource: 'points', action: 'update' },
-                    { id_user: id_user, resource: 'menu', action: 'create' },
-                    { id_user: id_user, resource: 'menu', action: 'updates' },
-                    { id_user: id_user, resource: 'menu', action: 'get' },
-                    { id_user: id_user, resource: 'menu', action: 'delete' },
-                ])
+                permission.orders = {
+                    'create': { scope: stringScope },
+                    'read': { scope: stringScope },
+                    'update': { scope: stringScope },
+                    'delete': { scope: stringScope }
+                }
+                permission.points = {
+                    'read': { scope: stringScope },
+                    'update': { scope: stringScope }
+                }
+                permission.menu = {
+                    'create': { scope: stringScope },
+                    'read': { scope: stringScope },
+                    'update': { scope: stringScope },
+                    'delete': { scope: stringScope }
+                }
                 break;
-            case UserRoles.admin:
-                await user_permissions.insert([
-                    { id_user: id_user, resource: 'users', action: 'create' },
-                    { id_user: id_user, resource: 'users', action: 'get' },
-                    { id_user: id_user, resource: 'users', action: 'delete' },
-                    { id_user: id_user, resource: 'orders', action: 'create' },
-                    { id_user: id_user, resource: 'orders', action: 'get' },
-                    { id_user: id_user, resource: 'orders', action: 'update' },
-                    { id_user: id_user, resource: 'orders', action: 'delete' },
-                    { id_user: id_user, resource: 'points', action: 'get' },
-                    { id_user: id_user, resource: 'points', action: 'update' },
-                    { id_user: id_user, resource: 'menu', action: 'create' },
-                    { id_user: id_user, resource: 'menu', action: 'update' },
-                    { id_user: id_user, resource: 'menu', action: 'get' },
-                    { id_user: id_user, resource: 'menu', action: 'delete' },
-                ])
-                break;
+            case UserRoles.client:
+                permission.orders = {
+                    'create': { scope: "" },
+                    'read': { scope: 'own' },
+                }
+                permission.users = {
+                    'read': { scope: "own" }
+                }
+            case UserRoles.guest:
+                permission.points = {
+                    'read': { scope: '' }
+                }
+                permission.menu = {
+                    'read': { scope: '' }
+                }
         }
+
+        const user_permission = Object.keys(permission).map((resource: any) => {
+            return Object.keys(permission[resource]).map((action: any) => {
+                return { id_user: id_user, resource, action, scope: permission[resource][action].scope }
+            })
+        })
+        await user_permissions.insert(user_permission.flat() as QueryDeepPartialEntity<user_permissions>[])
     }
 
     static async createCustomPermissionsUser(id_user: number, permissions: user_permissions[]) {

@@ -9,7 +9,7 @@ import { In } from 'typeorm';
 
 const router = express.Router();
 
-router.get('/', [scopeValidator('orders:get'), cache(60)], async (req: express.Request, res: express.Response) => {
+router.get('/', [scopeValidator('orders:read'), cache(60)], async (req: express.Request, res: express.Response) => {
   try {
     const condition: object = {}
     if (req.context?.condition.value.length > 0) {

@@ -4,7 +4,8 @@
          "es5",
          "es6",
          "dom",
-         "ES2018"
+         "ES2018",
+         "ES2019"
       ],
       "esModuleInterop": true,
       "target": "es6",

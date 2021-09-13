@@ -57,8 +57,8 @@ export default class ScopeBuilder {
 
     build(): ICondition {
         switch (this._scope) {
-            case 'me':
-                return this._scopeClass.me()
+            case 'own':
+                return this._scopeClass.own()
             case 'points':
                 return this._scopeClass.points(this._params)
             default:

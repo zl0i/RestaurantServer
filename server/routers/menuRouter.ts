@@ -9,7 +9,7 @@ import { UploadedFile } from 'express-fileupload';
 
 const router = express.Router();
 
-router.get('/', [scopeValidator('menu:get'), cache(1800)], async (req: express.Request, res: express.Response) => {
+router.get('/', [scopeValidator('menu:read'), cache(1800)], async (req: express.Request, res: express.Response) => {
     try {
         if (req.query.id_point) {
             const menu = await Menu.find({ id_point: Number(req.query.id_point), status: MenuStatus.active })

@@ -6,7 +6,7 @@ export default class UserScope extends BasicScope {
         super(user)
     }
 
-    me(): ICondition {
+    own(): ICondition {
         return { key: 'id', value: [this._user.id] }
     }
 

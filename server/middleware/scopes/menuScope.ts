@@ -6,7 +6,7 @@ export default class MenuScope extends BasicScope {
         super(user)
     }
 
-    me(): ICondition {
+    own(): ICondition {
         return { key: '', value: [] }
     }
 

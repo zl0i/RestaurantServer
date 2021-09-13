@@ -34,7 +34,7 @@ export default function check(atribute: string) {
 
             req.context = {
                 permission: `${resource}:${action}:${permissions.scope}`,
-                isOwn: permissions.scope === 'me',
+                isOwn: permissions.scope === 'own',
                 user: user
             }
 

@@ -12,6 +12,6 @@ export default abstract class BasicScope {
 
     protected _user: Users
 
-    abstract me(): ICondition
+    abstract own(): ICondition
     abstract points(ids: Array<number>): ICondition
 }
