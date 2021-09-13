@@ -2,6 +2,7 @@ import express from 'express'
 import { Tokens } from '../entity/tokens'
 import { token_permissions } from '../entity/token_permissions'
 import { Users } from '../entity/user'
+import { getCache, setCache } from './cacheMiddleware'
 import { ICondition } from './scopes/basicScope'
 import ScopeBuilder from './scopes/ScopeBuilder'
 
@@ -25,20 +26,37 @@ export default function check(atribute: string) {
             if (!token)
                 return res.status(401).json({ message: "Token not found" })
 
-            const user = await Users.findOne({ id: token?.id_user })
-            if (!user)
-                return res.status(401).json({ message: "User not found" })
-
+            const key_cache = `permissions_token_${token.token}`
+            let data_cache = await getCache(key_cache)
             const [resource, action] = atribute.split(":")
-            const permissions = await token_permissions.findOne({ resource: resource, action: action, id_token: token?.id })
+            let user: Users, permissions: token_permissions;
 
-            req.context = {
-                permission: `${resource}:${action}:${permissions.scope}`,
-                isOwn: permissions.scope === 'own',
-                user: user
+            if (data_cache) {
+                data_cache = (JSON.parse(data_cache))
+                permissions = Array<token_permissions>(...data_cache.permissions).find((value) => {
+                    if (value.resource == resource && value.action == action)
+                        return true
+                })
+                user = data_cache.user
+            } else {
+                user = await Users.findOne({ id: token?.id_user })
+                if (!user)
+                    return res.status(401).json({ message: "User not found" })
+
+                permissions = await token_permissions.findOne({ resource: resource, action: action, id_token: token?.id })
+
+                await setCache(key_cache, JSON.stringify({
+                    user: user,
+                    permissions: await token_permissions.find({ id_token: token?.id })
+                }), 1800)
             }
 
             if (permissions) {
+                req.context = {
+                    permission: `${resource}:${action}:${permissions.scope}`,
+                    isOwn: permissions.scope === 'own',
+                    user: user
+                }
 
                 req.context.condition = new ScopeBuilder()
                     .resource(resource || '')
@@ -57,4 +75,3 @@ export default function check(atribute: string) {
         }
     }
 }
-
