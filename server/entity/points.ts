@@ -23,4 +23,7 @@ export default class Points extends BaseEntity {
 
     @Column({default: false})
     is_delivering: boolean
+
+    @Column({default: ""})
+    icon: string
 }
