@@ -1,6 +1,7 @@
 import express from 'express'
 import fileUpload from 'express-fileupload';
 import * as Minio from 'minio'
+import { UploadedFile } from 'express-fileupload';
 
 var minioClient = new Minio.Client({
     endPoint: 'minio',
@@ -73,6 +74,20 @@ export default class ObjectStorage {
                 resolve(fileName)
             })
         })
+    }
+
+    static putImage(req: express.Request, res: express.Response): void {
+        const fileName: string = String(req.params.file)
+        const file = req.files.icon as UploadedFile
+        minioClient.putObject('restaurant', fileName, file.data, function (err, _objInfo) {
+            if (err)
+                res.status(500).end()
+
+            res.json({
+                result: 'ok'
+            })
+        })
+
     }
 
     static deleteImage(filename: string): Promise<boolean | Error> {
