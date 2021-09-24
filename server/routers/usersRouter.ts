@@ -36,6 +36,27 @@ router.get('/', [scopeValidator('users:read'), cache(600)], async (req: express.
   }
 });
 
+
+router.get('/profile', [scopeValidator('users:read'), cache(600)], async (req: express.Request, res: express.Response) => {
+  try {
+
+    const user: any = await Users.findOne({ id: req.context.user.id })
+
+    delete user.sms_code
+    delete user.sms_code_expired_at
+    delete user.password
+    const permissions = await user_permissions.find({ id_user: user.id })
+    user.permissions = new Array()
+    for (const perm of permissions) {
+      user.permissions.push(`${perm.resource}:${perm.action}:${perm.scope}`)
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    console.log(error)
+    res.status(500).end();
+  }
+});
+
 router.post('/', [body({ login: String, password: String }), scopeValidator('users:create')], async (req: express.Request, res: express.Response) => {
   try {
     const user = new Users()
