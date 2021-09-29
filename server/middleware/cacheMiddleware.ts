@@ -41,7 +41,7 @@ export function cache(seconds: number) {
             return next()
 
         res.set('Cache-Control', `private, max-age=${seconds}`);
-        const key: string = (req.context?.permission || req.baseUrl + req.url)
+        const key: string = (req.context?.permission + ':' + req.baseUrl + req.url)
 
         client.get(key, (_err: Error, value: string) => {
             if (value != null) {

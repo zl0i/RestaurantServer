@@ -1,11 +1,11 @@
 import express from 'express';
-import Orders from '../entity/orders';
 import scopeValidator from '../middleware/scopeVaildator'
 import { body } from '../middleware/schemaChecker';
 import YokassaAPI from '../src/yokassaAPI';
 import OrderBuilder from '../src/orderBuilder';
 import { cache } from '../middleware/cacheMiddleware';
 import { In } from 'typeorm';
+import DataProvider from '../lib/DataProvider';
 
 const router = express.Router();
 
@@ -15,7 +15,8 @@ router.get('/', [scopeValidator('orders:read'), cache(60)], async (req: express.
     if (req.context?.condition.value.length > 0) {
       condition[req.context?.condition?.key] = In(req.context?.condition.value)
     }
-    res.json(await Orders.find(condition));
+    const provider = new DataProvider('Orders')
+    await provider.index(req, res, condition)
   } catch (e) {
     res.status(500).json({ result: 'error' });
   }

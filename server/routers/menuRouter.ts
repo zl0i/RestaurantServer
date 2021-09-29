@@ -6,18 +6,14 @@ import MenuCategory from '../entity/menu_category';
 import { cache } from '../middleware/cacheMiddleware';
 import ObjectStorage from '../src/storage'
 import { UploadedFile } from 'express-fileupload';
+import DataProvider from '../lib/DataProvider';
 
 const router = express.Router();
 
 router.get('/', [scopeValidator('menu:read'), cache(1800)], async (req: express.Request, res: express.Response) => {
     try {
-        if (req.query.id_point) {
-            const menu = await Menu.find({ id_point: Number(req.query.id_point), status: MenuStatus.active })
-            res.json(menu)
-        } else {
-            const menu = await Menu.find({ status: MenuStatus.active })
-            res.json(menu)
-        }
+        const provider = new DataProvider('Menu')
+        await provider.index(req, res, { status: MenuStatus.active })
     } catch (e) {
         console.log(e)
         res.status(500).json({
