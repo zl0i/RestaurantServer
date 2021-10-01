@@ -2,6 +2,7 @@ import { Users } from "../../entity/user"
 import BasicScope, { ICondition } from "./basicScope"
 import MenuScope from "./menuScope"
 import OrderScope from "./orderScope"
+import PointScope from "./pointScope"
 import UserScope from "./userScope"
 
 
@@ -48,6 +49,9 @@ export default class ScopeBuilder {
                 break;
             case 'menu':
                 this._scopeClass = new MenuScope(this._user)
+                break;
+            case 'points':
+                this._scopeClass = new PointScope(this._user)
                 break;
             default:
                 throw new Error('ScopeBuilder: undefined resource ' + this._resource)
