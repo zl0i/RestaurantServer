@@ -62,16 +62,9 @@ router.post('/',
 router.patch('/:id', [scopeValidator('menu:update')], async (req: express.Request, res: express.Response) => {
     try {
         const item = await Menu.findOne({ id: Number(req.params.id) })
-        if (!!req.files?.icon) {
-            const file = req.files.icon as UploadedFile
-            item.icon = await ObjectStorage.replaceImage(item.icon, file, item.id) as string
-        }
-        if (req.body.name) {
-            item.name = req.body.name
-        }
-        if (req.body.cost) {
-            item.cost = Number(req.body.cost)
-        }
+        item.name = req.body.name || item.name
+        item.cost = Number(req.body.cost) || item.cost
+        item.description = req.body.description || item.description
         if (req.body.id_category) {
             const category = await MenuCategory.findOne({ id: req.body.id_category })
             if (category) {
@@ -83,8 +76,9 @@ router.patch('/:id', [scopeValidator('menu:update')], async (req: express.Reques
                 })
             }
         }
-        if (req.body.description) {
-            item.description = req.body.description
+        if (!!req.files?.icon) {
+            const file = req.files.icon as UploadedFile
+            item.icon = await ObjectStorage.replaceImage(item.icon, file, item.id) as string
         }
         await item.save()
         res.json(item)

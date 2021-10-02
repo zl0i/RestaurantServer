@@ -27,8 +27,8 @@ services:
       - MINIO_SECRET_KEY=${STORAGE_PASSWORD}
     networks:
       - backend
-    expose:
-      - 9000
+    ports:
+      - '9000:9000'
 
   redis:
     image: redis:6.2.5-alpine

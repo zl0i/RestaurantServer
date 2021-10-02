@@ -55,16 +55,12 @@ router.patch('/:id',
     ],
     async (req: express.Request, res: express.Response) => {
         try {
-            const category = await MenuCategory.findOne({ id: Number(req.params.id) })
+            const category = await MenuCategory.findOne({ id: Number(req.params.id) }) 
+            category.name = req.body.name || category.name
+            category.description = req.body.description || category.description
             if (!!req.files?.icon) {
                 const file = req.files.icon as UploadedFile
                 category.icon = await ObjectStorage.replaceImage(category.icon, file, category.id) as string
-            }
-            if (req.body.name) {
-                category.name = req.body.name
-            }
-            if (req.body.description) {
-                category.description = req.body.description
             }
             await category.save()
             res.json(category)

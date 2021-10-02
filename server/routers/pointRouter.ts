@@ -28,7 +28,6 @@ router.post('/',
   ],
   async (req: express.Request, res: express.Response) => {
     try {
-      console.log(req.body.is_delivering == 'true')
       const point = new Points()
       point.name = req.body.name
       point.address = req.body.address
