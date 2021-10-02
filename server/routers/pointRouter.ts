@@ -9,7 +9,7 @@ import ObjectStorage from '../src/storage';
 
 const router = express.Router();
 
-router.get('/', [cache(1800)], async (req: express.Request, res: express.Response) => {
+router.get('/', [cache(180)], async (req: express.Request, res: express.Response) => {
   try {
     const provide = new DataProvider('Points')
     await provide.index(req, res, {})

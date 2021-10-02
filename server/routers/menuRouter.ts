@@ -10,7 +10,7 @@ import DataProvider from '../lib/DataProvider';
 
 const router = express.Router();
 
-router.get('/', [scopeValidator('menu:read'), cache(1800)], async (req: express.Request, res: express.Response) => {
+router.get('/', [cache(180)], async (req: express.Request, res: express.Response) => {
     try {
         const provider = new DataProvider('Menu')
         await provider.index(req, res, { status: MenuStatus.active })
