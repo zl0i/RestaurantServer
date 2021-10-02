@@ -80,7 +80,30 @@ router.post('/',
     }
   });
 
+router.patch('/:id',
+  [scopeValidator(Resources.users, Actions.update)],
+  async (req: express.Request, res: express.Response) => {
+    try {
+      if (req.context.condition.value.includes(Number(req.params.id))) {
+        const user = await Users.findOne({ id: Number(req.params.id) })
+        user.name = req.body.name || user.name
+        user.lastname = req.body.lastname || user.lastname
+        user.login = req.body.login || user.login
+        user.age = Number(req.body.age) || user.age
+        user.birthday = new Date(req.body.birthday) || user.birthday
+        await user.save()
+        user.clear()
+        res.status(200).json(user);
+      } else {
+        res.status(403).json({
+          result: 'error'
+        });
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(500).end();
     }
+  });
 
 router.delete('/:id',
   [
