@@ -20,12 +20,10 @@ router.get('/', [scopeValidator(Resources.users, Actions.read), cache(600)], asy
       condition[req.context?.condition?.key] = In(req.context?.condition.value)
     }
     const users: any = await Users.find(condition)
-    for (const user of users) {
-      delete user.sms_code
-      delete user.sms_code_expired_at
-      delete user.password
+    for (const user of users) {      
       const permissions = await user_permissions.find({ id_user: user.id })
       user.permissions = new Array()
+      user.removePrivateData()
       for (const perm of permissions) {
         user.permissions.push(`${perm.resource}:${perm.action}:${perm.scope}`)
       }
@@ -41,16 +39,13 @@ router.get('/', [scopeValidator(Resources.users, Actions.read), cache(600)], asy
 router.get('/profile', [scopeValidator(Resources.users, Actions.read), cache(600)], async (req: express.Request, res: express.Response) => {
   try {
 
-    const user: any = await Users.findOne({ id: req.context.user.id })
-
-    delete user.sms_code
-    delete user.sms_code_expired_at
-    delete user.password
+    const user: any = await Users.findOne({ id: req.context.user.id })    
     const permissions = await user_permissions.find({ id_user: user.id })
     user.permissions = new Array()
     for (const perm of permissions) {
       user.permissions.push(`${perm.resource}:${perm.action}:${perm.scope}`)
     }
+    user.removePrivateData()
     res.status(200).json(user);
   } catch (error) {
     console.log(error)
@@ -92,7 +87,7 @@ router.patch('/:id',
         user.age = Number(req.body.age) || user.age
         user.birthday = new Date(req.body.birthday) || user.birthday
         await user.save()
-        user.clear()
+        user.removePrivateData()
         res.status(200).json(user);
       } else {
         res.status(403).json({
