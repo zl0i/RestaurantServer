@@ -9,10 +9,11 @@ import { In } from 'typeorm';
 import { Tokens } from '../entity/tokens';
 import { token_permissions } from '../entity/token_permissions';
 import { user_permissions } from '../entity/user_permissions';
+import { Actions, Resources } from '../lib/permissions';
 
 const router = express.Router();
 
-router.get('/', [scopeValidator('users:read'), cache(600)], async (req: express.Request, res: express.Response) => {
+router.get('/', [scopeValidator(Resources.users, Actions.read), cache(600)], async (req: express.Request, res: express.Response) => {
   try {
     const condition: object = {}
     if (req.context?.condition.value.length > 0) {
@@ -37,7 +38,7 @@ router.get('/', [scopeValidator('users:read'), cache(600)], async (req: express.
 });
 
 
-router.get('/profile', [scopeValidator('users:read'), cache(600)], async (req: express.Request, res: express.Response) => {
+router.get('/profile', [scopeValidator(Resources.users, Actions.read), cache(600)], async (req: express.Request, res: express.Response) => {
   try {
 
     const user: any = await Users.findOne({ id: req.context.user.id })
@@ -57,46 +58,57 @@ router.get('/profile', [scopeValidator('users:read'), cache(600)], async (req: e
   }
 });
 
-router.post('/', [body({ login: String, password: String }), scopeValidator('users:create')], async (req: express.Request, res: express.Response) => {
-  try {
-    const user = new Users()
-    user.login = req.body.login
-    user.password = bcrypt.hashSync(req.body.password, 5)
-    await user.save()
-    PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.admin)
+router.post('/',
+  [
+    body({ login: String, password: String }),
+    scopeValidator(Resources.users, Actions.create)
+  ],
+  async (req: express.Request, res: express.Response) => {
+    try {
+      const user = new Users()
+      user.login = req.body.login
+      user.password = bcrypt.hashSync(req.body.password, 5)
+      await user.save()
+      PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.admin)
 
-    res.status(200).json({
-      result: "ok"
-    });
-  } catch (error) {
-    console.log(error)
-    res.status(500).end();
-  }
-});
-
-router.delete('/:id', [scopeValidator('users:delete')], async (req: express.Request, res: express.Response) => {
-  try {
-    const user_id: number = Number(req.params.id)
-    const user = await Users.findOne({ id: user_id })
-    if (user) {
-      await user.remove()
-      await user_permissions.delete({ id_user: user_id })
-      const token = await Tokens.findOne({ id_user: user_id })
-      await token_permissions.delete({ id_token: token.id })
-      await token.remove()
-      res.json({
-        result: 'ok'
-      })
-    } else {
-      res.status(400).json({
-        result: 'error',
-        message: 'User not found'
-      })
+      res.status(200).json({
+        result: "ok"
+      });
+    } catch (error) {
+      console.log(error)
+      res.status(500).end();
     }
-  } catch (error) {
-    console.log(error)
-    res.status(500).end();
-  }
-})
+  });
+
+    }
+
+router.delete('/:id',
+  [
+    scopeValidator(Resources.users, Actions.delete)
+  ],
+  async (req: express.Request, res: express.Response) => {
+    try {
+      const user_id: number = Number(req.params.id)
+      const user = await Users.findOne({ id: user_id })
+      if (user) {
+        await user.remove()
+        await user_permissions.delete({ id_user: user_id })
+        const token = await Tokens.findOne({ id_user: user_id })
+        await token_permissions.delete({ id_token: token.id })
+        await token.remove()
+        res.json({
+          result: 'ok'
+        })
+      } else {
+        res.status(400).json({
+          result: 'error',
+          message: 'User not found'
+        })
+      }
+    } catch (error) {
+      console.log(error)
+      res.status(500).end();
+    }
+  })
 
 export default router

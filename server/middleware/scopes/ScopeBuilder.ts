@@ -1,4 +1,5 @@
 import { Users } from "../../entity/user"
+import { Resources, Scope } from "../../lib/permissions"
 import BasicScope, { ICondition } from "./basicScope"
 import MenuScope from "./menuScope"
 import OrderScope from "./orderScope"
@@ -6,7 +7,7 @@ import PointScope from "./pointScope"
 import UserScope from "./userScope"
 
 
-interface Scope {
+interface IScope {
     object: string,
     params: Array<any>
 }
@@ -14,15 +15,14 @@ interface Scope {
 export default class ScopeBuilder {
 
     private _user: Users
-    private _resource: string
+    private _resource: Resources
     private _scopeClass: BasicScope
-    private _scope: string
+    private _scope: Scope
     private _params: Array<number>
 
-    constructor() {
-    }
+    constructor() { }
 
-    resource(rs: string): ScopeBuilder {
+    resource(rs: Resources): ScopeBuilder {
         this._resource = rs
         return this
     }
@@ -34,23 +34,23 @@ export default class ScopeBuilder {
 
     scope(scope: string): ScopeBuilder {
         const obj = ScopeBuilder.parseScope(scope)
-        this._scope = obj.object
+        this._scope = obj.object as Scope //TO DO 
         this._params = obj.params
         return this
     }
 
     init(): ScopeBuilder {
-        switch (this._resource) { //TO DO create enum
-            case 'orders':
+        switch (this._resource) {
+            case Resources.orders:
                 this._scopeClass = new OrderScope(this._user)
                 break;
-            case 'users':
+            case Resources.users:
                 this._scopeClass = new UserScope(this._user)
                 break;
-            case 'menu':
+            case Resources.menu:
                 this._scopeClass = new MenuScope(this._user)
                 break;
-            case 'points':
+            case Resources.points:
                 this._scopeClass = new PointScope(this._user)
                 break;
             default:
@@ -61,17 +61,17 @@ export default class ScopeBuilder {
 
     build(): ICondition {
         switch (this._scope) {
-            case 'own':
+            case Scope.own:
                 return this._scopeClass.own()
-            case 'points':
+            case Scope.points:
                 return this._scopeClass.points(this._params)
             default:
-                return { key: '', value: [] }
+                throw new Error('ScopeBuilder: undefined scope ' + this._scope)
         }
     }
 
 
-    static parseScope(scope: string): Scope {
+    static parseScope(scope: string): IScope {
         let start = scope.indexOf('[')
         let end = scope.indexOf(']')
 

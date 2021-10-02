@@ -2,6 +2,7 @@ import express from 'express';
 import { UploadedFile } from 'express-fileupload';
 import Points from '../entity/points';
 import DataProvider from '../lib/DataProvider';
+import { Actions, Resources } from '../lib/permissions';
 import { cache } from '../middleware/cacheMiddleware'
 import { body } from '../middleware/schemaChecker';
 import scopeValidator from '../middleware/scopeVaildator'
@@ -23,7 +24,7 @@ router.get('/', [cache(180)], async (req: express.Request, res: express.Response
 
 router.post('/',
   [
-    scopeValidator('points:create'),
+    scopeValidator(Resources.points, Actions.create),
     body({ name: String, address: String, is_delivering: String })
   ],
   async (req: express.Request, res: express.Response) => {
@@ -50,7 +51,7 @@ router.post('/',
     }
   });
 
-router.patch('/:id', [scopeValidator('points:update')],
+router.patch('/:id', [scopeValidator(Resources.points, Actions.update)],
   async (req: express.Request, res: express.Response) => {
     try {
       const point = await Points.findOne({ id: Number(req.params.id) })
@@ -75,7 +76,7 @@ router.patch('/:id', [scopeValidator('points:update')],
   });
 
 router.delete('/:id',
-  [scopeValidator('points:delete')],
+  [scopeValidator(Resources.points, Actions.delete)],
   async (req: express.Request, res: express.Response) => {
     try {
       const point = await Points.findOne({ id: Number(req.params.id) })

@@ -6,25 +6,30 @@ import OrderBuilder from '../src/orderBuilder';
 import { cache } from '../middleware/cacheMiddleware';
 import { In } from 'typeorm';
 import DataProvider from '../lib/DataProvider';
+import { Actions, Resources } from '../lib/permissions';
 
 const router = express.Router();
 
-router.get('/', [scopeValidator('orders:read'), cache(60)], async (req: express.Request, res: express.Response) => {
-  try {
-    const condition: object = {}
-    if (req.context?.condition.value.length > 0) {
-      condition[req.context?.condition?.key] = In(req.context?.condition.value)
+router.get('/',
+  [
+    scopeValidator(Resources.orders, Actions.read), cache(60)
+  ],
+  async (req: express.Request, res: express.Response) => {
+    try {
+      const condition: object = {}
+      if (req.context?.condition.value.length > 0) {
+        condition[req.context?.condition?.key] = In(req.context?.condition.value)
+      }
+      const provider = new DataProvider('Orders')
+      await provider.index(req, res, condition)
+    } catch (e) {
+      res.status(500).json({ result: 'error' });
     }
-    const provider = new DataProvider('Orders')
-    await provider.index(req, res, condition)
-  } catch (e) {
-    res.status(500).json({ result: 'error' });
-  }
-});
+  });
 
 router.post(
   '/',
-  [body({ id_point: Number, menu: Array }), scopeValidator('orders:create')],
+  [body({ id_point: Number, menu: Array }), scopeValidator(Resources.orders, Actions.create)],
   async (req: express.Request, res: express.Response) => {
     try {
       const order = await new OrderBuilder(req.context.user, req.body.menu, req.body.id_point)

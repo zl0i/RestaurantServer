@@ -35,4 +35,11 @@ export class Users extends BaseEntity {
 
     @Column({default: null})
     sms_code_expired_at: Date;
+
+    clear() {
+        delete this.password
+        delete this.sms_code
+        delete this.sms_code_expired_at
+        return this
+    }
 }

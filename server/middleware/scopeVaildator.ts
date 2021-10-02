@@ -2,6 +2,7 @@ import express from 'express'
 import { Tokens } from '../entity/tokens'
 import { token_permissions } from '../entity/token_permissions'
 import { Users } from '../entity/user'
+import { Actions, Resources, Scope } from '../lib/permissions'
 import { getCache, setCache } from './cacheMiddleware'
 import { ICondition } from './scopes/basicScope'
 import ScopeBuilder from './scopes/ScopeBuilder'
@@ -19,7 +20,7 @@ declare global {
     }
 }
 
-export default function check(atribute: string) {
+export default function check(resource: Resources, action: Actions) {
     return async (req: express.Request, res: express.Response, next: Function) => {
         try {
             const token = await Tokens.findOne({ token: req.headers.authorization?.split(" ")[1] })
@@ -28,7 +29,6 @@ export default function check(atribute: string) {
 
             const key_cache = `permissions_token_${token.token}`
             let data_cache = await getCache(key_cache)
-            const [resource, action] = atribute.split(":")
             let user: Users, permissions: token_permissions;
 
             if (data_cache) {
@@ -45,7 +45,7 @@ export default function check(atribute: string) {
 
                 permissions = await token_permissions.findOne({ resource: resource, action: action, id_token: token?.id })
 
-                await setCache(key_cache, JSON.stringify({
+                setCache(key_cache, JSON.stringify({
                     user: user,
                     permissions: await token_permissions.find({ id_token: token?.id })
                 }), 1800)
@@ -54,13 +54,13 @@ export default function check(atribute: string) {
             if (permissions) {
                 req.context = {
                     permission: `${resource}:${action}:${permissions.scope}`,
-                    isOwn: permissions.scope === 'own',
+                    isOwn: permissions.scope === Scope.own,
                     user: user
                 }
 
                 req.context.condition = new ScopeBuilder()
-                    .resource(resource || '')
-                    .user(user || new Users())
+                    .resource(resource)
+                    .user(user)
                     .scope(permissions.scope)
                     .init()
                     .build()

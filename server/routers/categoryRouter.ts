@@ -7,25 +7,28 @@ import { cache } from '../middleware/cacheMiddleware';
 import ObjectStorage from '../src/storage'
 import { UploadedFile } from 'express-fileupload';
 import DataProvider from '../lib/DataProvider';
+import { Actions, Resources } from '../lib/permissions';
 
 const router = express.Router();
 
-router.get('/', [scopeValidator('menu:read'), cache(600)], async (req: express.Request, res: express.Response) => {
-    try {
-        const provider = new DataProvider('MenuCategory')
-        await provider.index(req, res)
-    } catch (e) {
-        console.log(e)
-        res.status(500).json({
-            message: e.message
-        })
-    }
-});
+router.get('/',
+    [scopeValidator(Resources.menu, Actions.read), cache(600)],
+    async (req: express.Request, res: express.Response) => {
+        try {
+            const provider = new DataProvider('MenuCategory')
+            await provider.index(req, res)
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({
+                message: e.message
+            })
+        }
+    });
 
 router.post('/',
     [
         body({ name: String, description: String, id_point: String }),
-        scopeValidator('menu:create')
+        scopeValidator(Resources.menu, Actions.create)
     ],
     async (req: express.Request, res: express.Response) => {
         try {
@@ -50,12 +53,10 @@ router.post('/',
 )
 
 router.patch('/:id',
-    [
-        scopeValidator('menu:update')
-    ],
+    [scopeValidator(Resources.menu, Actions.update)],
     async (req: express.Request, res: express.Response) => {
         try {
-            const category = await MenuCategory.findOne({ id: Number(req.params.id) }) 
+            const category = await MenuCategory.findOne({ id: Number(req.params.id) })
             category.name = req.body.name || category.name
             category.description = req.body.description || category.description
             if (!!req.files?.icon) {
@@ -73,28 +74,31 @@ router.patch('/:id',
     }
 )
 
-router.delete('/:id', [scopeValidator('menu:delete')], async (req: express.Request, res: express.Response) => {
-    try {
-        const menu = await Menu.find({ id_category: Number(req.params.id) })
-        if (menu.length > 0) {
-            return res.status(400).json({
-                result: 'error',
-                message: 'Category isn\'t empty'
+router.delete('/:id',
+    [scopeValidator(Resources.menu, Actions.delete)],
+    async (req: express.Request, res: express.Response) => {
+        try {
+            const menu = await Menu.find({ id_category: Number(req.params.id) })
+            if (menu.length > 0) {
+                res.status(400).json({
+                    result: 'error',
+                    message: 'Category isn\'t empty'
+                })
+                return
+            }
+
+            const category = await MenuCategory.findOne({ id: Number(req.params.id) })
+            await ObjectStorage.deleteImage(category.icon)
+            await category.remove()
+            res.json({
+                result: 'ok'
+            })
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({
+                message: e.message
             })
         }
-
-        const category = await MenuCategory.findOne({ id: Number(req.params.id) })
-        await ObjectStorage.deleteImage(category.icon)
-        await category.remove()
-        res.json({
-            result: 'ok'
-        })
-    } catch (e) {
-        console.log(e)
-        res.status(500).json({
-            message: e.message
-        })
-    }
-})
+    })
 
 export default router;
