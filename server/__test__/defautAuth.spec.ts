@@ -56,7 +56,7 @@ describe('Test /auth/phone', () => {
     }
     Users.findOne = jest.fn().mockReturnValue(Promise.resolve(user))
     DefaultAuth.sendSMSCode = jest.fn().mockReturnValue(Promise.resolve('4654'))
-    PermissionsBuilder.deleteTokenByUserId = jest.fn().mockReturnValue(Promise.resolve())
+    Tokens.delete = jest.fn().mockResolvedValue({})
 
     const response = await request(app)
       .post('/restaurant/api/auth/phone')
@@ -67,7 +67,7 @@ describe('Test /auth/phone', () => {
     expect(Users.findOne).toBeCalledTimes(1)
     expect(user.save).toBeCalledTimes(1)
     expect(DefaultAuth.sendSMSCode).toBeCalledTimes(1)
-    expect(PermissionsBuilder.deleteTokenByUserId).toBeCalledTimes(1)
+    expect(Tokens.delete).toBeCalledTimes(1)
   })
 })
 
