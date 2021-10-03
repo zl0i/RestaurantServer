@@ -1,5 +1,4 @@
 import axios from 'axios';
-import jwt from 'jsonwebtoken'
 import express from 'express'
 import bcrypt from 'bcryptjs'
 import HttpError from '../lib/httpError';
@@ -8,7 +7,6 @@ import { Tokens } from '../entity/tokens';
 import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder'
 
 const smsApiKey = process.env['APP_SMS_API_KEY'] || '';
-const secret_key = process.env['APP_SECRET'] || 'shhhh'
 
 
 export default class DefaultAuth {
@@ -59,13 +57,11 @@ export default class DefaultAuth {
       const code: string = req.body.code
 
       const user = await DefaultAuth.validateCode(phone, code)
-      const token = new Tokens()
-      token.id_user = user.id
-      token.token = jwt.sign({ user_id: user.id, role: 'role' }, secret_key)
+      const token = new Tokens(user.id)
       await token.save()
 
       user.sms_code = ''
-      if (!user.verify_phone) {   
+      if (!user.verify_phone) {
         await PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.client)
         user.verify_phone = true
       }
@@ -90,9 +86,7 @@ export default class DefaultAuth {
       const user = await Users.findOne({ login: req.body.login })
       if (user && bcrypt.compareSync(req.body.password, user.password)) {
         await PermissionsBuilder.deleteTokenByUserId(user.id)
-        const token = new Tokens()
-        token.id_user = user.id
-        token.token = jwt.sign({ user_id: user.id, role: 'role' }, secret_key)
+        const token = new Tokens(user.id)
         await token.save()
         await PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
         res.json({

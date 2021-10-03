@@ -18,8 +18,15 @@ db.createConnection({
   password: db_password,
   database: db_name,
   entities: [
-    "./entity/*[.ts|.js]"
+    "./entity/*[.ts]"
   ],
+  migrations: [
+    "./entity/migrations/*[.ts]"
+  ],
+  cli: {
+    migrationsDir: "./entity/migrations/"
+  },
+  migrationsRun: true,
   synchronize: true
 }).then(async () => {
   console.log('[OK] DB is connected');

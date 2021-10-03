@@ -1,7 +1,6 @@
 import express from 'express'
 import axios from 'axios';
 import qs from 'querystring';
-import jwt from 'jsonwebtoken';
 import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder';
 import { Users } from '../entity/user';
 import { Tokens } from '../entity/tokens';
@@ -20,8 +19,6 @@ const vk_client_secret = process.env['VK_CLIENT_SECRET'];
 
 const ya_client_id = "e843c0ced9934cb3b39ee73ed8f1958a";
 const ya_client_secret = process.env['YA_CLIENT_SECRET'];
-
-const secret_key = process.env['APP_SECRET'] || 'shhhh'
 
 interface IUserInfo {
     id: string
@@ -121,9 +118,7 @@ export default class OAuthFlow {
                 })
             }
 
-            const token = new Tokens()
-            token.id_user = user.id
-            token.token = jwt.sign({ id_user: user.id }, secret_key)
+            const token = new Tokens(user.id)
             await token.save()
             PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
 
