@@ -1,5 +1,5 @@
 import { Users } from "../../entity/user"
-import { Resources, Scope } from "../../lib/permissions"
+import { Resources, Scopes } from "../../lib/permissions"
 import BasicScope, { ICondition } from "./basicScope"
 import MenuScope from "./menuScope"
 import OrderScope from "./orderScope"
@@ -17,7 +17,7 @@ export default class ScopeBuilder {
     private _user: Users
     private _resource: Resources
     private _scopeClass: BasicScope
-    private _scope: Scope
+    private _scope: Scopes
     private _params: Array<number>
 
     constructor() { }
@@ -34,7 +34,7 @@ export default class ScopeBuilder {
 
     scope(scope: string): ScopeBuilder {
         const obj = ScopeBuilder.parseScope(scope)
-        this._scope = obj.object as Scope //TO DO 
+        this._scope = obj.object as Scopes //TO DO 
         this._params = obj.params
         return this
     }
@@ -61,9 +61,9 @@ export default class ScopeBuilder {
 
     build(): ICondition {
         switch (this._scope) {
-            case Scope.own:
+            case Scopes.own:
                 return this._scopeClass.own()
-            case Scope.points:
+            case Scopes.points:
                 return this._scopeClass.points(this._params)
             default:
                 throw new Error('ScopeBuilder: undefined scope ' + this._scope)

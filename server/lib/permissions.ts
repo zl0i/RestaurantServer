@@ -15,7 +15,8 @@ export enum Actions {
     delete = 'delete'
 }
 
-export const enum Scope {
+export const enum Scopes {
     points = 'points',
-    own = 'own'
+    own = 'own',
+    all = ''
 }

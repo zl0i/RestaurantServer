@@ -2,7 +2,7 @@ import express from 'express'
 import { Tokens } from '../entity/tokens'
 import { token_permissions } from '../entity/token_permissions'
 import { Users } from '../entity/user'
-import { Actions, Resources, Scope } from '../lib/permissions'
+import { Actions, Resources, Scopes } from '../lib/permissions'
 import { getCache, setCache } from './cacheMiddleware'
 import { ICondition } from './scopes/basicScope'
 import ScopeBuilder from './scopes/ScopeBuilder'
@@ -54,7 +54,7 @@ export default function check(resource: Resources, action: Actions) {
             if (permissions) {
                 req.context = {
                     permission: `${resource}:${action}:${permissions.scope}`,
-                    isOwn: permissions.scope === Scope.own,
+                    isOwn: permissions.scope === Scopes.own,
                     user: user
                 }
 

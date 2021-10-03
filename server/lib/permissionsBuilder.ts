@@ -1,6 +1,7 @@
 import { user_permissions } from "../entity/user_permissions"
 import { token_permissions } from '../entity/token_permissions';
 import { Tokens } from "../entity/tokens";
+import { Actions, Resources, Scopes } from "./permissions";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 
 export enum UserRoles {
@@ -16,103 +17,51 @@ export interface IScope {
     point?: Array<number>,
     own?: boolean
 }
-// TO DO get rename to read
+
 export default class PermissionsBuilder {
     constructor() { }
 
-    static async setUserRolePermissions(id_user: number, role: UserRoles, scope?: IScope) { //TO DO if roles are issued than do nothing
-        await user_permissions.delete({ id_user: id_user })
-        let stringScope = ''
-
-        if (scope) {
-            const resource = Object.keys(scope)[0]
-            stringScope = `${resource}[${scope[resource].join(',')}]`
-        }
-
+    static async setUserRolePermissions(id_user: number, role: UserRoles) { //TO DO if roles are issued than do nothing
         await user_permissions.delete({ id_user: id_user })
 
-        let permission: any = {};
+        const permissions: PermissionSet = new PermissionSet();
 
         switch (role) {
             case UserRoles.admin:
-                permission.users = {
-                    'create': { scope: "" },
-                    'read': { scope: "" },
-                    'update': { scope: "" },
-                    'delete': { scope: "" }
-                }
-                permission.orders = {
-                    'create': { scope: "" },
-                    'read': { scope: "" },
-                    'update': { scope: "" },
-                    'delete': { scope: "" }
-                }
-                permission.points = {
-                    'create': { scope: "" },
-                    'read': { scope: "" },
-                    'update': { scope: "" },
-                    'delete': { scope: "" }
-                }
-                permission.menu = {
-                    'create': { scope: "" },
-                    'read': { scope: "" },
-                    'update': { scope: "" },
-                    'delete': { scope: "" }
-                }
+                permissions.add(Resources.users)
+                permissions.add(Resources.orders)
+                permissions.add(Resources.points)
+                permissions.add(Resources.menu)
                 break;
-            case UserRoles.point_admin:
-                permission.orders = {
-                    'create': { scope: stringScope },
-                    'read': { scope: stringScope },
-                    'update': { scope: stringScope },
-                    'delete': { scope: stringScope }
-                }
-                permission.points = {
-                    'read': { scope: stringScope },
-                    'update': { scope: stringScope }
-                }
-                permission.menu = {
-                    'create': { scope: stringScope },
-                    'read': { scope: stringScope },
-                    'update': { scope: stringScope },
-                    'delete': { scope: stringScope }
-                }
-                break;
+            /*case UserRoles.point_admin:
+                permissions.add(Resources.orders)
+                permissions.add(Resources.points)
+                permissions.add(Resources.menu)
+                break;*/
             case UserRoles.client:
-                permission.orders = {
-                    'create': { scope: "" },
-                    'read': { scope: 'own' },
-                }
-                permission.users = {
-                    'read': { scope: "own" }
-                }
+                permissions.add(Resources.users, Actions.read, Scopes.own)
+                permissions.add(Resources.users, Actions.update, Scopes.own)
+                permissions.add(Resources.points, Actions.read)
+                permissions.add(Resources.menu, Actions.read)
+                permissions.add(Resources.orders, Actions.create)
+                permissions.add(Resources.orders, Actions.read, Scopes.own)
+                break;
             case UserRoles.guest:
-                permission.points = {
-                    'read': { scope: '' }
-                }
-                permission.menu = {
-                    'read': { scope: '' }
-                }
+                permissions.add(Resources.points, Actions.read)
+                permissions.add(Resources.menu, Actions.read)
+                break;
+            default:
+                throw new Error('PermissionsBuilder: undefinde role ' + role)
         }
 
-        const user_permission = Object.keys(permission).map((resource: any) => {
-            return Object.keys(permission[resource]).map((action: any) => {
-                return { id_user: id_user, resource, action, scope: permission[resource][action].scope }
-            })
-        })
-        await user_permissions.insert(user_permission.flat() as QueryDeepPartialEntity<user_permissions>[])
-    }
-
-    static async createCustomPermissionsUser(id_user: number, permissions: user_permissions[]) {
-        permissions.forEach(async (el) => {
-            await user_permissions.insert({
+        const user_permission = new Array;
+        for (let p of permissions) {
+            user_permission.push({
                 id_user: id_user,
-                resource: el.resource,
-                action: el.action,
-                scope: el.scope,
-                conditions: el.conditions
+                ...p
             })
-        })
+        }
+        await user_permissions.insert(user_permission as QueryDeepPartialEntity<user_permissions>[])
     }
 
     static async createTokenPermissionsByUser(id_user: number, id_token: number) {
@@ -135,5 +84,36 @@ export default class PermissionsBuilder {
             token.remove()
         }
     }
-
 }
+
+
+export class PermissionSet {
+
+    private obj: object = {};
+
+    public add(resource: Resources, action?: Actions, scope: Scopes = Scopes.all) {
+        if (!this.obj[resource]) {
+            this.obj[resource] = {}
+        }
+        if (action) {
+            this.obj[resource][action] = scope
+        } else {
+            this.obj[resource][Actions.create] = scope
+            this.obj[resource][Actions.read] = scope
+            this.obj[resource][Actions.update] = scope
+            this.obj[resource][Actions.delete] = scope
+        }
+    }
+
+    public [Symbol.iterator]() {
+        const arr = Object.keys(this.obj).map((resource: any) => {
+            return Object.keys(this.obj[resource]).map((action: any) => {
+                return { resource, action, scope: this.obj[resource][action] }
+            })
+        }).flat()
+        const iterrator = arr[Symbol.iterator]()
+        return iterrator
+    }
+}
+
+
