@@ -12,11 +12,6 @@ export enum UserRoles {
     custom
 }
 
-export interface IScope {
-    point?: Array<number>,
-    own?: boolean
-}
-
 export const enum Resources {
     points = 'points',
     menu = 'menu',
@@ -41,7 +36,8 @@ export const enum Scopes {
 export default class PermissionsBuilder {
     constructor() { }
 
-    static async setUserRolePermissions(id_user: number, role: UserRoles) { //TO DO if roles are issued than do nothing
+    //TO DO if roles are issued than do nothing
+    static async setUserRolePermissions(id_user: number, role: UserRoles) { 
         await user_permissions.delete({ id_user: id_user })
 
         const permissions: PermissionSet = new PermissionSet();

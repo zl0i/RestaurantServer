@@ -65,6 +65,8 @@ export default class ScopeBuilder {
                 return this._scopeClass.own()
             case Scopes.points:
                 return this._scopeClass.points(this._params)
+            case Scopes.all:
+                return { key: '', value: [] }
             default:
                 throw new Error('ScopeBuilder: undefined scope ' + this._scope)
         }
