@@ -1,7 +1,6 @@
 import { user_permissions } from "../entity/user_permissions"
 import { token_permissions } from '../entity/token_permissions';
 import { Tokens } from "../entity/tokens";
-import { Actions, Resources, Scopes } from "./permissions";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 
 export enum UserRoles {
@@ -16,6 +15,27 @@ export enum UserRoles {
 export interface IScope {
     point?: Array<number>,
     own?: boolean
+}
+
+export const enum Resources {
+    points = 'points',
+    menu = 'menu',
+    users = 'users',
+    orders = 'orders',
+    category = 'category'
+}
+
+export enum Actions {
+    create = 'create',
+    read = 'read',
+    update = 'update',
+    delete = 'delete'
+}
+
+export const enum Scopes {
+    points = 'points',
+    own = 'own',
+    all = ''
 }
 
 export default class PermissionsBuilder {
@@ -66,15 +86,15 @@ export default class PermissionsBuilder {
 
     static async createTokenPermissionsByUser(id_user: number, id_token: number) {
         const permissions = await user_permissions.find({ id_user: id_user })
-        permissions.forEach(async (el) => {
+        for(const p of permissions) {
             await token_permissions.insert({
                 id_token: id_token,
-                resource: el.resource,
-                action: el.action,
-                scope: el.scope,
-                conditions: el.conditions
+                resource: p.resource,
+                action: p.action,
+                scope: p.scope,
+                conditions: p.conditions
             })
-        })
+        }
     }
 
     static async deleteTokenByUserId(id_user: number) {

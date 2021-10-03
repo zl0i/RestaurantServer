@@ -6,7 +6,7 @@ import OrderBuilder from '../src/orderBuilder';
 import { cache } from '../middleware/cacheMiddleware';
 import { In } from 'typeorm';
 import DataProvider from '../lib/DataProvider';
-import { Actions, Resources } from '../lib/permissions';
+import { Resources, Actions } from '../lib/permissionsBuilder';
 
 const router = express.Router();
 

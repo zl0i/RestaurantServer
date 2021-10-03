@@ -59,22 +59,24 @@ export default class DefaultAuth {
       const code: string = req.body.code
 
       const user = await DefaultAuth.validateCode(phone, code)
-      user.sms_code = ''
-      user.verify_phone = true
-      await user.save()
-
       const token = new Tokens()
       token.id_user = user.id
       token.token = jwt.sign({ user_id: user.id, role: 'role' }, secret_key)
       await token.save()
-      await PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.client)
+
+      user.sms_code = ''
+      if (user.verify_phone) {
+        await PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.client)
+      } else {
+        user.verify_phone = true
+      }
+      await user.save()
       await PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
 
       res.json({
         result: "ok",
         token: token.token
       })
-
     } catch (error) {
       console.log(error)
       res.status(error.status).json({

@@ -2,7 +2,7 @@ import express from 'express';
 import { UploadedFile } from 'express-fileupload';
 import Points from '../entity/points';
 import DataProvider from '../lib/DataProvider';
-import { Actions, Resources } from '../lib/permissions';
+import { Resources, Actions } from '../lib/permissionsBuilder';
 import { cache } from '../middleware/cacheMiddleware'
 import { body } from '../middleware/schemaChecker';
 import scopeValidator from '../middleware/scopeVaildator'

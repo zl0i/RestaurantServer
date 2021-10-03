@@ -1,9 +1,8 @@
 import express from 'express';
 import scopeVaildator from '../middleware/scopeVaildator';
 import { cache } from '../middleware/cacheMiddleware';
-
 import ObjectStorage from '../src/storage'
-import { Actions, Resources } from '../lib/permissions';
+import { Resources, Actions } from '../lib/permissionsBuilder';
 
 const router = express.Router();
 

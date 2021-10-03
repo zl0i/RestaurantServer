@@ -7,7 +7,7 @@ import { cache } from '../middleware/cacheMiddleware';
 import ObjectStorage from '../src/storage'
 import { UploadedFile } from 'express-fileupload';
 import DataProvider from '../lib/DataProvider';
-import { Actions, Resources } from '../lib/permissions';
+import { Resources, Actions } from '../lib/permissionsBuilder';
 
 const router = express.Router();
 

@@ -3,13 +3,12 @@ import { Users } from '../entity/user';
 import { body } from '../middleware/schemaChecker';
 import scopeValidator from '../middleware/scopeVaildator'
 import bcrypt from 'bcryptjs'
-import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder';
+import PermissionsBuilder, { Actions, Resources, UserRoles } from '../lib/permissionsBuilder';
 import { cache } from '../middleware/cacheMiddleware';
 import { In } from 'typeorm';
 import { Tokens } from '../entity/tokens';
 import { token_permissions } from '../entity/token_permissions';
 import { user_permissions } from '../entity/user_permissions';
-import { Actions, Resources } from '../lib/permissions';
 
 const router = express.Router();
 
