@@ -31,7 +31,7 @@ export default class DefaultAuth {
       if (user) {
         user.sms_code = code
         await user.save()
-        await PermissionsBuilder.deleteTokenByUserId(user.id)
+        await Tokens.delete({ id_user: user.id })
       } else {
         const newUsers = new Users()
         newUsers.phone = phone
@@ -85,7 +85,7 @@ export default class DefaultAuth {
     try {
       const user = await Users.findOne({ login: req.body.login })
       if (user && bcrypt.compareSync(req.body.password, user.password)) {
-        await PermissionsBuilder.deleteTokenByUserId(user.id)
+        await Tokens.delete({ id_user: user.id })
         const token = new Tokens(user.id)
         await token.save()
         await PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)

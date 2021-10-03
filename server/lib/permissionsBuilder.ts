@@ -1,6 +1,5 @@
 import { user_permissions } from "../entity/user_permissions"
 import { token_permissions } from '../entity/token_permissions';
-import { Tokens } from "../entity/tokens";
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 
 export enum UserRoles {
@@ -90,14 +89,6 @@ export default class PermissionsBuilder {
                 scope: p.scope,
                 conditions: p.conditions
             })
-        }
-    }
-
-    static async deleteTokenByUserId(id_user: number) {
-        const token = await Tokens.findOne({ id_user: id_user })
-        if (token) {
-            await token_permissions.delete({ id_token: token.id })
-            token.remove()
         }
     }
 }
