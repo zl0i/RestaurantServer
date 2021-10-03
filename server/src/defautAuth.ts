@@ -65,9 +65,8 @@ export default class DefaultAuth {
       await token.save()
 
       user.sms_code = ''
-      if (user.verify_phone) {
+      if (!user.verify_phone) {   
         await PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.client)
-      } else {
         user.verify_phone = true
       }
       await user.save()

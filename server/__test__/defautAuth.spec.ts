@@ -78,6 +78,7 @@ describe('/auth/code', () => {
     const user = {
       id: 1,
       sms_code: '',
+      verify_phone: false,
       save: jest.fn().mockImplementation(() => Promise.resolve())
     }
     DefaultAuth.validateCode = jest.fn().mockReturnValue(Promise.resolve(user))
