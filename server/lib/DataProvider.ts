@@ -15,7 +15,7 @@ export default class DataProvider {
         return await manager.findAndCount(this._model, condition)
     }
 
-    async index(req: express.Request, res: express.Response, condition: object = {}) {
+    async index(req: express.Request, res: express.Response, condition: object = {}, relations: object = []) {
         const pagination = {}
         if (req.query['page'] || req.query['per-page']) {
             if (req.query['page'] && req.query['per-page']) {
@@ -40,6 +40,7 @@ export default class DataProvider {
                 ...req.query,
                 ...condition
             },
+            relations,
             ...pagination
         })
         const count = Number(model.pop())

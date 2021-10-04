@@ -1,20 +1,18 @@
 import express from 'express';
 import scopeValidator from '../middleware/scopeVaildator'
-import Menu, { MenuStatus } from '../entity/menu';
+import Menu from '../entity/menu';
 import { body } from '../middleware/schemaChecker';
-import MenuCategory from '../entity/menu_category';
 import { cache } from '../middleware/cacheMiddleware';
-import ObjectStorage from '../src/storage'
-import { UploadedFile } from 'express-fileupload';
 import DataProvider from '../lib/DataProvider';
 import { Resources, Actions } from '../lib/permissionsBuilder';
+import Additions from '../entity/additions';
 
 const router = express.Router();
 
 router.get('/', [cache(180)], async (req: express.Request, res: express.Response) => {
     try {
-        const provider = new DataProvider('Menu')
-        await provider.index(req, res, { status: MenuStatus.active }, ["additions", "additions.additions_item"])
+        const provider = new DataProvider('Additions')
+        await provider.index(req, res, {}, ["additions_item"])
     } catch (e) {
         console.log(e)
         res.status(500).json({
@@ -25,30 +23,23 @@ router.get('/', [cache(180)], async (req: express.Request, res: express.Response
 
 router.post('/',
     [
-        body({ id_category: String, name: String, cost: String, description: String }),
+        body({ name: String, id_menu: Number, mode: String }),
         scopeValidator(Resources.menu, Actions.create)
     ],
     async (req: express.Request, res: express.Response) => {
         try {
-            const category = await MenuCategory.findOne({ id: req.body.id_category })
-            if (category) {
-                const item = new Menu()
+            const menu = await Menu.findOne({ id: req.body.id_menu })
+            if (menu) {
+                const item = new Additions()
                 item.name = req.body.name
-                item.cost = Number(req.body.cost)
-                item.id_category = category.id
-                item.id_point = category.id_point
-                item.description = req.body.description
+                item.id_menu = menu
+                item.mode = req.body.mode
                 await item.save()
-                if (!!req.files?.icon) {
-                    const file = req.files.icon as UploadedFile
-                    item.icon = await ObjectStorage.uploadImage(file as UploadedFile, item.id) as string
-                    await item.save()
-                }
                 res.json(item)
             } else {
                 res.status(400).json({
                     result: 'error',
-                    message: "Категория не найдена"
+                    message: "Блюдо не найдена"
                 })
             }
         } catch (e) {
@@ -64,25 +55,19 @@ router.patch('/:id',
     [scopeValidator(Resources.menu, Actions.update)],
     async (req: express.Request, res: express.Response) => {
         try {
-            const item = await Menu.findOne({ id: Number(req.params.id) })
+            const item = await Additions.findOne({ id: Number(req.params.id) })
             item.name = req.body.name || item.name
-            item.cost = Number(req.body.cost) || item.cost
-            item.description = req.body.description || item.description
-            if (req.body.id_category) {
-                const category = await MenuCategory.findOne({ id: req.body.id_category })
-                if (category) {
-                    item.id_category = category.id
+            item.mode = req.body.mode || item.mode
+            if (req.body.id_menu) {
+                const menu = await Menu.findOne({ id: req.body.id_menu })
+                if (menu) {
+                    item.id_menu = menu
                 } else {
-                    res.status(400).json({
+                    return res.status(400).json({
                         result: 'error',
                         message: 'Категория не найдена'
                     })
-                    return
                 }
-            }
-            if (!!req.files?.icon) {
-                const file = req.files.icon as UploadedFile
-                item.icon = await ObjectStorage.replaceImage(item.icon, file, item.id) as string
             }
             await item.save()
             res.json(item)
@@ -98,9 +83,7 @@ router.delete('/:id',
     [scopeValidator(Resources.menu, Actions.delete)],
     async (req: express.Request, res: express.Response) => {
         try {
-            const item = await Menu.findOne({ id: Number(req.params.id) })
-            await ObjectStorage.deleteImage(item.icon)
-            await item.remove()
+            await Additions.delete({ id: Number(req.params.id) })
             res.json({
                 result: 'ok'
             })

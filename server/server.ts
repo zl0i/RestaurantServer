@@ -8,6 +8,8 @@ import orderRouter from './routers/orderRouter'
 import shopRouter from './routers/shopRouter'
 import oauthRouter from './routers/oauthRouter'
 import menuRouter from './routers/menuRouter'
+import additionsRouter from './routers/additionsRouter'
+import additionsItemRouter from './routers/additionsItemRouter'
 import categoryRouter from './routers/categoryRouter'
 import imageRouter from './routers/imagesRouter'
 import pointRouter from './routers/pointRouter'
@@ -32,6 +34,8 @@ app.use('/restaurant/api/orders', orderRouter);
 app.use('/restaurant/api/shops', shopRouter);
 app.use('/restaurant/api/point', pointRouter);
 app.use('/restaurant/api/menu', menuRouter);
+app.use('/restaurant/api/menu/additions', additionsRouter);
+app.use('/restaurant/api/menu/additions/items', additionsItemRouter);
 app.use('/restaurant/api/category', categoryRouter);
 app.use('/restaurant/api/oauth', oauthRouter);
 
