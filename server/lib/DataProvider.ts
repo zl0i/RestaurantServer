@@ -15,7 +15,7 @@ export default class DataProvider {
         return await manager.findAndCount(this._model, condition)
     }
 
-    async index(req: express.Request, res: express.Response, condition: object = {}, relations: object = []) {
+    async index(req: express.Request, res: express.Response, condition: object = {}, relations: Array<string> = []) {
         const pagination = {}
         if (req.query['page'] || req.query['per-page']) {
             if (req.query['page'] && req.query['per-page']) {
@@ -34,13 +34,19 @@ export default class DataProvider {
                 result: 'page and per-page must be greater than zero'
             })
         }
+        let expand: Array<string> = []
+        if (req.query.expand) {
+            expand = String(req.query.expand).split(',')
+            delete req.query.expand
+        }
+        expand.push(...relations)
 
         const model = await this.find({
             where: {
                 ...req.query,
                 ...condition
             },
-            relations,
+            relations: expand,
             ...pagination
         })
         const count = Number(model.pop())

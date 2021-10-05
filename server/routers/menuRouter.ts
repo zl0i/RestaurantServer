@@ -14,7 +14,7 @@ const router = express.Router();
 router.get('/', [cache(180)], async (req: express.Request, res: express.Response) => {
     try {
         const provider = new DataProvider('Menu')
-        await provider.index(req, res, { status: MenuStatus.active }, ["additions", "additions.additions_item"])
+        await provider.index(req, res, { status: MenuStatus.active })
     } catch (e) {
         console.log(e)
         res.status(500).json({

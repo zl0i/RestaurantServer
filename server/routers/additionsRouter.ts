@@ -12,7 +12,7 @@ const router = express.Router();
 router.get('/', [cache(180)], async (req: express.Request, res: express.Response) => {
     try {
         const provider = new DataProvider('Additions')
-        await provider.index(req, res, {}, ["additions_item"])
+        await provider.index(req, res)
     } catch (e) {
         console.log(e)
         res.status(500).json({
