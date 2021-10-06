@@ -23,6 +23,31 @@ router.get('/', [cache(180)], async (req: express.Request, res: express.Response
     }
 });
 
+router.get('/:id', [cache(180)], async (req: express.Request, res: express.Response) => {
+    try {
+        const provider = new DataProvider('Menu')
+        await provider.index(req, res, { id: Number(req.params.id) })
+    } catch (e) {
+        console.log(e)
+        res.status(500).json({
+            message: e.message
+        })
+    }
+});
+
+
+router.get('/:id/additions', [/*cache(180)*/], async (req: express.Request, res: express.Response) => {
+    try {
+        const provider = new DataProvider('Additions')
+        await provider.index(req, res, { id_menu: Number(req.params.id) })
+    } catch (e) {
+        console.log(e)
+        res.status(500).json({
+            message: e.message
+        })
+    }
+});
+
 router.post('/',
     [
         body({ id_category: String, name: String, cost: String, description: String }),
