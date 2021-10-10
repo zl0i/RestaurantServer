@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, OneToOne, JoinColumn } from "typeorm";
 import Additions from "./additions";
+import { MenuRecipes } from "./menu_recipes";
 
 export enum MenuStatus {
     active = 'active',
@@ -35,6 +36,10 @@ export default class Menu extends BaseEntity {
 
     @OneToMany(() => Additions, additions => additions.id_menu)
     additions: Additions[]
+
+    @OneToOne(() => MenuRecipes, recipe => recipe.id)
+    @JoinColumn()
+    recipe: MenuRecipes
 }
 
 
