@@ -1,7 +1,7 @@
 import express from 'express';
 import { Users } from '../entity/user';
 import { body } from '../middleware/schemaChecker';
-import scopeValidator from '../middleware/scopeVaildator'
+import allow from '../middleware/permissionVaildator'
 import bcrypt from 'bcryptjs'
 import PermissionsBuilder, { Actions, Resources, UserRoles } from '../lib/permissionsBuilder';
 import { cache } from '../middleware/cacheMiddleware';
@@ -12,50 +12,58 @@ import { user_permissions } from '../entity/user_permissions';
 
 const router = express.Router();
 
-router.get('/', [scopeValidator(Resources.users, Actions.read), cache(600)], async (req: express.Request, res: express.Response) => {
-  try {
-    const condition: object = {}
-    if (req.context?.condition.value.length > 0) {
-      condition[req.context?.condition?.key] = In(req.context?.condition.value)
+router.get('/',
+  [
+    allow(Resources.users, Actions.read),
+    cache(600)
+  ],
+  async (req: express.Request, res: express.Response) => {
+    try {
+      const condition: object = {}
+      if (req.context?.condition.value.length > 0) {
+        condition[req.context?.condition?.key] = In(req.context?.condition.value)
+      }
+      const users: any = await Users.find(condition)
+      for (const user of users) {
+        const permissions = await user_permissions.find({ id_user: user.id })
+        user.permissions = new Array()
+        user.removePrivateData()
+        for (const perm of permissions) {
+          user.permissions.push(`${perm.resource}:${perm.action}:${perm.scope}`)
+        }
+      }
+      res.status(200).json(users);
+    } catch (error) {
+      console.log(error)
+      res.status(500).end();
     }
-    const users: any = await Users.find(condition)
-    for (const user of users) {      
+  });
+
+
+router.get('/profile',
+  [
+    allow(Resources.users, Actions.read), cache(600)
+  ],
+  async (req: express.Request, res: express.Response) => {
+    try {
+      const user: any = await Users.findOne({ id: req.context.user.id })
       const permissions = await user_permissions.find({ id_user: user.id })
       user.permissions = new Array()
-      user.removePrivateData()
       for (const perm of permissions) {
         user.permissions.push(`${perm.resource}:${perm.action}:${perm.scope}`)
       }
+      user.removePrivateData()
+      res.status(200).json(user);
+    } catch (error) {
+      console.log(error)
+      res.status(500).end();
     }
-    res.status(200).json(users);
-  } catch (error) {
-    console.log(error)
-    res.status(500).end();
-  }
-});
-
-
-router.get('/profile', [scopeValidator(Resources.users, Actions.read), cache(600)], async (req: express.Request, res: express.Response) => {
-  try {
-
-    const user: any = await Users.findOne({ id: req.context.user.id })    
-    const permissions = await user_permissions.find({ id_user: user.id })
-    user.permissions = new Array()
-    for (const perm of permissions) {
-      user.permissions.push(`${perm.resource}:${perm.action}:${perm.scope}`)
-    }
-    user.removePrivateData()
-    res.status(200).json(user);
-  } catch (error) {
-    console.log(error)
-    res.status(500).end();
-  }
-});
+  });
 
 router.post('/',
   [
     body({ login: String, password: String }),
-    scopeValidator(Resources.users, Actions.create)
+    allow(Resources.users, Actions.create)
   ],
   async (req: express.Request, res: express.Response) => {
     try {
@@ -75,7 +83,9 @@ router.post('/',
   });
 
 router.patch('/:id',
-  [scopeValidator(Resources.users, Actions.update)],
+  [
+    allow(Resources.users, Actions.update)
+  ],
   async (req: express.Request, res: express.Response) => {
     try {
       if (req.context.condition.value.includes(Number(req.params.id))) {
@@ -101,7 +111,7 @@ router.patch('/:id',
 
 router.delete('/:id',
   [
-    scopeValidator(Resources.users, Actions.delete)
+    allow(Resources.users, Actions.delete)
   ],
   async (req: express.Request, res: express.Response) => {
     try {

@@ -1,5 +1,5 @@
 import express from 'express';
-import scopeValidator from '../middleware/scopeVaildator'
+import allow from '../middleware/permissionVaildator'
 import Menu, { MenuStatus } from '../entity/menu';
 import { body } from '../middleware/schemaChecker';
 import MenuCategory from '../entity/menu_category';
@@ -11,47 +11,59 @@ import { Resources, Actions } from '../lib/permissionsBuilder';
 
 const router = express.Router();
 
-router.get('/', [cache(180)], async (req: express.Request, res: express.Response) => {
-    try {
-        const provider = new DataProvider('Menu')
-        await provider.index(req, res, { status: MenuStatus.active })
-    } catch (e) {
-        console.log(e)
-        res.status(500).json({
-            message: e.message
-        })
-    }
-});
+router.get('/',
+    [
+        cache(180)
+    ],
+    async (req: express.Request, res: express.Response) => {
+        try {
+            const provider = new DataProvider('Menu')
+            await provider.index(req, res, { status: MenuStatus.active })
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({
+                message: e.message
+            })
+        }
+    });
 
-router.get('/:id', [cache(180)], async (req: express.Request, res: express.Response) => {
-    try {
-        const provider = new DataProvider('Menu')
-        await provider.index(req, res, { id: Number(req.params.id) })
-    } catch (e) {
-        console.log(e)
-        res.status(500).json({
-            message: e.message
-        })
-    }
-});
+router.get('/:id',
+    [
+        cache(180)
+    ],
+    async (req: express.Request, res: express.Response) => {
+        try {
+            const provider = new DataProvider('Menu')
+            await provider.index(req, res, { id: Number(req.params.id) })
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({
+                message: e.message
+            })
+        }
+    });
 
 
-router.get('/:id/additions', [/*cache(180)*/], async (req: express.Request, res: express.Response) => {
-    try {
-        const provider = new DataProvider('Additions')
-        await provider.index(req, res, { id_menu: Number(req.params.id) })
-    } catch (e) {
-        console.log(e)
-        res.status(500).json({
-            message: e.message
-        })
-    }
-});
+router.get('/:id/additions',
+    [
+        cache(180)
+    ],
+    async (req: express.Request, res: express.Response) => {
+        try {
+            const provider = new DataProvider('Additions')
+            await provider.index(req, res, { id_menu: Number(req.params.id) })
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({
+                message: e.message
+            })
+        }
+    });
 
 router.post('/',
     [
         body({ id_category: String, name: String, cost: String, description: String }),
-        scopeValidator(Resources.menu, Actions.create)
+        allow(Resources.menu, Actions.create)
     ],
     async (req: express.Request, res: express.Response) => {
         try {
@@ -86,7 +98,9 @@ router.post('/',
 )
 
 router.patch('/:id',
-    [scopeValidator(Resources.menu, Actions.update)],
+    [
+        allow(Resources.menu, Actions.update)
+    ],
     async (req: express.Request, res: express.Response) => {
         try {
             const item = await Menu.findOne({ id: Number(req.params.id) })
@@ -120,7 +134,9 @@ router.patch('/:id',
     })
 
 router.delete('/:id',
-    [scopeValidator(Resources.menu, Actions.delete)],
+    [
+        allow(Resources.menu, Actions.delete)
+    ],
     async (req: express.Request, res: express.Response) => {
         try {
             const item = await Menu.findOne({ id: Number(req.params.id) })

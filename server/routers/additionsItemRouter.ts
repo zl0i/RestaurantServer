@@ -1,5 +1,5 @@
 import express from 'express';
-import scopeValidator from '../middleware/scopeVaildator'
+import allow from '../middleware/permissionVaildator'
 import { body } from '../middleware/schemaChecker';
 import { cache } from '../middleware/cacheMiddleware';
 import DataProvider from '../lib/DataProvider';
@@ -9,22 +9,26 @@ import Additions from '../entity/additions';
 
 const router = express.Router();
 
-router.get('/', [cache(180)], async (req: express.Request, res: express.Response) => {
-    try {
-        const provider = new DataProvider('AdditionsItem')
-        await provider.index(req, res)
-    } catch (e) {
-        console.log(e)
-        res.status(500).json({
-            message: e.message
-        })
-    }
-});
+router.get('/',
+    [
+        cache(180)
+    ],
+    async (req: express.Request, res: express.Response) => {
+        try {
+            const provider = new DataProvider('AdditionsItem')
+            await provider.index(req, res)
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({
+                message: e.message
+            })
+        }
+    });
 
 router.post('/',
     [
         body({ name: String, cost: Number, id_additions: Number }),
-        scopeValidator(Resources.menu, Actions.create)
+        allow(Resources.menu, Actions.create)
     ],
     async (req: express.Request, res: express.Response) => {
         try {
@@ -51,7 +55,9 @@ router.post('/',
     })
 
 router.patch('/:id',
-    [scopeValidator(Resources.menu, Actions.update)],
+    [
+        allow(Resources.menu, Actions.update)
+    ],
     async (req: express.Request, res: express.Response) => {
         try {
             const item = await AdditionsItem.findOne({ id: Number(req.params.id) })
@@ -79,7 +85,9 @@ router.patch('/:id',
     })
 
 router.delete('/:id',
-    [scopeValidator(Resources.menu, Actions.delete)],
+    [
+        allow(Resources.menu, Actions.delete)
+    ],
     async (req: express.Request, res: express.Response) => {
         try {
             await AdditionsItem.delete({ id: Number(req.params.id) })

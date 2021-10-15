@@ -5,26 +5,30 @@ import DataProvider from '../lib/DataProvider';
 import { Resources, Actions } from '../lib/permissionsBuilder';
 import { cache } from '../middleware/cacheMiddleware'
 import { body } from '../middleware/schemaChecker';
-import scopeValidator from '../middleware/scopeVaildator'
+import allow from '../middleware/permissionVaildator'
 import ObjectStorage from '../src/storage';
 
 const router = express.Router();
 
-router.get('/', [cache(180)], async (req: express.Request, res: express.Response) => {
-  try {
-    const provide = new DataProvider('Points')
-    await provide.index(req, res, {})
-  } catch (e) {
-    console.log(e)
-    res.status(500).json({
-      message: e.message
-    })
-  }
-});
+router.get('/',
+  [
+    cache(180)
+  ],
+  async (req: express.Request, res: express.Response) => {
+    try {
+      const provide = new DataProvider('Points')
+      await provide.index(req, res, {})
+    } catch (e) {
+      console.log(e)
+      res.status(500).json({
+        message: e.message
+      })
+    }
+  });
 
 router.post('/',
   [
-    scopeValidator(Resources.points, Actions.create),
+    allow(Resources.points, Actions.create),
     body({ name: String, address: String, is_delivering: String })
   ],
   async (req: express.Request, res: express.Response) => {
@@ -51,7 +55,10 @@ router.post('/',
     }
   });
 
-router.patch('/:id', [scopeValidator(Resources.points, Actions.update)],
+router.patch('/:id',
+  [
+    allow(Resources.points, Actions.update)
+  ],
   async (req: express.Request, res: express.Response) => {
     try {
       const point = await Points.findOne({ id: Number(req.params.id) })
@@ -76,7 +83,9 @@ router.patch('/:id', [scopeValidator(Resources.points, Actions.update)],
   });
 
 router.delete('/:id',
-  [scopeValidator(Resources.points, Actions.delete)],
+  [
+    allow(Resources.points, Actions.delete)
+  ],
   async (req: express.Request, res: express.Response) => {
     try {
       const point = await Points.findOne({ id: Number(req.params.id) })

@@ -1,5 +1,5 @@
 import express from 'express';
-import scopeValidator from '../middleware/scopeVaildator'
+import allow from '../middleware/permissionVaildator'
 import { body } from '../middleware/schemaChecker';
 import YokassaAPI from '../src/yokassaAPI';
 import OrderBuilder from '../src/orderBuilder';
@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.get('/',
   [
-    scopeValidator(Resources.orders, Actions.read), cache(60)
+    allow(Resources.orders, Actions.read), cache(60)
   ],
   async (req: express.Request, res: express.Response) => {
     try {
@@ -29,7 +29,10 @@ router.get('/',
 
 router.post(
   '/',
-  [body({ id_point: Number, menu: Array }), scopeValidator(Resources.orders, Actions.create)],
+  [
+    body({ id_point: Number, menu: Array }),
+    allow(Resources.orders, Actions.create)
+  ],
   async (req: express.Request, res: express.Response) => {
     try {
       const order = await new OrderBuilder(req.context.user, req.body.menu, req.body.id_point)

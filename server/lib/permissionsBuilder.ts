@@ -29,7 +29,7 @@ export enum Actions {
 export const enum Scopes {
     points = 'points',
     own = 'own',
-    all = ''
+    all = 'all'
 }
 
 export default class PermissionsBuilder {

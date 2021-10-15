@@ -21,7 +21,7 @@ declare global {
     }
 }
 
-export default function check(resource: Resources, action: Actions) {
+export default function allow(resource: Resources, action: Actions) {
     return async (req: express.Request, res: express.Response, next: Function) => {
         try {
             const token = await Tokens.findOne({ token: req.headers.authorization?.split(" ")[1], expired_at: MoreThan(new Date()) })

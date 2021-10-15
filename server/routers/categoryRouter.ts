@@ -1,5 +1,5 @@
 import express from 'express';
-import scopeValidator from '../middleware/scopeVaildator'
+import allow from '../middleware/permissionVaildator'
 import Menu from '../entity/menu';
 import { body } from '../middleware/schemaChecker';
 import MenuCategory from '../entity/menu_category';
@@ -12,7 +12,9 @@ import { Resources, Actions } from '../lib/permissionsBuilder';
 const router = express.Router();
 
 router.get('/',
-    [scopeValidator(Resources.menu, Actions.read), cache(600)],
+    [
+        allow(Resources.menu, Actions.read), cache(600)
+    ],
     async (req: express.Request, res: express.Response) => {
         try {
             const provider = new DataProvider('MenuCategory')
@@ -28,7 +30,7 @@ router.get('/',
 router.post('/',
     [
         body({ name: String, description: String, id_point: String }),
-        scopeValidator(Resources.menu, Actions.create)
+        allow(Resources.menu, Actions.create)
     ],
     async (req: express.Request, res: express.Response) => {
         try {
@@ -53,7 +55,9 @@ router.post('/',
 )
 
 router.patch('/:id',
-    [scopeValidator(Resources.menu, Actions.update)],
+    [
+        allow(Resources.menu, Actions.update)
+    ],
     async (req: express.Request, res: express.Response) => {
         try {
             const category = await MenuCategory.findOne({ id: Number(req.params.id) })
@@ -75,7 +79,9 @@ router.patch('/:id',
 )
 
 router.delete('/:id',
-    [scopeValidator(Resources.menu, Actions.delete)],
+    [
+        allow(Resources.menu, Actions.delete)
+    ],
     async (req: express.Request, res: express.Response) => {
         try {
             const menu = await Menu.find({ id_category: Number(req.params.id) })
