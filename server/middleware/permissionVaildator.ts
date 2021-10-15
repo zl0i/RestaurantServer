@@ -6,7 +6,7 @@ import { Users } from '../entity/user'
 import { Actions, Resources, Scopes } from '../lib/permissionsBuilder'
 import { getCache, setCache } from './cacheMiddleware'
 import { ICondition } from './scopes/basicScope'
-import ScopeBuilder from './scopes/ScopeBuilder'
+import ScopeCondition from './scopes/ScopeCondition'
 
 declare global {
     namespace Express {
@@ -15,11 +15,13 @@ declare global {
                 user: Users
                 permission: string
                 condition?: ICondition,
-                isOwn: boolean
+                isOwn: boolean,
+                isAll: boolean
             }
         }
     }
 }
+
 
 export default function allow(resource: Resources, action: Actions) {
     return async (req: express.Request, res: express.Response, next: Function) => {
@@ -56,15 +58,12 @@ export default function allow(resource: Resources, action: Actions) {
                 req.context = {
                     permission: `${resource}:${action}:${permissions.scope}`,
                     isOwn: permissions.scope === Scopes.own,
+                    isAll: permissions.scope === Scopes.all,
                     user: user
                 }
 
-                req.context.condition = new ScopeBuilder()
-                    .resource(resource)
-                    .user(user)
-                    .scope(permissions.scope)
-                    .init()
-                    .build()
+                const condition = new ScopeCondition(resource, permissions.scope, user)
+                req.context.condition = condition.getCondition()
 
                 next()
             } else {

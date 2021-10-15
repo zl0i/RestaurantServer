@@ -3,8 +3,11 @@ import BasicScope, { ICondition } from "./basicScope";
 
 export default class UserScope extends BasicScope {
     constructor(user: Users) {
-        super(user)
+        super()
+        this._user = user        
     }
+
+    private _user: Users
 
     own(): ICondition {
         return { key: 'id', value: [this._user.id] }

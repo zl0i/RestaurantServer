@@ -12,66 +12,49 @@ interface IScope {
     params: Array<any>
 }
 
-export default class ScopeBuilder {
+export default class ScopeCondition {
 
     private _user: Users
     private _resource: Resources
-    private _scopeClass: BasicScope
     private _scope: Scopes
     private _params: Array<number>
 
-    constructor() { }
-
-    resource(rs: Resources): ScopeBuilder {
+    constructor(rs: Resources, scope: string, user: Users) {
         this._resource = rs
-        return this
-    }
-
-    user(user: Users): ScopeBuilder {
         this._user = user
-        return this
-    }
-
-    scope(scope: string): ScopeBuilder {
-        const obj = ScopeBuilder.parseScope(scope)
+        const obj = ScopeCondition.parseScope(scope)
         this._scope = obj.object as Scopes //TO DO 
         this._params = obj.params
-        return this
     }
 
-    init(): ScopeBuilder {
+    private createScopeClass(): BasicScope {
         switch (this._resource) {
             case Resources.orders:
-                this._scopeClass = new OrderScope(this._user)
-                break;
+                return new OrderScope(this._user)
             case Resources.users:
-                this._scopeClass = new UserScope(this._user)
-                break;
+                return new UserScope(this._user)
             case Resources.menu:
-                this._scopeClass = new MenuScope(this._user)
-                break;
+                return new MenuScope()
             case Resources.points:
-                this._scopeClass = new PointScope(this._user)
-                break;
+                return new PointScope()
             default:
                 throw new Error('ScopeBuilder: undefined resource ' + this._resource)
         }
-        return this
     }
 
-    build(): ICondition {
+    getCondition(): ICondition {
+        const sclass = this.createScopeClass()
         switch (this._scope) {
             case Scopes.own:
-                return this._scopeClass.own()
+                return sclass.own()
             case Scopes.points:
-                return this._scopeClass.points(this._params)
+                return sclass.points(this._params)
             case Scopes.all:
                 return { key: '', value: [] }
             default:
                 throw new Error('ScopeBuilder: undefined scope ' + this._scope)
         }
     }
-
 
     static parseScope(scope: string): IScope {
         let start = scope.indexOf('[')

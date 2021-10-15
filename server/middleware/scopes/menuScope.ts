@@ -1,9 +1,8 @@
-import { Users } from '../../entity/user'
 import BasicScope, { ICondition } from './basicScope'
 
 export default class MenuScope extends BasicScope {
-    constructor(user: Users) {
-        super(user)
+    constructor() {
+        super()
     }
 
     own(): ICondition {

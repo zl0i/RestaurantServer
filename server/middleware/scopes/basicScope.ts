@@ -1,4 +1,3 @@
-import { Users } from "../../entity/user";
 
 export interface ICondition {
     key: string,
@@ -6,11 +5,7 @@ export interface ICondition {
 }
 
 export default abstract class BasicScope {
-    constructor(user: Users) {
-        this._user = user
-    }
-
-    protected _user: Users
+    constructor() { }    
 
     abstract own(): ICondition
     abstract points(ids: Array<number>): ICondition
