@@ -3,7 +3,7 @@ import { body } from '../middleware/schemaChecker';
 import allow from '../middleware/permissionVaildator'
 import { Actions, Resources } from '../lib/permissionsBuilder';
 import { cache } from '../middleware/cacheMiddleware';
-import UserService from '../services/users.services';
+import UserService from '../services/users.service';
 import HttpError from '../lib/httpError';
 
 const router = express.Router();
