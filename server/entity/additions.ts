@@ -1,30 +1,26 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, OneToMany } from "typeorm";
-import AdditionsItem from "./additions_item";
-import Menu from "./menu";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToOne } from "typeorm";
+import AdditionsCategory from "./additions_category";
+import { AdditionsRecipes } from "./additions_recipes";
 
-
-export enum AdditionsMode {
-    single = 'single',
-    many = 'many'
-}
 
 @Entity()
 export default class Additions extends BaseEntity {
 
     @PrimaryGeneratedColumn()
-    id: number
+    id: number;
+
+    @ManyToOne(() => AdditionsCategory, addition => addition.id)
+    id_additions: AdditionsCategory
 
     @Column()
     name: string
 
-    @ManyToOne(() => Menu, menu => menu.id)
-    id_menu: Menu
-
     @Column()
-    mode: AdditionsMode
+    cost: number
 
-    @OneToMany(() => AdditionsItem, item => item.id_additions)
-    additions_item: AdditionsItem[]
+    @OneToOne(() => AdditionsRecipes, recipe => recipe.id)
+    @JoinColumn()
+    recipe: AdditionsRecipes
 }
 
 

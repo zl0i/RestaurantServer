@@ -5,7 +5,7 @@ import { body } from '../middleware/schemaChecker';
 import { cache } from '../middleware/cacheMiddleware';
 import DataProvider from '../lib/DataProvider';
 import { Resources, Actions } from '../lib/permissionsBuilder';
-import Additions from '../entity/additions';
+import Additions from '../entity/additions_category';
 
 const router = express.Router();
 

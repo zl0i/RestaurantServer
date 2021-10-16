@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, OneToOne, JoinColumn } from "typeorm";
-import Additions from "./additions";
+import Additions from "./additions_category";
 import { MenuRecipes } from "./menu_recipes";
 
 export enum MenuStatus {
