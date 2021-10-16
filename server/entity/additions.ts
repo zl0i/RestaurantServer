@@ -9,8 +9,8 @@ export default class Additions extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => AdditionsCategory, addition => addition.id)
-    id_additions: AdditionsCategory
+    @ManyToOne(() => AdditionsCategory, category => category.id)
+    id_category: AdditionsCategory
 
     @Column()
     name: string

@@ -17,14 +17,14 @@ export default class AdditionsCategory extends BaseEntity {
     @Column()
     name: string
 
-    @ManyToOne(() => Menu, menu => menu.id)
+    @ManyToOne(() => Menu, menu => menu.id) //ManyToMany
     id_menu: Menu
 
     @Column()
     mode: AdditionsMode
 
-    @OneToMany(() => Additions, item => item.id_additions)
-    additions_item: Additions[]
+    @OneToMany(() => Additions, additions => additions.id_category)
+    additions: Additions[]
 }
 
 

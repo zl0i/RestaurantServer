@@ -1,11 +1,10 @@
 import express from 'express';
 import allow from '../middleware/permissionVaildator'
-import { MenuStatus } from '../entity/menu';
 import { body } from '../middleware/schemaChecker';
 import { cache } from '../middleware/cacheMiddleware';
 import DataProvider from '../lib/DataProvider';
 import { Resources, Actions } from '../lib/permissionsBuilder';
-import MenuService from '../services/menu.service';
+import AdditionsService from '../services/additions.service';
 import HttpError from '../lib/httpError';
 
 const router = express.Router();
@@ -16,41 +15,8 @@ router.get('/',
     ],
     async (req: express.Request, res: express.Response) => {
         try {
-            const provider = new DataProvider('Menu')
-            await provider.index(req, res, { status: MenuStatus.active })
-        } catch (e) {
-            console.log(e)
-            res.status(500).json({
-                message: e.message
-            })
-        }
-    });
-
-router.get('/:id',
-    [
-        cache(180)
-    ],
-    async (req: express.Request, res: express.Response) => {
-        try {
-            const provider = new DataProvider('Menu')
-            await provider.index(req, res, { id: Number(req.params.id) })
-        } catch (e) {
-            console.log(e)
-            res.status(500).json({
-                message: e.message
-            })
-        }
-    });
-
-
-router.get('/:id/additions',
-    [
-        cache(180)
-    ],
-    async (req: express.Request, res: express.Response) => {
-        try {
-            const provider = new DataProvider('AdditionsCategory')
-            await provider.index(req, res, { id_menu: Number(req.params.id) }, ['additions'])
+            const provider = new DataProvider('Additions')
+            await provider.index(req, res)
         } catch (e) {
             console.log(e)
             res.status(500).json({
@@ -61,13 +27,12 @@ router.get('/:id/additions',
 
 router.post('/',
     [
-        body({ id_category: String, name: String, cost: String, description: String }),
+        body({ name: String, cost: Number, id_additions: Number }),
         allow(Resources.menu, Actions.create)
     ],
     async (req: express.Request, res: express.Response) => {
         try {
-            const data = { ...req.body, icon: req.files?.icon }
-            const item = await MenuService.create(data)
+            const item = await AdditionsService.create(req.body)
             res.json(item)
         } catch (error) {
             console.log(error)
@@ -82,8 +47,7 @@ router.post('/',
                 })
             }
         }
-    }
-)
+    })
 
 router.patch('/:id',
     [
@@ -91,8 +55,7 @@ router.patch('/:id',
     ],
     async (req: express.Request, res: express.Response) => {
         try {
-            const data = { ...req.body, icon: req.files?.icon }
-            const item = await MenuService.update(Number(req.params.id), data)
+            const item = await AdditionsService.update(Number(req.params.id), req.body)
             res.json(item)
         } catch (error) {
             console.log(error)
@@ -115,7 +78,7 @@ router.delete('/:id',
     ],
     async (req: express.Request, res: express.Response) => {
         try {
-            await MenuService.delete(Number(req.params.id))
+            await AdditionsService.delete(Number(req.params.id))
             res.json({
                 result: 'ok'
             })

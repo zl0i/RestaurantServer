@@ -8,8 +8,8 @@ import orderRouter from './routers/orderRouter'
 import shopRouter from './routers/shopRouter'
 import oauthRouter from './routers/oauthRouter'
 import menuRouter from './routers/menu.router'
-import additionsRouter from './routers/additionsRouter'
-import additionsItemRouter from './routers/additionsItemRouter'
+import additionsCategoryRouter from './routers/additionsCategory.router'
+import additionsRouter from './routers/additions.router'
 import categoryRouter from './routers/menuCategory.router'
 import imageRouter from './routers/imagesRouter'
 import pointRouter from './routers/pointRouter'
@@ -29,15 +29,15 @@ if (process.env['NODE_ENV'] !== 'test') {
 
 app.use('/restaurant/images', imageRouter);
 app.use('/restaurant/api/auth', authRouter);
+app.use('/restaurant/api/oauth', oauthRouter);
 app.use('/restaurant/api/users', usersRouter);
 app.use('/restaurant/api/orders', orderRouter);
 app.use('/restaurant/api/shops', shopRouter);
 app.use('/restaurant/api/point', pointRouter);
-app.use('/restaurant/api/menu', menuRouter);
+app.use('/restaurant/api/menu/additions/category', additionsCategoryRouter);
 app.use('/restaurant/api/menu/additions', additionsRouter);
-app.use('/restaurant/api/menu/additions/items', additionsItemRouter);
-app.use('/restaurant/api/category', categoryRouter);
-app.use('/restaurant/api/oauth', oauthRouter);
+app.use('/restaurant/api/menu/category', categoryRouter);
+app.use('/restaurant/api/menu', menuRouter);
 
 if (process.env['NODE_ENV'] == 'test') {
     //It's magic!!! This need for the supertest.
