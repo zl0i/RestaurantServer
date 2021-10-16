@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, OneToMany } from "typeorm";
-import AdditionsItem from "./additions";
+import Additions from "./additions";
 import Menu from "./menu";
 
 
@@ -23,8 +23,8 @@ export default class AdditionsCategory extends BaseEntity {
     @Column()
     mode: AdditionsMode
 
-    @OneToMany(() => AdditionsItem, item => item.id_additions)
-    additions_item: AdditionsItem[]
+    @OneToMany(() => Additions, item => item.id_additions)
+    additions_item: Additions[]
 }
 
 
