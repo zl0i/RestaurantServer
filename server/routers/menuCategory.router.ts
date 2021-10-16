@@ -4,7 +4,7 @@ import { body } from '../middleware/schemaChecker';
 import { cache } from '../middleware/cacheMiddleware';
 import DataProvider from '../lib/DataProvider';
 import { Resources, Actions } from '../lib/permissionsBuilder';
-import CategoryService from '../services/category.service';
+import MenuCategoryService from '../services/menuCategory.service';
 import HttpError from '../lib/httpError';
 
 const router = express.Router();
@@ -33,7 +33,7 @@ router.post('/',
     async (req: express.Request, res: express.Response) => {
         try {
             const data = { ...req.body, icon: req.files?.icon }
-            const category = await CategoryService.create(data)
+            const category = await MenuCategoryService.create(data)
             res.json(category)
         } catch (error) {
             console.log(error)
@@ -58,7 +58,7 @@ router.patch('/:id',
     async (req: express.Request, res: express.Response) => {
         try {
             const data = { ...req.body, icon: req.files?.icon }
-            const category = await CategoryService.update(Number(req.params.id), data)
+            const category = await MenuCategoryService.update(Number(req.params.id), data)
             res.json(category)
         } catch (error) {
             console.log(error)
@@ -82,7 +82,7 @@ router.delete('/:id',
     ],
     async (req: express.Request, res: express.Response) => {
         try {
-            await CategoryService.delete(Number(req.params.id))
+            await MenuCategoryService.delete(Number(req.params.id))
             res.json({
                 result: 'ok'
             })

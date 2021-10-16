@@ -10,7 +10,7 @@ import ObjectStorage from "../src/storage"
 
 
 
-export default class CategoryService {
+export default class MenuCategoryService {
 
     static async read(icondition: ICondition) {
 
