@@ -3,7 +3,7 @@ import fileUpload from 'express-fileupload'
 import * as prom from './src/prometheus'
 import morgan from 'morgan';
 import authRouter from './routers/authRouter'
-import usersRouter from './routers/usersRouter'
+import usersRouter from './routers/users.router'
 import orderRouter from './routers/orderRouter'
 import shopRouter from './routers/shopRouter'
 import oauthRouter from './routers/oauthRouter'
