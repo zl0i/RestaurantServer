@@ -57,7 +57,7 @@ export default class MenuService {
     }
 
     static async delete(id: number) {
-        const item = await Menu.findOne({ id })
+        const item = await Menu.findOne({ id }) //TO DO throw error if item is undefined
         if (item.icon)
             await ObjectStorage.deleteImage(item.icon)
         await item.remove()

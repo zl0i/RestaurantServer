@@ -10,7 +10,7 @@ import oauthRouter from './routers/oauthRouter'
 import menuRouter from './routers/menu.router'
 import additionsRouter from './routers/additionsRouter'
 import additionsItemRouter from './routers/additionsItemRouter'
-import categoryRouter from './routers/categoryRouter'
+import categoryRouter from './routers/category.router'
 import imageRouter from './routers/imagesRouter'
 import pointRouter from './routers/pointRouter'
 
