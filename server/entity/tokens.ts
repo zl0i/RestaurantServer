@@ -11,9 +11,9 @@ export class Tokens extends BaseEntity {
     constructor(user_id: number) {
         super();
         this.id_user = user_id
-        this.token = jwt.sign({ id: user_id }, secret_key)
         const d = new Date()
         d.setDate(d.getDate() + 10)
+        this.token = jwt.sign({ id: user_id }, secret_key, { expiresIn: '10d' })
         this.expired_at = d
     }
 
