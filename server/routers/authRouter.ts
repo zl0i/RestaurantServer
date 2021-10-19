@@ -10,6 +10,6 @@ router.post('/code', [body({ phone: String, code: String })], DefaultAuth.viaCod
 
 router.post('/password', [body({ login: String, password: String })], DefaultAuth.viaPassword);
 
-router.post('/token', [body({ token: String })], DefaultAuth.viaToken);
+router.post('/token', DefaultAuth.viaToken);
 
 export default router

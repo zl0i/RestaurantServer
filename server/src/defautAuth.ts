@@ -5,6 +5,7 @@ import HttpError from '../lib/httpError';
 import { Users } from '../entity/user';
 import { Tokens } from '../entity/tokens';
 import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder'
+import { MoreThan } from 'typeorm';
 
 const smsApiKey = process.env['APP_SMS_API_KEY'] || '';
 
@@ -104,8 +105,22 @@ export default class DefaultAuth {
     }
   }
 
-  static async viaToken(_req: express.Request, res: express.Response) {
-    res.status(404).end()
+  static async viaToken(req: express.Request, res: express.Response) {
+    try {
+      const token = await Tokens.findOne({ token: req.headers.authorization?.split(" ")[1], expired_at: MoreThan(new Date()) })
+      if (token) {
+        const newToken = new Tokens(token.id_user)
+        await token.remove()
+        await newToken.save()
+        res.json({
+          token: newToken.token
+        })
+      } else {
+        res.status(401).end()
+      }
+    } catch (error) {
+      res.status(500).end()
+    }
   }
 
 
