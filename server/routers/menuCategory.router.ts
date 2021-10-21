@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.get('/',
     [
-        allow(Resources.menu, Actions.read), cache(600)
+        cache(600)
     ],
     async (req: express.Request, res: express.Response) => {
         try {
