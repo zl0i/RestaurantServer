@@ -8,5 +8,6 @@ export default abstract class BasicScope {
     constructor() { }    
 
     abstract own(): ICondition
-    abstract points(ids: Array<number>): ICondition
+    abstract points(ids: Array<number>): ICondition    
+    abstract orders(ids: Array<number>): ICondition
 }

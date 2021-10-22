@@ -49,6 +49,8 @@ export default class ScopeCondition {
                 return sclass.own()
             case Scopes.points:
                 return sclass.points(this._params)
+            case Scopes.orders:
+                return sclass.orders(this._params)
             case Scopes.all:
                 return { key: '', value: [] }
             default:

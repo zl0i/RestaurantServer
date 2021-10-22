@@ -27,6 +27,7 @@ export enum Actions {
 }
 
 export const enum Scopes {
+    orders = 'orders',
     points = 'points',
     own = 'own',
     all = 'all'

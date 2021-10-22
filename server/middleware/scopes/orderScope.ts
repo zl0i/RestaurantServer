@@ -16,4 +16,8 @@ export default class OrderScope extends BasicScope {
     points(ids: Array<number>): ICondition {
         return { key: 'id_point', value: ids }
     }
+
+    orders(ids: Array<number>): ICondition {
+        return { key: 'id', value: ids }
+    }
 }

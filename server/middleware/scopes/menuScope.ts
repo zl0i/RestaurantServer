@@ -12,4 +12,8 @@ export default class MenuScope extends BasicScope {
     points(ids: Array<number>): ICondition {
         return { key: 'id_point', value: ids }
     }
+
+    orders(_ids: Array<number>): ICondition {
+        return { key: '', value: [] }
+    }
 }
