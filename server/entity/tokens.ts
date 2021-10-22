@@ -8,19 +8,19 @@ const secret_key = process.env['APP_SECRET'] || 'shhhh'
 @Entity()
 export class Tokens extends BaseEntity {
 
-    constructor(user_id: number) {
+    constructor(user_id: number, permissions: string) {
         super();
         this.id_user = user_id
         const d = new Date()
         d.setDate(d.getDate() + 10)
-        this.token = jwt.sign({ id: user_id }, secret_key, { expiresIn: '10d' })
+        this.token = jwt.sign({ id: user_id, rights: permissions }, secret_key, { expiresIn: '10d' })
         this.expired_at = d
     }
 
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ unique: true })
+    @Column({ unique: true, length: 500 })
     token: string
 
     @Column()

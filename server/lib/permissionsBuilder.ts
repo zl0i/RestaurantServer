@@ -37,7 +37,7 @@ export default class PermissionsBuilder {
     constructor() { }
 
     //TO DO if roles are issued than do nothing
-    static async setUserRolePermissions(id_user: number, role: UserRoles) { 
+    static async setUserRolePermissions(id_user: number, role: UserRoles) {
         await user_permissions.delete({ id_user: id_user })
 
         const permissions: PermissionSet = new PermissionSet();
@@ -82,7 +82,7 @@ export default class PermissionsBuilder {
 
     static async createTokenPermissionsByUser(id_user: number, id_token: number) {
         const permissions = await user_permissions.find({ id_user: id_user })
-        for(const p of permissions) {
+        for (const p of permissions) {
             await token_permissions.insert({
                 id_token: id_token,
                 resource: p.resource,
@@ -91,6 +91,17 @@ export default class PermissionsBuilder {
                 conditions: p.conditions
             })
         }
+        return permissions
+    }
+
+    static compressPermissions(permissions: string[]): string {
+        const result: string[] = new Array()
+        for (const p of permissions) {
+            const [resource, actions, scope] = p.split(':')
+            const index = scope.indexOf('[')
+            result.push(`${resource.charAt(0)}:${actions.charAt(0)}:${index == -1 ? scope.charAt(0) : scope.replace(scope.slice(1, index), '')}`)
+        }
+        return result.join(',')
     }
 }
 

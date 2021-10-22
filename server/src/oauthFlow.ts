@@ -5,6 +5,7 @@ import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder';
 import { Users } from '../entity/user';
 import { Tokens } from '../entity/tokens';
 import { oauth_users } from '../entity/oauth_users';
+import { user_permissions } from '../entity/user_permissions';
 
 const redirect_uri = "https://zloi.space/restaurant/api/oauth/code";
 const project_uri = "https://gossy.link"
@@ -118,7 +119,8 @@ export default class OAuthFlow {
                 })
             }
 
-            const token = new Tokens(user.id)
+            const permissions = await user_permissions.find({ id_user: user.id })
+      const token = new Tokens(user.id, PermissionsBuilder.compressPermissions(permissions.map(p => `${p.resource}:${p.action}:${p.scope}`)))
             await token.save()
             PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
 

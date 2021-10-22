@@ -6,6 +6,8 @@ import { Users } from '../entity/user';
 import { Tokens } from '../entity/tokens';
 import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder'
 import { MoreThan } from 'typeorm';
+import { user_permissions } from '../entity/user_permissions';
+import { token_permissions } from '../entity/token_permissions';
 
 const smsApiKey = process.env['APP_SMS_API_KEY'] || '';
 
@@ -58,7 +60,8 @@ export default class DefaultAuth {
       const code: string = req.body.code
 
       const user = await DefaultAuth.validateCode(phone, code)
-      const token = new Tokens(user.id)
+      const permissions = await user_permissions.find({ id_user: user.id })
+      const token = new Tokens(user.id, PermissionsBuilder.compressPermissions(permissions.map(p => `${p.resource}:${p.action}:${p.scope}`)))
       await token.save()
 
       user.sms_code = ''
@@ -87,7 +90,8 @@ export default class DefaultAuth {
       const user = await Users.findOne({ login: req.body.login })
       if (user && bcrypt.compareSync(req.body.password, user.password)) {
         await Tokens.delete({ id_user: user.id })
-        const token = new Tokens(user.id)
+        const permissions = await user_permissions.find({ id_user: user.id })
+        const token = new Tokens(user.id, PermissionsBuilder.compressPermissions(permissions.map(p => `${p.resource}:${p.action}:${p.scope}`)))
         await token.save()
         await PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
         res.json({
@@ -101,6 +105,7 @@ export default class DefaultAuth {
         })
       }
     } catch (error) {
+      console.log(error)
       res.status(500).end()
     }
   }
@@ -109,7 +114,8 @@ export default class DefaultAuth {
     try {
       const token = await Tokens.findOne({ token: req.headers.authorization?.split(" ")[1], expired_at: MoreThan(new Date()) })
       if (token) {
-        const newToken = new Tokens(token.id_user)
+        const permissions = await token_permissions.find({ id_token: token.id })
+        const newToken = new Tokens(token.id_user, PermissionsBuilder.compressPermissions(permissions.map(p => `${p.resource}:${p.action}:${p.scope}`)))
         await token.remove()
         await newToken.save()
         res.json({
