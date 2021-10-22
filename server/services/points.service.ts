@@ -41,11 +41,11 @@ export default class PointService {
             const file = data.files.icon as UploadedFile
             point.icon = await ObjectStorage.uploadImage(file as UploadedFile, point.id) as string
         }
-        await point.save()
+        return await point.save()
     }
 
-    static async delete(id: number) { //TO DO remove category and menu
+    static async delete(id: number) {
         const point = await Points.findOne({ id })
-        await point.remove()
+        return await point.remove()
     }
 }

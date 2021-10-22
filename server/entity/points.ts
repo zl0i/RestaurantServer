@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, DeleteResult, FindConditions, ObjectType, RemoveOptions } from "typeorm";
+import ObjectStorage from "../src/storage";
+import MenuCategory from "./menu_category";
 
 @Entity()
 export default class Points extends BaseEntity {
@@ -12,18 +14,35 @@ export default class Points extends BaseEntity {
     @Column()
     address: string
 
-    @Column({default: null})
+    @Column({ default: null })
     lat: number
 
-    @Column({default: null})
+    @Column({ default: null })
     lon: string
 
-    @Column({default: 0})
+    @Column({ default: 0 })
     delivery_cost: number
 
-    @Column({default: false})
+    @Column({ default: false })
     is_delivering: boolean
 
-    @Column({default: ""})
+    @Column({ default: "" })
     icon: string
+
+    async remove(): Promise<this> {
+        MenuCategory.delete({ id_point: this.id })
+        if (this.icon)
+            await ObjectStorage.deleteImage(this.icon)
+        return super.remove()
+    }
+
+    static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
+        const points = await Points.find(criteria)
+        for (const p of points) {
+            MenuCategory.delete({ id_point: p.id })
+            if (p.icon)
+                await ObjectStorage.deleteImage(p.icon)
+        }
+        return super.delete(criteria, options)
+    }
 }

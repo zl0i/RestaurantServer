@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, OneToMany, DeleteResult, FindConditions, ObjectType, RemoveOptions } from "typeorm";
 import Additions from "./additions";
 import Menu from "./menu";
 
@@ -17,7 +17,7 @@ export default class AdditionsCategory extends BaseEntity {
     @Column()
     name: string
 
-    @ManyToOne(() => Menu, menu => menu.id) //ManyToMany
+    @ManyToOne(() => Menu, menu => menu.id) //TO DO ManyToMany
     id_menu: Menu
 
     @Column()
@@ -25,6 +25,19 @@ export default class AdditionsCategory extends BaseEntity {
 
     @OneToMany(() => Additions, additions => additions.id_category)
     additions: Additions[]
+
+    async remove(): Promise<this> {
+        Additions.delete({ id_category: this })
+        return super.remove()
+    }
+
+    static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
+        const additionsCategory = await AdditionsCategory.find(criteria)
+        for (const a of additionsCategory) {
+            Additions.delete({ id_category: a })
+        }
+        return super.delete(criteria, options)
+    }
 }
 
 
