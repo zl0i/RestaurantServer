@@ -1,7 +1,7 @@
 import Points from '../entity/points'
 import Orders, { OrderStatus } from '../entity/orders';
 import { Users } from '../entity/user';
-import YokassaAPI from './yokassaAPI';
+import YokassaAPI from '../src/yokassaAPI';
 import OrderContent from '../entity/order_content';
 import Menu from '../entity/menu';
 import OrderDelivery from '../entity/order_delivery';

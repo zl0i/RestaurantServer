@@ -1,5 +1,5 @@
 import { Users } from '../entity/user';
-import DefaultAuth from '../src/defautAuth'
+import DefaultAuth from '../services/auth.service'
 import request from 'supertest'
 import app from '../server'
 import PermissionsBuilder from '../lib/permissionsBuilder';

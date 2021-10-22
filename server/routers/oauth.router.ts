@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import OAuthFlow from '../src/oauthFlow';
+import OAuthFlow from '../services/oauth.service';
 import { query } from '../middleware/schemaChecker';
 
 const router = Router()

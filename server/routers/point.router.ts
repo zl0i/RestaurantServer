@@ -1,12 +1,10 @@
 import express from 'express';
-import { UploadedFile } from 'express-fileupload';
-import Points from '../entity/points';
 import DataProvider from '../lib/DataProvider';
 import { Resources, Actions } from '../lib/permissionsBuilder';
 import { cache } from '../middleware/cacheMiddleware'
 import { body } from '../middleware/schemaChecker';
 import allow from '../middleware/permissionVaildator'
-import ObjectStorage from '../src/storage';
+import PointService from '../services/points.service';
 
 const router = express.Router();
 
@@ -33,19 +31,8 @@ router.post('/',
   ],
   async (req: express.Request, res: express.Response) => {
     try {
-      const point = new Points()
-      point.name = req.body.name
-      point.address = req.body.address
-      point.lat = req.body.lat
-      point.lon = req.body.lon
-      point.delivery_cost = req.body.delivery_cost || 0
-      point.is_delivering = req.body.is_delivering == 'true'
-      await point.save()
-      if (!!req.files?.icon) {
-        const file = req.files.icon as UploadedFile
-        point.icon = await ObjectStorage.uploadImage(file as UploadedFile, point.id) as string
-        await point.save()
-      }
+      const data = { ...req.body, icon: req.files?.icon }
+      const point = await PointService.create(data)
       res.json(point)
     } catch (e) {
       console.log(e)
@@ -61,18 +48,8 @@ router.patch('/:id',
   ],
   async (req: express.Request, res: express.Response) => {
     try {
-      const point = await Points.findOne({ id: Number(req.params.id) })
-      point.name = req.body.name || point.name
-      point.address = req.body.address || point.address
-      point.lat = req.body.lat || point.lat
-      point.lon = req.body.lon || point.lon
-      point.delivery_cost = req.body.delivery_cost || point.delivery_cost
-      point.is_delivering = req.body.is_delivering == 'true' || point.is_delivering
-      if (!!req.files?.icon) {
-        const file = req.files.icon as UploadedFile
-        point.icon = await ObjectStorage.uploadImage(file as UploadedFile, point.id) as string
-      }
-      await point.save()
+      const data = { ...req.body, icon: req.files?.icon }
+      const point = await PointService.update(Number(req.params.id), data)
       res.json(point)
     } catch (e) {
       console.log(e)
@@ -88,8 +65,7 @@ router.delete('/:id',
   ],
   async (req: express.Request, res: express.Response) => {
     try {
-      const point = await Points.findOne({ id: Number(req.params.id) })
-      await point.remove()
+      const point = await PointService.delete(Number(req.params.id))
       res.json(point)
     } catch (e) {
       console.log(e)

@@ -2,17 +2,16 @@ import express from 'express'
 import fileUpload from 'express-fileupload'
 import * as prom from './src/prometheus'
 import morgan from 'morgan';
-import authRouter from './routers/authRouter'
+import authRouter from './routers/auth.router'
 import usersRouter from './routers/users.router'
-import orderRouter from './routers/orderRouter'
-import shopRouter from './routers/shopRouter'
-import oauthRouter from './routers/oauthRouter'
+import orderRouter from './routers/order.router'
+import oauthRouter from './routers/oauth.router'
 import menuRouter from './routers/menu.router'
 import additionsCategoryRouter from './routers/additionsCategory.router'
 import additionsRouter from './routers/additions.router'
 import categoryRouter from './routers/menuCategory.router'
 import imageRouter from './routers/imagesRouter'
-import pointRouter from './routers/pointRouter'
+import pointRouter from './routers/point.router'
 
 const app = express();
 
@@ -32,7 +31,6 @@ app.use('/restaurant/api/auth', authRouter);
 app.use('/restaurant/api/oauth', oauthRouter);
 app.use('/restaurant/api/users', usersRouter);
 app.use('/restaurant/api/orders', orderRouter);
-app.use('/restaurant/api/shops', shopRouter);
 app.use('/restaurant/api/point', pointRouter);
 app.use('/restaurant/api/menu/additions/category', additionsCategoryRouter);
 app.use('/restaurant/api/menu/additions', additionsRouter);

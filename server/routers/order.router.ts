@@ -2,7 +2,7 @@ import express from 'express';
 import allow from '../middleware/permissionVaildator'
 import { body } from '../middleware/schemaChecker';
 import YokassaAPI from '../src/yokassaAPI';
-import OrderBuilder from '../src/orderBuilder';
+import OrderBuilder from '../services/orders.service';
 import { cache } from '../middleware/cacheMiddleware';
 import { In } from 'typeorm';
 import DataProvider from '../lib/DataProvider';

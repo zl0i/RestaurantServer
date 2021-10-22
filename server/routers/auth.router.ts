@@ -1,6 +1,6 @@
 import express from 'express';
 import { body } from '../middleware/schemaChecker';
-import DefaultAuth from '../src/defautAuth';
+import DefaultAuth from '../services/auth.service';
 
 const router = express.Router();
 
