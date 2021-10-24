@@ -47,8 +47,9 @@ export default class ObjectStorage {
     static streamImage(req: express.Request, res: express.Response) {
         minioClient.getObject('restaurant', req.params.file, function (err, dataStream) {
             if (err) {
-                console.log(err)
-                return res.status(404).end()
+                res.status(404).json({
+                    message: err.message
+                })
             }
             dataStream.on('data', function (chunk) {
                 res.write(chunk)
