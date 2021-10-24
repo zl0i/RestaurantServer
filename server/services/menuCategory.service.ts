@@ -19,7 +19,7 @@ export default class MenuCategoryService {
     static async create(data: any) {
         const category = new MenuCategory()
         category.name = data.name
-        category.id_point = Number(data.id_point)
+        category.point = Number(data.id_point)
         category.description = data.description
         await category.save()
         if (data.icon) {

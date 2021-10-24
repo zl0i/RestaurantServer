@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, DeleteResult, FindConditions, ObjectType, RemoveOptions, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, DeleteResult, FindConditions, ObjectType, RemoveOptions, OneToMany, ManyToOne } from "typeorm";
 import ObjectStorage from "../src/storage";
 import Menu from "./menu";
+import Points from "./points";
 
 
 @Entity()
@@ -15,8 +16,8 @@ export default class MenuCategory extends BaseEntity {
     @Column({ default: null })
     icon: string
 
-    @Column()
-    id_point: number
+    @ManyToOne(() => Points, point => point.id)
+    point: Points | number
 
     @Column({ default: '', length: 1000 })
     description: string
