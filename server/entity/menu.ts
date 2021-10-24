@@ -61,6 +61,11 @@ export default class Menu extends BaseEntity {
         }
         return super.delete(criteria, options)
     }
+
+    @AfterLoad()
+    deleteQty() {
+        delete this.qty
+    }
 }
 
 

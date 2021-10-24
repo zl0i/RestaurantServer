@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, SaveOptions, DeleteResult, FindConditions, ObjectType, RemoveOptions } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, SaveOptions, DeleteResult, FindConditions, ObjectType, RemoveOptions, AfterLoad } from "typeorm";
 import Menu from "./menu";
 import OrdersAdditionsContent from "./orders_additions_content.entity";
 
@@ -54,5 +54,10 @@ export default class OrderContent extends BaseEntity {
             OrdersAdditionsContent.delete({ id_order_content: c.id })
         }
         return super.delete(criteria, options)
+    }
+
+    @AfterLoad()
+    deleteAdditions() {
+        delete this.additions
     }
 }
