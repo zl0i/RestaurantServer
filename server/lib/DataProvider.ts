@@ -15,6 +15,17 @@ export default class DataProvider {
         return await manager.findAndCount(this._model, condition)
     }
 
+    private buildNestedCondition(arr: string[], value: any) {
+        const name = arr.shift()
+        if (name) {
+            const obj = {}
+            obj[name] = this.buildNestedCondition(arr, value)
+            return obj
+        } else {
+            return value
+        }
+    }
+
     async index(req: express.Request, res: express.Response, condition: object = {}, relations: string[] = []) {
         const pagination = {}
         if (req.query['page'] || req.query['per-page']) {
@@ -41,20 +52,40 @@ export default class DataProvider {
         }
         expand.push(...relations)
 
-        const model = await this.find({
+        const delete_filed: string[] = new Array()
+        const v_condition: object = {}
+        for (const q of Object.keys(req.query)) {
+            if (q.includes('.')) {
+                const names = q.split('.')
+                const name = names.shift()
+                delete_filed.push(name)
+                v_condition[name] = this.buildNestedCondition(names, Number(req.query[q]))
+            } else {
+                v_condition[q] = req.query[q]
+            }
+        }
+
+        const model = (await this.find({
             where: {
-                ...req.query,
+                ...v_condition,
                 ...condition
             },
             relations: expand,
             ...pagination
-        })
+        })).flat()
         const count = Number(model.pop())
+
+        for (const md of model) {
+            for (const df of delete_filed) {
+                delete md[df]
+            }
+        }
+
         res.json({
-            data: model.flat(),
+            data: model,
             meta: {
                 lenght: count,
-                pages: Math.ceil(count / pagination['take']) || 1
+                pages: Math.ceil(count / pagination['take']) || (count > 0 ? 1 : 0)
             }
         })
     }

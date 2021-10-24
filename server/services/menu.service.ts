@@ -20,8 +20,7 @@ export default class MenuService {
             const item = new Menu()
             item.name = data.name
             item.cost = Number(data.cost)
-            item.id_category = category.id
-            item.id_point = category.id_point
+            item.category = category.id            
             item.description = data.description
             await item.save()
             if (data.icon) {
@@ -44,7 +43,7 @@ export default class MenuService {
         if (data.id_category) {
             const category = await MenuCategory.findOne({ id: data.id_category })
             if (category) {
-                item.id_category = category.id
+                item.category = category.id
             } else {
                 throw new HttpError(400, 'Category not found')
             }

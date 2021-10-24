@@ -42,7 +42,7 @@ export default class MenuCategoryService {
     }
 
     static async delete(id: number) {
-        const menu = await Menu.find({ id_category: id })
+        const menu = await Menu.find({ category: id })
         if (menu.length > 0) {
             throw new HttpError(400, 'Category isn\'t empty')
         }

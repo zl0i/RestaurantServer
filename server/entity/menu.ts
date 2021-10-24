@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, OneToOne, JoinColumn, DeleteResult, FindConditions, ObjectType, RemoveOptions } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, OneToOne, JoinColumn, DeleteResult, FindConditions, ObjectType, RemoveOptions, ManyToOne, AfterLoad } from "typeorm";
 import ObjectStorage from "../src/storage";
 import AdditionsCategory from "./additions_category";
+import MenuCategory from "./menu_category";
 import { MenuRecipes } from "./menu_recipes";
 
 export enum MenuStatus {
@@ -25,11 +26,9 @@ export default class Menu extends BaseEntity {
     @Column()
     cost: number
 
-    @Column()//TO DO delete
-    id_point: number
-
-    @Column()//TO DO do OnetoOne
-    id_category: number
+    @ManyToOne(() => MenuCategory, mc => mc.id)
+    @JoinColumn()
+    category: MenuCategory | number
 
     @Column({ default: MenuStatus.active })
     status: MenuStatus
