@@ -22,7 +22,7 @@ router.get('/',
         condition[req.context?.condition?.key] = In(req.context?.condition.value)
       }
       const provider = new DataProvider('Orders')
-      await provider.index(req, res, condition)
+      res.json(await provider.index(req, condition))
     } catch (e) {
       res.status(500).json({ result: e.message });
     }

@@ -17,7 +17,7 @@ router.get('/',
     async (req: express.Request, res: express.Response) => {
         try {
             const provider = new DataProvider('Menu')
-            await provider.index(req, res, { status: MenuStatus.active })
+            res.json(await provider.index(req, { status: MenuStatus.active }))
         } catch (e) {
             console.log(e)
             res.status(500).json({
@@ -33,7 +33,7 @@ router.get('/:id',
     async (req: express.Request, res: express.Response) => {
         try {
             const provider = new DataProvider('Menu')
-            await provider.index(req, res, { id: Number(req.params.id) })
+            res.json(await provider.index(req, { id: Number(req.params.id) }))
         } catch (e) {
             console.log(e)
             res.status(500).json({
@@ -50,7 +50,7 @@ router.get('/:id/additions',
     async (req: express.Request, res: express.Response) => {
         try {
             const provider = new DataProvider('AdditionsCategory')
-            await provider.index(req, res, { id_menu: Number(req.params.id) }, ['additions'])
+            res.json(await provider.index(req, { id_menu: Number(req.params.id) }, ['additions']))
         } catch (e) {
             console.log(e)
             res.status(500).json({

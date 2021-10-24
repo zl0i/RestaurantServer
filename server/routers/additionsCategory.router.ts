@@ -16,7 +16,7 @@ router.get('/',
     async (req: express.Request, res: express.Response) => {
         try {
             const provider = new DataProvider('AdditionsCategory')
-            await provider.index(req, res)
+            res.json(await provider.index(req))
         } catch (e) {
             console.log(e)
             res.status(500).json({

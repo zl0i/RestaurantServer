@@ -15,7 +15,7 @@ router.get('/',
   async (req: express.Request, res: express.Response) => {
     try {
       const provide = new DataProvider('Points')
-      await provide.index(req, res, {})
+      res.json(await provide.index(req))
     } catch (e) {
       console.log(e)
       res.status(500).json({
