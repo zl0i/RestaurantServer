@@ -2,7 +2,7 @@ import express from 'express';
 import allow from '../middleware/permissionVaildator'
 import { body } from '../middleware/schemaChecker';
 import YokassaAPI from '../src/yokassaAPI';
-import OrderBuilder from '../services/orders.service';
+import OrderService from '../services/orders.service';
 import { cache } from '../middleware/cacheMiddleware';
 import { In } from 'typeorm';
 import DataProvider from '../lib/DataProvider';
@@ -30,21 +30,38 @@ router.get('/',
 router.post(
   '/',
   [
-    body({ id_point: Number, menu: Array }),
+    body({ menu: Array }),
     allow(Resources.orders, Actions.create)
   ],
   async (req: express.Request, res: express.Response) => {
     try {
-      const order = await new OrderBuilder(req.context.user, req.body.menu, req.body.id_point)
-        .address(req.body.address)
-        .phone(req.body.phone)
-        .build()
+      const order = await OrderService.create(req.context.user, req.body)
+      res.json(order)
+    } catch (error) {
+      console.log(error)
+      res.status(500).json({
+        message: error.message
+      })
+    }
+  })
+
+
+router.delete(
+  '/:id',
+  [
+    allow(Resources.orders, Actions.delete)
+  ],
+  async (req: express.Request, res: express.Response) => {
+    try {
+      await OrderService.delete(Number(req.params.id))
       res.json({
-        id_order: order.order_id,
-        payment_token: order.payment_token
+        result: 'ok'
       })
     } catch (error) {
-      res.status(500).json(error.message)
+      console.log(error)
+      res.status(500).json({
+        message: error.message
+      })
     }
   })
 

@@ -1,102 +1,87 @@
-import Points from '../entity/points'
-import Orders, { OrderStatus } from '../entity/orders';
-import { Users } from '../entity/user';
-import YokassaAPI from '../src/yokassaAPI';
-import OrderContent from '../entity/order_content';
+
 import Menu from '../entity/menu';
-import OrderDelivery from '../entity/order_delivery';
+import { Users } from '../entity/user';
+import Orders from '../entity/orders'
+import { createQueryBuilder, In } from 'typeorm';
+import Additions from '../entity/additions';
+import AdditionsCategory from '../entity/additions_category';
+import YokassaAPI from '../src/yokassaAPI';
 
 
-export interface IAddress {
-  city: string,
-  street: string,
-  houde: string,
-  flat: string
-}
+export default class OrderService {
 
-export interface IContentOrder {
-  id: number
-  count: number
-}
+  static async create(user: Users, data: any) {
+    const ids: number[] = Array.from(data.menu).map(m => m['id'])
+    const menu = await Menu.find({ id: In(ids) })
 
-export interface UserOrder {
-  order_id: number,
-  payment_token: string
-}
+    if (ids.length != menu.length)
+      throw new Error('any menu is undefined')
 
-export default class OrderBuilder {
+    for (const m of menu) { //TO DO refractor
+      const req_menu = Array.from(data.menu).find(mn => mn['id'] === m.id)
+      m.qty = Number(req_menu['count'])
+      if (req_menu['additions']) {
+        const ad_ids = Array.from(req_menu['additions']).map(ad => ad['id'])
+        if (ad_ids.length > 0) {
+          const ad_cat = await createQueryBuilder()
+            .select('ad.*, ac.mode')
+            .from('additions_category', 'ac')
+            .leftJoin('additions', 'ad', 'ad.idCategoryId = ac.id')
+            .where('ad.id in (:...id)', { id: ad_ids })
+            .andWhere('ac.idMenuId = :menu', { menu: m.id })
+            .getRawMany();
 
-  private _address: IAddress;
-  private _menu: Array<IContentOrder>
-  private _comment: string
-  private _phone: string
-  private _id_point: number
-  private _user: Users
+          if (ad_cat.length != ad_ids.length)
+            throw new Error('any additions is undefined')
 
-  constructor(user: Users, menu: Array<IContentOrder>, id_point: number) {
-    this._user = user
-    this._menu = menu
-    this._id_point = id_point
-  }
+          for (const ad of ad_cat) {
+            let category: AdditionsCategory
+            if (m.additions_category) {
+              category = m.additions_category.find(ac => ac.id === ad.idCategoryId)
+              if (!category) {
+                const num = m.additions_category.push({
+                  mode: ad.mode,
+                  additions: []
+                } as AdditionsCategory)
+                category = m.additions_category[num - 1]
+              }
+            } else {
+              m.additions_category = new Array()
+              m.additions_category.push({
+                id: ad.idCategoryId,
+                mode: ad.mode,
+                additions: []
+              } as AdditionsCategory)
+              category = m.additions_category[0]
+            }
+            if (ad.mode === 'single' && category.additions.length > 0)
+              throw new Error(`additions category ${ad.idCategoryId} is single`)
 
-  address(address: IAddress): OrderBuilder {
-    this._address = address
-    return this
-  }
-
-  comment(text: string) {
-    this._comment = text
-    return this
-  }
-
-  phone(phone: string) {
-    this._phone = phone
-    return this
-  }
-
-  async build(): Promise<UserOrder> {
-    const point = await Points.findOne({ id: this._id_point })
-
-    const order = new Orders();
-    order.id_point = point.id
-    order.id_user = this._user.id
-    order.date = new Date();
-    order.status = OrderStatus.accepted;
-    order.phone = this._phone
-    order.comment = this._comment
-    await order.save();
-
-    let cost = 0;
-
-    this._menu.forEach(async (el: IContentOrder) => {
-      const item = await Menu.findOne({ id: el.id })
-
-      const content = new OrderContent()
-      content.id_menu = el.id
-      content.id_order = order.id
-      content.count = el.count
-      content.cost = item.cost
-      await content.save()
-      cost += item.cost * el.count
-    }, 0)
-
-    if (this._address) {
-      const delivery = new OrderDelivery()
-      delivery.id_order = order.id
-      delivery.address = JSON.stringify(this._address)
-      delivery.cost = point.delivery_cost
-      await delivery.save()
+            category.additions.push({
+              id: ad.id,
+              cost: ad.cost,
+              count: m.qty
+            } as unknown as Additions)
+          }
+        }
+      }
     }
-
-    const payment = await YokassaAPI.createPaymentOrder(cost, order.id, 'Заказ')
-    order.total = cost
-    order.status = OrderStatus.wait_payment;
+    const order = new Orders(menu, user)
+    order.comment = data.comment
+    await order.save()
+    const payment = await YokassaAPI.createPaymentOrder(order.total, order.id, 'Your order')
     order.payment_id = payment.payment_id
     await order.save()
-
+    delete order.payment_id
     return {
-      order_id: order.id,
-      payment_token: payment.confirmation_token
-    };
+      ...order,
+      confirmation_token: payment.confirmation_token
+    }
   }
+
+  static async delete(id: number) {
+    await Orders.delete({ id })
+    return 'ok'
+  }
+
 }

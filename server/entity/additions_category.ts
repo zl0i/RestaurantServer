@@ -18,7 +18,7 @@ export default class AdditionsCategory extends BaseEntity {
     name: string
 
     @ManyToOne(() => Menu, menu => menu.id) //TO DO ManyToMany
-    id_menu: Menu
+    id_menu: Menu | number
 
     @Column()
     mode: AdditionsMode

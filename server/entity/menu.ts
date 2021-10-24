@@ -11,6 +11,8 @@ export enum MenuStatus {
 @Entity()
 export default class Menu extends BaseEntity {
 
+    public qty: number = 0
+
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -23,10 +25,10 @@ export default class Menu extends BaseEntity {
     @Column()
     cost: number
 
-    @Column()
+    @Column()//TO DO delete
     id_point: number
 
-    @Column()
+    @Column()//TO DO do OnetoOne
     id_category: number
 
     @Column({ default: MenuStatus.active })

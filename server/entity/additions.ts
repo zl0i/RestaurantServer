@@ -10,7 +10,7 @@ export default class Additions extends BaseEntity {
     id: number;
 
     @ManyToOne(() => AdditionsCategory, category => category.id)
-    id_category: AdditionsCategory
+    id_category: AdditionsCategory | number
 
     @Column()
     name: string
