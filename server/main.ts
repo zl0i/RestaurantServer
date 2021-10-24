@@ -5,10 +5,20 @@ import * as db from "typeorm";
 import YookassaAPI from './src/yokassaAPI';
 import { Users } from "./entity/user";
 import PermissionsBuilder, { UserRoles } from "./lib/permissionsBuilder";
+import ObjectStorage from "./src/storage";
 
 const db_host: string = process.env['DB_HOST'] || 'localhost'
 const db_password: string = process.env['DB_PASSWORD'] || 'admin';
 const db_name: string = process.env['DB_NAME'] || 'restaurant'
+
+ObjectStorage.connect()
+  .then(_ => {
+    console.log('[OK] Storage is connected')
+  })
+  .catch(e => {
+    console.log('[ERROR] Storage is not connected')
+    console.log(e.mesage)
+  })
 
 db.createConnection({
   type: "mysql",

@@ -11,21 +11,29 @@ var minioClient = new Minio.Client({
     secretKey: process.env['STORAGE_PASSWORD']
 });
 
-minioClient.bucketExists('restaurant', (err, res) => {
-    if (res == false) {
-        minioClient.makeBucket('restaurant', '')
-            .then((val) => {
-                console.log(val)
-            })
-            .catch((err) => {
-                console.log(err)
-            })
-    } else {
-        console.log('[OK] Storage is connected')
-    }
-})
+
+
 
 export default class ObjectStorage {
+
+    static async connect() {
+        return new Promise((resolve, reject) => {
+            minioClient.bucketExists('restaurant', (err, res) => {
+                if (res == false) {
+                    minioClient.makeBucket('restaurant', '')
+                        .then((val) => {
+                            resolve(res)
+                        })
+                        .catch((err) => {
+                            reject(err)
+                        })
+                } else {
+                    resolve(res)
+                }
+            })
+        })
+
+    }
 
     static listImages(req: express.Request, res: express.Response) {
         const stream = minioClient.listObjects('restaurant', '', true)
