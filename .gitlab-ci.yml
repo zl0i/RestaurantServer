@@ -3,8 +3,7 @@ image: docker:19.03.12
 services:
   - docker:19.03.12-dind
 
-after_script:
-  - docker logout
+
 
 stages:
   - test
@@ -27,6 +26,8 @@ build_app:
   script:
     - docker build -t ${CI_REGISTRY_IMAGE}/app:latest ./server/
     - docker push ${CI_REGISTRY_IMAGE}/app:latest
+  after_script:
+    - docker logout
   needs:
     - test
   only:
@@ -43,6 +44,8 @@ build_proxy:
   script:
     - docker build -t ${CI_REGISTRY_IMAGE}/proxy:latest ./proxy/
     - docker push ${CI_REGISTRY_IMAGE}/proxy:latest
+  after_script:
+    - docker logout
   only:
     - master
 
@@ -53,6 +56,8 @@ build_prometheus:
   script:
     - docker build -t ${CI_REGISTRY_IMAGE}/prometheus:latest ./monitoring/prometheus/
     - docker push ${CI_REGISTRY_IMAGE}/prometheus:latest
+  after_script:
+  - docker logout
   only:
     - master
 
@@ -75,6 +80,8 @@ deploy:
     - docker-compose -f docker-compose.prod.yml --env-file ./.env up -d
     - docker system prune -f
     - docker volume prune -f
+  after_script:
+    - docker logout
   only:
     - master
   needs:
