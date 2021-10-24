@@ -1,11 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, SaveOptions, DeleteResult, FindConditions, ObjectType, RemoveOptions, AfterLoad } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, SaveOptions, DeleteResult, FindConditions, ObjectType, RemoveOptions, ManyToOne, OneToOne, JoinColumn, OneToMany } from "typeorm";
 import Menu from "./menu";
+import Orders from "./orders";
 import OrdersAdditionsContent from "./orders_additions_content.entity";
 
 @Entity()
 export default class OrderContent extends BaseEntity {
-
-    private additions: OrdersAdditionsContent[] = new Array()
 
     constructor(menu: Menu) {
         super()
@@ -22,10 +21,8 @@ export default class OrderContent extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    id_order: number
-
-    @Column()
+    @OneToOne(() => Menu, menu => menu.id)
+    @JoinColumn()
     id_menu: number
 
     @Column()
@@ -34,8 +31,14 @@ export default class OrderContent extends BaseEntity {
     @Column()
     count: number
 
+    @ManyToOne(() => Orders, order => order.id)
+    order: Orders | number
+
+    @OneToMany(() => OrdersAdditionsContent, content => content.order_content)
+    additions: OrdersAdditionsContent[]
+
     async save(options?: SaveOptions): Promise<this> {
-        this.id_order = options.data['id']
+        this.order = options.data['id']
         const s = await super.save()
         for (const a of this.additions) {
             await a.save({ data: s })
@@ -44,20 +47,15 @@ export default class OrderContent extends BaseEntity {
     }
 
     async remove(): Promise<this> {
-        OrdersAdditionsContent.delete({ id_order_content: this.id })
+        OrdersAdditionsContent.delete({ order_content: this.id })
         return super.remove()
     }
 
     static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
         const content = await OrderContent.find(criteria)
         for (const c of content) {
-            OrdersAdditionsContent.delete({ id_order_content: c.id })
+            OrdersAdditionsContent.delete({ order_content: c.id })
         }
         return super.delete(criteria, options)
-    }
-
-    @AfterLoad()
-    deleteAdditions() {
-        delete this.additions
     }
 }

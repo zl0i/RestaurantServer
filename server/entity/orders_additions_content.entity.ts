@@ -1,5 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, SaveOptions } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, SaveOptions, ManyToOne, OneToOne, JoinColumn } from "typeorm";
+import Additions from "./additions";
 import AdditionsCategory from "./additions_category";
+import OrderContent from "./order_content";
 
 
 @Entity()
@@ -17,11 +19,12 @@ export default class OrdersAdditionsContent extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    id_order_content: number
+    @ManyToOne(() => OrderContent, content => content.additions)
+    order_content: OrderContent | number
 
-    @Column()
-    id_additions: number
+    @OneToOne(() => Additions, additions => additions.id)
+    @JoinColumn()
+    id_additions: Additions | number
 
     @Column()
     cost: number
@@ -30,7 +33,7 @@ export default class OrdersAdditionsContent extends BaseEntity {
     count: number
 
     async save(options?: SaveOptions): Promise<this> {
-        this.id_order_content = options.data['id']
+        this.order_content = options.data['id']
         return await super.save()
     }
 }

@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany } from "typeorm";
+import Orders from "./orders";
 
 @Entity()
 export class Users extends BaseEntity {
@@ -35,6 +36,9 @@ export class Users extends BaseEntity {
 
     @Column({default: null})
     sms_code_expired_at: Date;
+
+    @OneToMany(() => Orders, order => order.id)
+    orders: Orders[]
 
     removePrivateData() {
         delete this.password

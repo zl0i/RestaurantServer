@@ -12,7 +12,8 @@ const router = express.Router();
 
 router.get('/',
   [
-    allow(Resources.orders, Actions.read), cache(60)
+    cache(60),
+    allow(Resources.orders, Actions.read)
   ],
   async (req: express.Request, res: express.Response) => {
     try {
@@ -23,7 +24,7 @@ router.get('/',
       const provider = new DataProvider('Orders')
       await provider.index(req, res, condition)
     } catch (e) {
-      res.status(500).json({ result: 'error' });
+      res.status(500).json({ result: e.message });
     }
   });
 

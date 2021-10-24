@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, CreateDateColumn, SaveOptions, DeleteResult, FindConditions, ObjectType, RemoveOptions } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, CreateDateColumn, SaveOptions, DeleteResult, FindConditions, ObjectType, RemoveOptions, ManyToOne, OneToMany } from "typeorm";
 import Menu from "./menu";
 import OrderContent from "./order_content";
 import { Users } from "./user";
@@ -16,12 +16,10 @@ export enum OrderStatus {
 @Entity()
 export default class Orders extends BaseEntity {
 
-    private content: OrderContent[] = new Array()
-
     //These checks are necessary because TypeOrm creates all enitities on startup without save 
     constructor(menu: Array<Menu>, user: Users) {
         super()
-        this.id_user = user?.id
+        this.user = user?.id
         this.total = 0
         for (const m of menu || []) {
             const content = new OrderContent(m)
@@ -39,8 +37,8 @@ export default class Orders extends BaseEntity {
     @CreateDateColumn()
     create_date: Date
 
-    @Column()
-    id_user: number
+    @ManyToOne(() => Users, user => user.id)
+    user: Users | number
 
     @Column({ default: OrderStatus.accepted })
     status: OrderStatus
@@ -51,6 +49,9 @@ export default class Orders extends BaseEntity {
     @Column({ default: null })
     comment: string
 
+    @OneToMany(() => OrderContent, content => content.order)
+    content: OrderContent[]
+
     async save(_options?: SaveOptions): Promise<this> {
         const s = await super.save()
         for (const c of this.content) {
@@ -60,14 +61,14 @@ export default class Orders extends BaseEntity {
     }
 
     async remove(): Promise<this> {
-        OrderContent.delete({ id_order: this.id })
+        OrderContent.delete({ order: this.id })
         return super.remove()
     }
 
     static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
         const orders = await Orders.find(criteria)
         for (const o of orders) {
-            OrderContent.delete({ id_order: o.id })
+            OrderContent.delete({ order: o.id })
         }
         return super.delete(criteria, options)
     }
