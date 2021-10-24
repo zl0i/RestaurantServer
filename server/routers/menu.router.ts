@@ -6,7 +6,7 @@ import { cache } from '../middleware/cacheMiddleware';
 import DataProvider from '../lib/DataProvider';
 import { Resources, Actions } from '../lib/permissionsBuilder';
 import MenuService from '../services/menu.service';
-import HttpError from '../lib/httpError';
+import HttpErrorHandler from '../lib/httpErrorHandler';
 
 const router = express.Router();
 
@@ -18,11 +18,8 @@ router.get('/',
         try {
             const provider = new DataProvider('Menu')
             res.json(await provider.index(req, { status: MenuStatus.active }))
-        } catch (e) {
-            console.log(e)
-            res.status(500).json({
-                message: e.message
-            })
+        } catch (error) {
+            HttpErrorHandler.handle(error, res)
         }
     });
 
@@ -34,11 +31,8 @@ router.get('/:id',
         try {
             const provider = new DataProvider('Menu')
             res.json(await provider.index(req, { id: Number(req.params.id) }))
-        } catch (e) {
-            console.log(e)
-            res.status(500).json({
-                message: e.message
-            })
+        } catch (error) {
+            HttpErrorHandler.handle(error, res)
         }
     });
 
@@ -51,11 +45,8 @@ router.get('/:id/additions',
         try {
             const provider = new DataProvider('AdditionsCategory')
             res.json(await provider.index(req, { id_menu: Number(req.params.id) }, ['additions']))
-        } catch (e) {
-            console.log(e)
-            res.status(500).json({
-                message: e.message
-            })
+        } catch (error) {
+            HttpErrorHandler.handle(error, res)
         }
     });
 
@@ -70,17 +61,7 @@ router.post('/',
             const item = await MenuService.create(data)
             res.json(item)
         } catch (error) {
-            console.log(error)
-            if (error instanceof HttpError) {
-                res.status(error.status).json({
-                    error: 'error',
-                    mesage: error.message
-                });
-            } else {
-                res.status(500).json({
-                    message: error.message
-                })
-            }
+            HttpErrorHandler.handle(error, res)
         }
     }
 )
@@ -95,17 +76,7 @@ router.patch('/:id',
             const item = await MenuService.update(Number(req.params.id), data)
             res.json(item)
         } catch (error) {
-            console.log(error)
-            if (error instanceof HttpError) {
-                res.status(error.status).json({
-                    error: 'error',
-                    mesage: error.message
-                });
-            } else {
-                res.status(500).json({
-                    message: error.message
-                })
-            }
+            HttpErrorHandler.handle(error, res)
         }
     })
 
@@ -120,17 +91,7 @@ router.delete('/:id',
                 result: 'ok'
             })
         } catch (error) {
-            console.log(error)
-            if (error instanceof HttpError) {
-                res.status(error.status).json({
-                    error: 'error',
-                    mesage: error.message
-                });
-            } else {
-                res.status(500).json({
-                    message: error.message
-                })
-            }
+            HttpErrorHandler.handle(error, res)
         }
     })
 

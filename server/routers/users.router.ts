@@ -4,7 +4,7 @@ import allow from '../middleware/permissionVaildator'
 import { Actions, Resources } from '../lib/permissionsBuilder';
 import { cache } from '../middleware/cacheMiddleware';
 import UserService from '../services/users.service';
-import HttpError from '../lib/httpError';
+import HttpErrorHandler from '../lib/httpErrorHandler';
 
 const router = express.Router();
 
@@ -18,8 +18,7 @@ router.get('/', //TO DO new format response with pages and meta
       const users = await UserService.read(req.context?.condition)
       res.status(200).json(users);
     } catch (error) {
-      console.log(error)
-      res.status(500).end();
+      HttpErrorHandler.handle(error, res)
     }
   });
 
@@ -33,8 +32,7 @@ router.get('/profile',
       const user = await UserService.read({ key: 'id', value: [req.context.user.id] })
       res.status(200).json(user);
     } catch (error) {
-      console.log(error)
-      res.status(500).end();
+      HttpErrorHandler.handle(error, res)
     }
   });
 
@@ -50,8 +48,7 @@ router.post('/',
         result: "ok"
       });
     } catch (error) {
-      console.log(error)
-      res.status(500).end();
+      HttpErrorHandler.handle(error, res)
     }
   });
 
@@ -70,8 +67,7 @@ router.patch('/:id',
         });
       }
     } catch (error) {
-      console.log(error)
-      res.status(500).end();
+      HttpErrorHandler.handle(error, res)
     }
   });
 
@@ -87,12 +83,7 @@ router.delete('/:id',
         result: 'ok'
       })
     } catch (error) {
-      console.log(error)
-      if (error instanceof HttpError)
-        res.status(error.status).json({
-          error: 'error',
-          mesage: error.message
-        });
+      HttpErrorHandler.handle(error, res)
     }
   })
 

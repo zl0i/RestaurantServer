@@ -7,6 +7,7 @@ import { cache } from '../middleware/cacheMiddleware';
 import { In } from 'typeorm';
 import DataProvider from '../lib/DataProvider';
 import { Resources, Actions } from '../lib/permissionsBuilder';
+import HttpErrorHandler from '../lib/httpErrorHandler';
 
 const router = express.Router();
 
@@ -23,8 +24,8 @@ router.get('/',
       }
       const provider = new DataProvider('Orders')
       res.json(await provider.index(req, condition))
-    } catch (e) {
-      res.status(500).json({ result: e.message });
+    } catch (error) {
+      HttpErrorHandler.handle(error, res)
     }
   });
 
@@ -39,10 +40,7 @@ router.post(
       const order = await OrderService.create(req.context.user, req.body)
       res.json(order)
     } catch (error) {
-      console.log(error)
-      res.status(500).json({
-        message: error.message
-      })
+      HttpErrorHandler.handle(error, res)
     }
   })
 
@@ -59,38 +57,10 @@ router.delete(
         result: 'ok'
       })
     } catch (error) {
-      console.log(error)
-      res.status(500).json({
-        message: error.message
-      })
+      HttpErrorHandler.handle(error, res)
     }
   })
 
 router.post('/payment', YokassaAPI.handleHook)
-
-
-/*
-router.delete('/:id', async (req, res) => {
-  try {
-    let order = await ActiveOrders.findOne({ id: req.params.id });
-    if (
-      order.status === 'wait_payment' ||
-      order.status === 'accepted' ||
-      order.status === 'coocking'
-    ) {
-      await ActiveOrders.deleteOne({ id: req.params.id });
-      res.json({
-        result: 'ok',
-      });
-    } else {
-      throw new Error('Order cannot be returned');
-    }
-  } catch (e) {
-    res.status(400).json({
-      result: e.message,
-    });
-  }
-});
-*/
 
 export default router

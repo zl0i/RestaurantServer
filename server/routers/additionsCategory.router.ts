@@ -5,7 +5,7 @@ import { cache } from '../middleware/cacheMiddleware';
 import DataProvider from '../lib/DataProvider';
 import { Resources, Actions } from '../lib/permissionsBuilder';
 import AdditionsCategoryService from '../services/additionsCategory.service';
-import HttpError from '../lib/httpError';
+import HttpErrorHandler from '../lib/httpErrorHandler';
 
 const router = express.Router();
 
@@ -17,11 +17,8 @@ router.get('/',
         try {
             const provider = new DataProvider('AdditionsCategory')
             res.json(await provider.index(req))
-        } catch (e) {
-            console.log(e)
-            res.status(500).json({
-                message: e.message
-            })
+        } catch (error) {
+            HttpErrorHandler.handle(error, res)
         }
     });
 
@@ -35,17 +32,7 @@ router.post('/',
             const item = await AdditionsCategoryService.create(req.body)
             res.json(item)
         } catch (error) {
-            console.log(error)
-            if (error instanceof HttpError) {
-                res.status(error.status).json({
-                    error: 'error',
-                    mesage: error.message
-                });
-            } else {
-                res.status(500).json({
-                    message: error.message
-                })
-            }
+            HttpErrorHandler.handle(error, res)
         }
     }
 )
@@ -59,17 +46,7 @@ router.patch('/:id',
             const item = await AdditionsCategoryService.update(Number(req.params.id), req.body)
             res.json(item)
         } catch (error) {
-            console.log(error)
-            if (error instanceof HttpError) {
-                res.status(error.status).json({
-                    error: 'error',
-                    mesage: error.message
-                });
-            } else {
-                res.status(500).json({
-                    message: error.message
-                })
-            }
+            HttpErrorHandler.handle(error, res)
         }
     })
 
@@ -84,17 +61,7 @@ router.delete('/:id',
                 result: 'ok'
             })
         } catch (error) {
-            console.log(error)
-            if (error instanceof HttpError) {
-                res.status(error.status).json({
-                    error: 'error',
-                    mesage: error.message
-                });
-            } else {
-                res.status(500).json({
-                    message: error.message
-                })
-            }
+            HttpErrorHandler.handle(error, res)
         }
     })
 

@@ -5,6 +5,7 @@ import { cache } from '../middleware/cacheMiddleware'
 import { body } from '../middleware/schemaChecker';
 import allow from '../middleware/permissionVaildator'
 import PointService from '../services/points.service';
+import HttpErrorHandler from '../lib/httpErrorHandler';
 
 const router = express.Router();
 
@@ -16,11 +17,8 @@ router.get('/',
     try {
       const provide = new DataProvider('Points')
       res.json(await provide.index(req))
-    } catch (e) {
-      console.log(e)
-      res.status(500).json({
-        message: e.message
-      })
+    } catch (error) {
+      HttpErrorHandler.handle(error, res)
     }
   });
 
@@ -34,11 +32,8 @@ router.post('/',
       const data = { ...req.body, icon: req.files?.icon }
       const point = await PointService.create(data)
       res.json(point)
-    } catch (e) {
-      console.log(e)
-      res.status(500).json({
-        message: e.message
-      })
+    } catch (error) {
+      HttpErrorHandler.handle(error, res)
     }
   });
 
@@ -51,11 +46,8 @@ router.patch('/:id',
       const data = { ...req.body, icon: req.files?.icon }
       const point = await PointService.update(Number(req.params.id), data)
       res.json(point)
-    } catch (e) {
-      console.log(e)
-      res.status(500).json({
-        message: e.message
-      })
+    } catch (error) {
+      HttpErrorHandler.handle(error, res)
     }
   });
 
@@ -67,11 +59,8 @@ router.delete('/:id',
     try {
       const point = await PointService.delete(Number(req.params.id))
       res.json(point)
-    } catch (e) {
-      console.log(e)
-      res.status(500).json({
-        message: e.message
-      })
+    } catch (error) {
+      HttpErrorHandler.handle(error, res)
     }
   });
 
