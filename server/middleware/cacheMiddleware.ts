@@ -46,6 +46,7 @@ export function cache(seconds: number) {
         client.get(key, (_err: Error, value: string) => {
             if (value != null) {
                 const obj = JSON.parse(value)
+                //TO DO set status 
                 res[obj.method](obj.data)
             } else {
                 res.json = new Proxy(res.json, {

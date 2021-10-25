@@ -1,4 +1,3 @@
-import express from 'express'
 import axios from 'axios';
 import qs from 'querystring';
 import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder';
@@ -34,68 +33,58 @@ interface IUserInfo {
     email: string
 }
 
-export default class OAuthFlow {
+export default class OAuthService {
 
 
-    static async redirectUser(req: express.Request, res: express.Response) {
-        try {
-            let url: string;
-            const method: string = String(req.query['method'])
-            const device: string = String(req.query['device'])
-            switch (method) {
-                case "google":
-                    url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${google_client_id}&response_type=code&access_type=offline&scope=${google_scopes}&state=go`
-                    break;
-                case "vk":
-                    url = `https://oauth.vk.com/authorize?client_id=${vk_client_id}&display=page&scope=offline&response_type=code&v=5.131&state=vk`
-                    break;
-                case "yandex":
-                    url = `https://oauth.yandex.ru/authorize?client_id=${ya_client_id}&response_type=code&state=ya`
-                    break;
-                default: {
-                    res.redirect(`${project_uri}?error=method_undefined`)
-                }
+    static redirectUser(method: string, device: string) {
+        let url: string;
+        switch (method) {
+            case "google":
+                url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${google_client_id}&response_type=code&access_type=offline&scope=${google_scopes}&state=go`
+                break;
+            case "vk":
+                url = `https://oauth.vk.com/authorize?client_id=${vk_client_id}&display=page&scope=offline&response_type=code&v=5.131&state=vk`
+                break;
+            case "yandex":
+                url = `https://oauth.yandex.ru/authorize?client_id=${ya_client_id}&response_type=code&state=ya`
+                break;
+            default: {
+                return `${project_uri}?error=method_undefined`
             }
-            switch (device) {
-                case "web":
-                    url = url + `&redirect_uri=${redirect_uri}`
-                    break;
-                default: {
-                    res.redirect(`${project_uri}?error=device_undefined`)
-                    return;
-                }
-            }
-            res.redirect(url);
-        } catch (e) {
-            console.log(e.message)
-            res.redirect(`${project_uri}?error=method_undefined`);
         }
+        switch (device) {
+            case "web":
+                url = url + `&redirect_uri=${redirect_uri}`
+                break;
+            default: {
+                return `${project_uri}?error=device_undefined`
+            }
+        }
+        return url;
     }
 
-    static async handleCode(req: express.Request, res: express.Response) {
+    static async handleCode(code: string, state: string) {
         try {
-            const code = req.query['code'] as string;
             let info: IUserInfo;
-            switch (req.query['state'] as string) {
+            switch (state) {
                 case 'vk':
-                    info = await OAuthFlow.requstInfoVk(code)
+                    info = await OAuthService.requstInfoVk(code)
                     break;
                 case 'ya':
-                    info = await OAuthFlow.requstInfoYandex(code)
+                    info = await OAuthService.requstInfoYandex(code)
                     break;
                 case 'go':
-                    info = await OAuthFlow.requstInfoGoogle(code)
+                    info = await OAuthService.requstInfoGoogle(code)
                     break;
                 case 'df':
-                    info = OAuthFlow.defaultInfo()
+                    info = OAuthService.defaultInfo()
                     break;
                 default:
-                    res.redirect(`${project_uri}?message=error`)
-                    break;
+                    return `${project_uri}?message=state_error`
             }
 
             //TO DO if phone is undefined, than permission is guest and redirect to request phone page
-            const oauth_user = await oauth_users.findOne({ oauth_id: info.id, service: req.query['state'] as string })
+            const oauth_user = await oauth_users.findOne({ oauth_id: info.id, service: state })
             let user: Users
             if (oauth_user) {
                 user = await Users.findOne({ id: oauth_user.id_user })
@@ -114,19 +103,18 @@ export default class OAuthFlow {
                     login: info.login,
                     refresh_token: info.refresh_token,
                     access_token: info.access_token,
-                    service: req.query['state'] as string
+                    service: state
                 })
             }
 
             const token = new Tokens(user.id)
             await token.save()
             PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
-
-            res.redirect(`https://gossy.link?token=${token.token}`)
+            return `${project_uri}?token=${token.token}`
         } catch (error) {
-            console.log(error.message)
-            res.status(500).end();
+            return `${project_uri}?message=${error.message}`
         }
+
     }
 
     static async requstInfoVk(code: string): Promise<IUserInfo> {
