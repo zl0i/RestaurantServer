@@ -1,5 +1,4 @@
 import axios from 'axios';
-import express from 'express'
 import bcrypt from 'bcryptjs'
 import HttpError from '../lib/httpError';
 import { Users } from '../entity/user';
@@ -23,114 +22,81 @@ export default class DefaultAuth {
     return Number(Math.round(Math.random() * 8999 + 1000)).toString()
   }
 
-  static async viaPhone(req: express.Request, res: express.Response) {
-    try {
-      const phone: string = req.body.phone
-      const code: string = await DefaultAuth.sendSMSCode(phone)
-      const user = await Users.findOne({ phone: phone })
-
-      if (user) {
-        user.sms_code = code
-        await user.save()
-        await Tokens.delete({ id_user: user.id })
-      } else {
-        const newUsers = new Users()
-        newUsers.phone = phone
-        newUsers.sms_code = code
-        await newUsers.save()
-        PermissionsBuilder.setUserRolePermissions(newUsers.id, UserRoles.guest)
-      }
-
-      res.json({
-        result: 'ok'
-      })
-    } catch (error) {
-      res.status(error.status).json({
-        result: 'error',
-        message: error.message
-      })
+  static async viaPhone(phone: string) {
+    const code: string = await DefaultAuth.sendSMSCode(phone)
+    const user = await Users.findOne({ phone: phone })
+    if (user) {
+      user.sms_code = code
+      await user.save()
+      await Tokens.delete({ id_user: user.id })
+    } else {
+      const newUsers = new Users()
+      newUsers.phone = phone
+      newUsers.sms_code = code
+      await newUsers.save()
+      PermissionsBuilder.setUserRolePermissions(newUsers.id, UserRoles.guest)
+    }
+    return {
+      result: 'ok'
     }
   }
 
-  static async viaCode(req: express.Request, res: express.Response) {
-    try {
-      const phone: string = req.body.phone
-      const code: string = req.body.code
+  static async viaCode(phone: string, code: string) {
+    const user = await DefaultAuth.validateCode(phone, code)
+    const token = new Tokens(user.id)
+    await token.save()
 
-      const user = await DefaultAuth.validateCode(phone, code)
+    user.sms_code = ''
+    if (!user.verify_phone) {
+      await PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.client)
+      user.verify_phone = true
+    }
+    await user.save()
+    await PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
+
+    return {
+      result: "ok",
+      token: token.token
+    }
+  }
+
+  static async viaPassword(login: string, password: string) {
+    const user = await Users.findOne({ login })
+    if (user && bcrypt.compareSync(password, user.password)) {
+      await Tokens.delete({ id_user: user.id })
       const token = new Tokens(user.id)
       await token.save()
-
-      user.sms_code = ''
-      if (!user.verify_phone) {
-        await PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.client)
-        user.verify_phone = true
-      }
-      await user.save()
       await PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
-
-      res.json({
+      return {
         result: "ok",
         token: token.token
-      })
-    } catch (error) {
-      console.log(error)
-      res.status(error.status).json({
-        result: 'error',
-        message: error.message
-      })
+      }
+    } else {
+      throw new HttpError(401, 'login or password isn\'t correct')
     }
   }
 
-  static async viaPassword(req: express.Request, res: express.Response) {
-    try {
-      const user = await Users.findOne({ login: req.body.login })
-      if (user && bcrypt.compareSync(req.body.password, user.password)) {
-        await Tokens.delete({ id_user: user.id })
-        const token = new Tokens(user.id)
-        await token.save()
-        await PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
-        res.json({
-          result: "ok",
-          token: token.token
-        })
-      } else {
-        res.status(401).json({
-          result: 'error',
-          message: 'login or password isn\'t correct'
-        })
-      }
-    } catch (error) {
-      res.status(500).end()
-    }
-  }
-
-  static async viaToken(req: express.Request, res: express.Response) {
-    try {
-      const token = await Tokens.findOne({ token: req.headers.authorization?.split(" ")[1], expired_at: MoreThan(new Date()) })
-      if (token) {
-        const newToken = new Tokens(token.id_user)
-        await token.remove()
-        await newToken.save()
-        res.json({
-          token: newToken.token
-        })
-      } else {
-        res.status(401).end()
-      }
-    } catch (error) {
-      res.status(500).end()
+  static async viaToken(req_token: string) {
+    const token = await Tokens.findOne({ token: req_token, expired_at: MoreThan(new Date()) })
+    if (token) {
+      const newToken = new Tokens(token.id_user)
+      await token.remove()
+      await newToken.save()
+      return { token: newToken.token }
+    } else {
+      throw new HttpError(401, 'token is not valid')
     }
   }
 
 
 
   static async sendSMSCode(phone: string): Promise<string> {
-    if (phone == '+79999999999' || smsApiKey == 'test')
-      return '9674'
 
     if (!this.validatePhone(phone))
       throw new HttpError(400, 'bad number phone');
+
+    if (phone == '+79999999999' || smsApiKey == 'test')
+      return '9674'
 
     const code = this.generateCode();
     const reply = await axios.get(

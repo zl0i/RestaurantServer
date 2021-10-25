@@ -1,5 +1,5 @@
 import { Users } from '../entity/user';
-import DefaultAuth from '../services/auth.service'
+import AuthSrvice from '../services/auth.service'
 import request from 'supertest'
 import app from '../server'
 import PermissionsBuilder from '../lib/permissionsBuilder';
@@ -7,22 +7,22 @@ import { Tokens } from '../entity/tokens';
 
 
 
-describe('Test DefaultAuth:', () => {
+describe('Test AuthSrvice:', () => {
 
   afterEach(() => {
     jest.clearAllMocks()
   })
 
   test('validate phone', () => {
-    expect(DefaultAuth.validatePhone('+79999999999')).toBe(true)
-    expect(DefaultAuth.validatePhone('+7999999999')).toBe(false)
-    expect(DefaultAuth.validatePhone('89999999999')).toBe(false)
-    expect(DefaultAuth.validatePhone('+7(999)999-99-99')).toBe(false)
+    expect(AuthSrvice.validatePhone('+79999999999')).toBe(true)
+    expect(AuthSrvice.validatePhone('+7999999999')).toBe(false)
+    expect(AuthSrvice.validatePhone('89999999999')).toBe(false)
+    expect(AuthSrvice.validatePhone('+7(999)999-99-99')).toBe(false)
   })
 
   test('generate code', () => {
     for (let i = 0; i < 10; i++) {
-      expect(DefaultAuth.generateCode()).toHaveLength(4)
+      expect(AuthSrvice.generateCode()).toHaveLength(4)
     }
   })
 })
@@ -33,7 +33,7 @@ describe('Test /auth/phone', () => {
 
     Users.findOne = jest.fn().mockReturnValue(Promise.resolve(null))
     Users.prototype.save = jest.fn().mockImplementation(() => Promise.resolve())
-    DefaultAuth.sendSMSCode = jest.fn().mockReturnValue(Promise.resolve('4654'))
+    AuthSrvice.sendSMSCode = jest.fn().mockReturnValue(Promise.resolve('4654'))
     PermissionsBuilder.setUserRolePermissions = jest.fn().mockReturnValue(Promise.resolve())
 
     const response = await request(app)
@@ -44,7 +44,7 @@ describe('Test /auth/phone', () => {
     expect(response.body).toEqual({ result: 'ok' })
     expect(Users.findOne).toBeCalledTimes(1)
     expect(Users.prototype.save).toBeCalledTimes(1)
-    expect(DefaultAuth.sendSMSCode).toBeCalledTimes(1)
+    expect(AuthSrvice.sendSMSCode).toBeCalledTimes(1)
     expect(PermissionsBuilder.setUserRolePermissions).toBeCalledTimes(1)
   })
 
@@ -55,7 +55,7 @@ describe('Test /auth/phone', () => {
       save: jest.fn().mockImplementation(() => Promise.resolve())
     }
     Users.findOne = jest.fn().mockReturnValue(Promise.resolve(user))
-    DefaultAuth.sendSMSCode = jest.fn().mockReturnValue(Promise.resolve('4654'))
+    AuthSrvice.sendSMSCode = jest.fn().mockReturnValue(Promise.resolve('4654'))
     Tokens.delete = jest.fn().mockResolvedValue({})
 
     const response = await request(app)
@@ -66,7 +66,7 @@ describe('Test /auth/phone', () => {
     expect(response.body).toEqual({ result: 'ok' })
     expect(Users.findOne).toBeCalledTimes(1)
     expect(user.save).toBeCalledTimes(1)
-    expect(DefaultAuth.sendSMSCode).toBeCalledTimes(1)
+    expect(AuthSrvice.sendSMSCode).toBeCalledTimes(1)
     expect(Tokens.delete).toBeCalledTimes(1)
   })
 })
@@ -81,9 +81,9 @@ describe('/auth/code', () => {
       verify_phone: false,
       save: jest.fn().mockImplementation(() => Promise.resolve())
     }
-    DefaultAuth.validateCode = jest.fn().mockReturnValue(Promise.resolve(user))
+    AuthSrvice.validateCode = jest.fn().mockReturnValue(Promise.resolve(user))
     Tokens.prototype.save = jest.fn().mockReturnValue(Promise.resolve())
-    DefaultAuth.sendSMSCode = jest.fn().mockReturnValue(Promise.resolve('4654'))
+    AuthSrvice.sendSMSCode = jest.fn().mockReturnValue(Promise.resolve('4654'))
     PermissionsBuilder.setUserRolePermissions = jest.fn().mockReturnValue(Promise.resolve())
     PermissionsBuilder.createTokenPermissionsByUser = jest.fn().mockReturnValue(Promise.resolve())
 
@@ -94,7 +94,7 @@ describe('/auth/code', () => {
     expect(response.statusCode).toBe(200)
     expect(response.body).toHaveProperty('token')
     expect(user.save).toBeCalledTimes(1)
-    expect(DefaultAuth.validateCode).toBeCalledTimes(1)
+    expect(AuthSrvice.validateCode).toBeCalledTimes(1)
     expect(PermissionsBuilder.setUserRolePermissions).toBeCalledTimes(1)
     expect(PermissionsBuilder.createTokenPermissionsByUser).toBeCalledTimes(1)
   })
