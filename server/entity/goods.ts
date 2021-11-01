@@ -1,6 +1,7 @@
-import { BaseEntity, Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm"
-import { AdditionsRecipes } from "./additions_recipes"
-import { MenuRecipes } from "./menu_recipes"
+import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
+import { AdditionsIngredients } from "./additions_ingredients"
+import { MenuIngredients } from "./menu_ingredients"
+
 
 @Entity()
 export class Goods extends BaseEntity {
@@ -20,7 +21,9 @@ export class Goods extends BaseEntity {
     @Column()
     weight: number
 
-    @ManyToMany(() => MenuRecipes, recipe => recipe.id)
-    @ManyToMany(() => AdditionsRecipes, recipe => recipe.id)
-    recipes: MenuRecipes[] | AdditionsRecipes[] | number
+    @OneToMany(() => MenuIngredients, ingredients => ingredients.good)
+    menu_ingredients: MenuIngredients[]
+
+    @OneToMany(() => AdditionsIngredients, ingredients => ingredients.good)
+    additions_ingredients: AdditionsIngredients[]
 }

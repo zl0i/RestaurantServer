@@ -1,6 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, JoinColumn, OneToOne, DeleteResult, FindConditions, ObjectType, RemoveOptions } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, DeleteResult, FindConditions, ObjectType, RemoveOptions, OneToMany } from "typeorm";
 import AdditionsCategory from "./additions_category";
-import { AdditionsRecipes } from "./additions_recipes";
+import { AdditionsIngredients } from "./additions_ingredients";
 
 
 @Entity()
@@ -18,19 +18,18 @@ export default class Additions extends BaseEntity {
     @Column()
     cost: number
 
-    @OneToOne(() => AdditionsRecipes, recipe => recipe.id)
-    @JoinColumn()
-    recipe: AdditionsRecipes
+    @OneToMany(() => AdditionsIngredients, recipe => recipe.addition)
+    recipe: AdditionsIngredients[]
 
     async remove(): Promise<this> {
-        AdditionsRecipes.delete({ id: this.recipe.id })
+        AdditionsIngredients.delete({ id_addition: this.id })
         return super.remove()
     }
 
     static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
         const additions = await Additions.find(criteria)
         for (const a of additions) {
-            AdditionsRecipes.delete({ id: a.recipe.id })
+            AdditionsIngredients.delete({ id_addition: a.id })
         }
         return super.delete(criteria, options)
     }

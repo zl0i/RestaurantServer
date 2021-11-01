@@ -1,8 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, OneToOne, JoinColumn, DeleteResult, FindConditions, ObjectType, RemoveOptions, ManyToOne, AfterLoad } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, JoinColumn, DeleteResult, FindConditions, ObjectType, RemoveOptions, ManyToOne, AfterLoad } from "typeorm";
 import ObjectStorage from "../src/storage";
 import AdditionsCategory from "./additions_category";
 import MenuCategory from "./menu_category";
-import { MenuRecipes } from "./menu_recipes";
+import { MenuIngredients } from "./menu_ingredients";
 
 export enum MenuStatus {
     active = 'active',
@@ -39,13 +39,12 @@ export default class Menu extends BaseEntity {
     @OneToMany(() => AdditionsCategory, additions => additions.id_menu)
     additions_category: AdditionsCategory[]
 
-    @OneToOne(() => MenuRecipes, recipe => recipe.id)
-    @JoinColumn()
-    recipe: MenuRecipes
+    @OneToMany(() => MenuIngredients, recipe => recipe.menu)
+    recipe: MenuIngredients[]
 
     async remove(): Promise<this> {
         AdditionsCategory.delete({ id_menu: this }) //TO DO if ManyToMany then don't remove
-        MenuRecipes.delete({ id: this.recipe.id })
+        MenuIngredients.delete({ id_menu: this.id })
         if (this.icon)
             await ObjectStorage.deleteImage(this.icon)
         return super.remove()
@@ -55,7 +54,7 @@ export default class Menu extends BaseEntity {
         const menu = await Menu.find(criteria)
         for (const m of menu) {
             AdditionsCategory.delete({ id_menu: m }) //TO DO if ManyToMany then don't remove
-            MenuRecipes.delete({ id: m.recipe.id })
+            MenuIngredients.delete({ id_menu: m.id })
             if (m.icon)
                 await ObjectStorage.deleteImage(m.icon)
         }
