@@ -27,6 +27,7 @@ export default class Additions extends BaseEntity {
 
     async remove(): Promise<this> {
         AdditionsIngredients.delete({ id_addition: this.id })
+        AdditionsRecipes.delete({ id_addition: this.id })
         return super.remove()
     }
 
@@ -34,6 +35,7 @@ export default class Additions extends BaseEntity {
         const additions = await Additions.find(criteria)
         for (const a of additions) {
             AdditionsIngredients.delete({ id_addition: a.id })
+            AdditionsRecipes.delete({ id_addition: a.id })
         }
         return super.delete(criteria, options)
     }

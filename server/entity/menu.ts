@@ -49,6 +49,7 @@ export default class Menu extends BaseEntity {
     async remove(): Promise<this> {
         AdditionsCategory.delete({ id_menu: this }) //TO DO if ManyToMany then don't remove
         MenuIngredients.delete({ id_menu: this.id })
+        MenuRecipes.delete({ id_menu: this.id })
         if (this.icon)
             await ObjectStorage.deleteImage(this.icon)
         return super.remove()
@@ -59,6 +60,7 @@ export default class Menu extends BaseEntity {
         for (const m of menu) {
             AdditionsCategory.delete({ id_menu: m }) //TO DO if ManyToMany then don't remove
             MenuIngredients.delete({ id_menu: m.id })
+            MenuRecipes.delete({ id_menu: m.id })
             if (m.icon)
                 await ObjectStorage.deleteImage(m.icon)
         }
