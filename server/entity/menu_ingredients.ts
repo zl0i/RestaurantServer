@@ -9,12 +9,14 @@ export class MenuIngredients extends BaseEntity {
     id: number
 
     @RelationId((mr: MenuIngredients) => mr.good)
+    @Column()
     id_good: number
 
     @Column()
     count: number
 
     @RelationId((ingredients: MenuIngredients) => ingredients.menu)
+    @Column()
     id_menu: number
 
     @Column()

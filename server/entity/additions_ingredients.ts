@@ -9,12 +9,14 @@ export class AdditionsIngredients extends BaseEntity {
     id: number
 
     @RelationId((adr: AdditionsIngredients) => adr.good)
+    @Column()
     id_good: number
 
     @Column()
     count: number
 
     @RelationId((ingredients: AdditionsIngredients) => ingredients.addition)
+    @Column()
     id_addition: number
 
     @Column()
