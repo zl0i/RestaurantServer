@@ -1,8 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, JoinColumn, DeleteResult, FindConditions, ObjectType, RemoveOptions, ManyToOne, AfterLoad } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, JoinColumn, DeleteResult, FindConditions, ObjectType, RemoveOptions, ManyToOne, AfterLoad, OneToOne } from "typeorm";
 import ObjectStorage from "../src/storage";
 import AdditionsCategory from "./additions_category";
 import MenuCategory from "./menu_category";
 import { MenuIngredients } from "./menu_ingredients";
+import { MenuRecipes } from "./menu_recipes";
 
 export enum MenuStatus {
     active = 'active',
@@ -39,8 +40,11 @@ export default class Menu extends BaseEntity {
     @OneToMany(() => AdditionsCategory, additions => additions.id_menu)
     additions_category: AdditionsCategory[]
 
-    @OneToMany(() => MenuIngredients, recipe => recipe.menu)
-    recipe: MenuIngredients[]
+    @OneToMany(() => MenuIngredients, ingredients => ingredients.menu)
+    ingredients: MenuIngredients[]
+
+    @OneToOne(() => MenuRecipes, recipe => recipe.addition)
+    recipe: MenuRecipes
 
     async remove(): Promise<this> {
         AdditionsCategory.delete({ id_menu: this }) //TO DO if ManyToMany then don't remove

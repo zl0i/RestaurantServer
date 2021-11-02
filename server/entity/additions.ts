@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, DeleteResult, FindConditions, ObjectType, RemoveOptions, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, DeleteResult, FindConditions, ObjectType, RemoveOptions, OneToMany, OneToOne } from "typeorm";
 import AdditionsCategory from "./additions_category";
 import { AdditionsIngredients } from "./additions_ingredients";
+import { AdditionsRecipes } from "./addition_recipes";
 
 
 @Entity()
@@ -18,8 +19,11 @@ export default class Additions extends BaseEntity {
     @Column()
     cost: number
 
-    @OneToMany(() => AdditionsIngredients, recipe => recipe.addition)
-    recipe: AdditionsIngredients[]
+    @OneToMany(() => AdditionsIngredients, ingredients => ingredients.addition)
+    ingredients: AdditionsIngredients[]
+
+    @OneToOne(() => AdditionsRecipes, recipe => recipe.addition)
+    recipe: AdditionsRecipes
 
     async remove(): Promise<this> {
         AdditionsIngredients.delete({ id_addition: this.id })
