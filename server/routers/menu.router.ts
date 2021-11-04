@@ -10,6 +10,12 @@ import HttpErrorHandler from '../lib/httpErrorHandler';
 
 const router = express.Router();
 
+import MenuRecipes from './menuRecipes.router'
+import MenuIngredients from './menuIngredients.router'
+
+router.use('/', MenuRecipes)
+router.use('/', MenuIngredients)
+
 router.get('/',
     [
         cache(180)
@@ -57,20 +63,6 @@ router.get('/:id/recipe',
     async (req: express.Request, res: express.Response) => {
         try {
             const provider = new DataProvider('MenuRecipes')
-            res.json(await provider.index(req, { id_menu: Number(req.params.id) }))
-        } catch (error) {
-            HttpErrorHandler.handle(error, res)
-        }
-    });
-
-
-router.get('/:id/ingredients',
-    [
-        cache(180)
-    ],
-    async (req: express.Request, res: express.Response) => {
-        try {
-            const provider = new DataProvider('MenuIngredients')
             res.json(await provider.index(req, { id_menu: Number(req.params.id) }))
         } catch (error) {
             HttpErrorHandler.handle(error, res)
