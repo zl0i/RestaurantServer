@@ -17,7 +17,7 @@ export default class AdditionsCategoryService {
         if (menu) {
             const item = new AdditionsCategory()
             item.name = data.name
-            item.id_menu = menu
+            item.id_menu = menu.id
             item.mode = data.mode
             return await item.save()
         } else {
@@ -32,7 +32,7 @@ export default class AdditionsCategoryService {
         if (data.id_menu) {
             const menu = await Menu.findOne({ id: data.id_menu })
             if (menu) {
-                item.id_menu = menu
+                item.id_menu = menu.id
             } else {
                 throw new HttpError(400, 'Dish not found')
             }

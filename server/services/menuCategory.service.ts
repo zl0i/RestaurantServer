@@ -19,7 +19,7 @@ export default class MenuCategoryService {
     static async create(data: any) {
         const category = new MenuCategory()
         category.name = data.name
-        category.point = Number(data.id_point)
+        category.id_point = Number(data.id_point)
         category.description = data.description
         await category.save()
         if (data.icon) {
@@ -42,7 +42,7 @@ export default class MenuCategoryService {
     }
 
     static async delete(id: number) {
-        const menu = await Menu.find({ category: id })
+        const menu = await Menu.find({ id_category: id })
         if (menu.length > 0) {
             throw new HttpError(400, 'Category isn\'t empty')
         }

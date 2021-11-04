@@ -29,11 +29,11 @@ export default class Points extends BaseEntity {
     @Column({ default: "" })
     icon: string
 
-    @OneToMany(() => MenuCategory, category => category.point)
+    @OneToMany(() => MenuCategory, category => category.points)
     categories: MenuCategory[]
 
     async remove(): Promise<this> {
-        MenuCategory.delete({ point: this.id })
+        MenuCategory.delete({ id_point: this.id })
         if (this.icon)
             await ObjectStorage.deleteImage(this.icon)
         return super.remove()
@@ -42,7 +42,7 @@ export default class Points extends BaseEntity {
     static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
         const points = await Points.find(criteria)
         for (const p of points) {
-            MenuCategory.delete({ point: p.id })
+            MenuCategory.delete({ id_point: p.id })
             if (p.icon)
                 await ObjectStorage.deleteImage(p.icon)
         }

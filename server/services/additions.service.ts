@@ -19,7 +19,7 @@ export default class AdditionsService {
             const item = new Additions()
             item.name = data.name
             item.cost = data.cost
-            item.id_category = category
+            item.id_category = category.id
             return await item.save()
         } else {
             throw new HttpError(400, 'Additions Category not found')
@@ -33,7 +33,7 @@ export default class AdditionsService {
         if (data.id_additions) {
             const category = await AdditionsCategory.findOne({ id: data.id_additions })
             if (category) {
-                item.id_category = category
+                item.id_category = category.id
             } else {
                 throw new HttpError(400, 'a')
             }

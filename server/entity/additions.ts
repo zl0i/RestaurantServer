@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, DeleteResult, FindConditions, ObjectType, RemoveOptions, OneToMany, OneToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, DeleteResult, FindConditions, ObjectType, RemoveOptions, OneToMany, OneToOne, RelationId, JoinColumn } from "typeorm";
 import AdditionsCategory from "./additions_category";
 import { AdditionsIngredients } from "./additions_ingredients";
 import { AdditionsRecipes } from "./addition_recipes";
@@ -10,8 +10,13 @@ export default class Additions extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @RelationId((additions: Additions) => additions.category)
+    @Column()
+    id_category: number
+
     @ManyToOne(() => AdditionsCategory, category => category.id)
-    id_category: AdditionsCategory | number
+    @JoinColumn({ name: 'id_category' })
+    category: AdditionsCategory
 
     @Column()
     name: string
