@@ -50,6 +50,33 @@ router.get('/:id/additions',
         }
     });
 
+router.get('/:id/recipe',
+    [
+        cache(180)
+    ],
+    async (req: express.Request, res: express.Response) => {
+        try {
+            const provider = new DataProvider('MenuRecipes')
+            res.json(await provider.index(req, { id_menu: Number(req.params.id) }))
+        } catch (error) {
+            HttpErrorHandler.handle(error, res)
+        }
+    });
+
+
+router.get('/:id/ingredients',
+    [
+        cache(180)
+    ],
+    async (req: express.Request, res: express.Response) => {
+        try {
+            const provider = new DataProvider('MenuIngredients')
+            res.json(await provider.index(req, { id_menu: Number(req.params.id) }))
+        } catch (error) {
+            HttpErrorHandler.handle(error, res)
+        }
+    });
+
 router.post('/',
     [
         body({ id_category: String, name: String, cost: String, description: String }),

@@ -22,6 +22,45 @@ router.get('/',
         }
     });
 
+router.get('/:id',
+    [
+        cache(180)
+    ],
+    async (req: express.Request, res: express.Response) => {
+        try {
+            const provider = new DataProvider('Additions')
+            res.json(await provider.index(req, { id: Number(req.params.id) }))
+        } catch (error) {
+            HttpErrorHandler.handle(error, res)
+        }
+    });
+
+router.get('/:id/recipe',
+    [
+        cache(180)
+    ],
+    async (req: express.Request, res: express.Response) => {
+        try {
+            const provider = new DataProvider('AdditionsRecipes')
+            res.json(await provider.index(req, { id_addition: Number(req.params.id) }))
+        } catch (error) {
+            HttpErrorHandler.handle(error, res)
+        }
+    });
+
+router.get('/:id/ingredients',
+    [
+        cache(180)
+    ],
+    async (req: express.Request, res: express.Response) => {
+        try {
+            const provider = new DataProvider('AdditionsIngredients')
+            res.json(await provider.index(req, { id_addition: Number(req.params.id) }))
+        } catch (error) {
+            HttpErrorHandler.handle(error, res)
+        }
+    });
+
 router.post('/',
     [
         body({ name: String, cost: Number, id_additions: Number }),
