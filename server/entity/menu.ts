@@ -43,7 +43,7 @@ export default class Menu extends BaseEntity {
     @OneToMany(() => MenuIngredients, ingredients => ingredients.menu)
     ingredients: MenuIngredients[]
 
-    @OneToOne(() => MenuRecipes, recipe => recipe.addition)
+    @OneToOne(() => MenuRecipes, recipe => recipe.menu)
     recipe: MenuRecipes
 
     async remove(): Promise<this> {
