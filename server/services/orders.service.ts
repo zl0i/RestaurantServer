@@ -26,10 +26,12 @@ export default class OrderService {
           const ad_cat = await createQueryBuilder()
             .select('ad.*, ac.mode')
             .from('additions_category', 'ac')
-            .leftJoin('additions', 'ad', 'ad.idCategoryId = ac.id')
+            .leftJoin('additions', 'ad', 'ad.id_category = ac.id')
             .where('ad.id in (:...id)', { id: ad_ids })
-            .andWhere('ac.idMenuId = :menu', { menu: m.id })
+            .andWhere('ac.id_menu = :menu', { menu: m.id })
             .getRawMany();
+
+          console.log(ad_cat)
 
           if (ad_cat.length != ad_ids.length)
             throw new Error('any additions is undefined')

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, SaveOptions, ManyToOne, OneToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, SaveOptions, ManyToOne, JoinColumn, RelationId } from "typeorm";
 import Additions from "./additions";
 import AdditionsCategory from "./additions_category";
 import OrderContent from "./order_content";
@@ -10,7 +10,7 @@ export default class OrdersAdditionsContent extends BaseEntity {
     constructor(category: AdditionsCategory) {
         super()
         for (const ad of category?.additions || []) {
-            this.id_additions = ad.id
+            this.id_addition = ad.id
             this.count = ad['count']
             this.cost = ad.cost * ad['count']
         }
@@ -19,12 +19,21 @@ export default class OrdersAdditionsContent extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => OrderContent, content => content.additions)
-    order_content: OrderContent | number
+    @RelationId((content: OrdersAdditionsContent) => content.order_content)
+    @Column()
+    id_order_content: number
 
-    @OneToOne(() => Additions, additions => additions.id)
-    @JoinColumn()
-    id_additions: Additions | number
+    @ManyToOne(() => OrderContent, content => content.additions)
+    @JoinColumn({ name: 'id_order_content' })
+    order_content: OrderContent 
+
+    @RelationId((content: OrdersAdditionsContent) => content.addition)
+    @Column()
+    id_addition: number
+
+    @ManyToOne(() => Additions, additions => additions.id)
+    @JoinColumn({ name: 'id_addition' })
+    addition: Additions
 
     @Column()
     cost: number
@@ -33,7 +42,7 @@ export default class OrdersAdditionsContent extends BaseEntity {
     count: number
 
     async save(options?: SaveOptions): Promise<this> {
-        this.order_content = options.data['id']
+        this.id_order_content = options.data['id']
         return await super.save()
     }
 }
