@@ -31,7 +31,7 @@ export default class DataProvider {
         const pagination = this.parsePagination(req)
 
         const expand = this.parseExpand(req, relations)
-        const [in_condition, delete_field] = this.parseFilter(req)
+        const in_condition = this.parseFilter(req)
 
         const model = (await this.find({
             where: {
@@ -43,11 +43,6 @@ export default class DataProvider {
         })).flat()
 
         const count = Number(model.pop())
-        for (const md of model) {
-            for (const df of delete_field as string[]) {
-                delete md[df]
-            }
-        }
 
         return {
             data: model,
@@ -87,19 +82,17 @@ export default class DataProvider {
     }
 
     private parseFilter(req: express.Request) {
-        const delete_filed: string[] = new Array()
         const condition: object = {}
         for (const q of Object.keys(req.query)) {
             if (q.includes('.')) {
                 const names = q.split('.')
                 const name = names.shift()
-                delete_filed.push(name)
                 condition[name] = this.buildNestedCondition(names, Number(req.query[q]))
             } else {
                 condition[q] = req.query[q]
             }
         }
-        return [condition, delete_filed]
+        return condition
     }
 }
 
