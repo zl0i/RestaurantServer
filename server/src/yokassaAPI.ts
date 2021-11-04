@@ -36,7 +36,7 @@ export default class YokassaAPI {
       url: 'https://api.yookassa.ru/v3/payments',
       headers: {
         'Content-Type': 'application/json',
-        'Idempotence-Key': order_id,
+        'Idempotence-Key': String(order_id) + Number(Math.random()).toFixed(5),
       },
       auth: {
         username: shipId,
