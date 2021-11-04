@@ -28,7 +28,7 @@ export default class AdditionsCategory extends BaseEntity {
     @Column()
     mode: AdditionsMode
 
-    @OneToMany(() => Additions, additions => additions.id_category)
+    @OneToMany(() => Additions, additions => additions.category)
     additions: Additions[]
 
     async remove(): Promise<this> {

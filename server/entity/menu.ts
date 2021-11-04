@@ -41,7 +41,7 @@ export default class Menu extends BaseEntity {
     @Column({ default: '', length: 1000 })
     description: string
 
-    @OneToMany(() => AdditionsCategory, additions => additions.id_menu)
+    @OneToMany(() => AdditionsCategory, category => category.menu)
     additions_category: AdditionsCategory[]
 
     @OneToMany(() => MenuIngredients, ingredients => ingredients.menu)
