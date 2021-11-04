@@ -8,7 +8,7 @@ export class MenuRecipes extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number
 
-    @RelationId((recipe: MenuRecipes) => recipe.addition)
+    @RelationId((recipe: MenuRecipes) => recipe.menu)
     @Column()
     id_menu: number
 
@@ -17,5 +17,5 @@ export class MenuRecipes extends BaseEntity {
 
     @OneToOne(() => Menu, menu => menu.id)
     @JoinColumn({ name: "id_menu" })
-    addition: Menu
+    menu: Menu
 }
