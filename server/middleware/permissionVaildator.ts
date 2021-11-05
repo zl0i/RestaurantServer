@@ -28,7 +28,7 @@ export default function allow(resource: Resources, action: Actions) {
         try {
             const token = await Tokens.findOne({ token: req.headers.authorization?.split(" ")[1], expired_at: MoreThan(new Date()) })
             if (!token)
-                return res.status(401).json({ message: "Token not found" })
+                return res.status(401).json({ message: "Token invalid" })
 
             const key_cache = `permissions_token_${token.token}`
             let data_cache = await getCache(key_cache)
