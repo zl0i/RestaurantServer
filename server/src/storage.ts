@@ -3,25 +3,22 @@ import fileUpload from 'express-fileupload';
 import * as Minio from 'minio'
 import { UploadedFile } from 'express-fileupload';
 
-var minioClient = new Minio.Client({
-    endPoint: 'minio',
-    port: 9000,
-    useSSL: false,
-    accessKey: process.env['STORAGE_USER'],
-    secretKey: process.env['STORAGE_PASSWORD']
-});
-
-
 
 
 export default class ObjectStorage {
 
-    static async connect() {
+    static __minioClient: Minio.Client
+
+    static async connect(options: Minio.ClientOptions) {
         return new Promise((resolve, reject) => {
-            minioClient.bucketExists('restaurant', (err, res) => {
+            ObjectStorage.__minioClient = new Minio.Client(options)
+            ObjectStorage.__minioClient.bucketExists('restaurant', (err, res) => {
+                if (err)
+                    reject(err)
+
                 if (res == false) {
-                    minioClient.makeBucket('restaurant', '')
-                        .then((val) => {
+                    ObjectStorage.__minioClient.makeBucket('restaurant', '')
+                        .then((_val) => {
                             resolve(res)
                         })
                         .catch((err) => {
@@ -32,11 +29,11 @@ export default class ObjectStorage {
                 }
             })
         })
-
     }
 
-    static listImages(req: express.Request, res: express.Response) {
-        const stream = minioClient.listObjects('restaurant', '', true)
+    static listImages(_req: express.Request, res: express.Response) {
+        console.log(ObjectStorage.__minioClient)
+        const stream = ObjectStorage.__minioClient.listObjects('restaurant', '', true)
         res.setHeader('Content-Type', 'application/json')
         res.write('[')
         stream.on('data', (obj) => {
@@ -53,7 +50,7 @@ export default class ObjectStorage {
     }
 
     static streamImage(req: express.Request, res: express.Response) {
-        minioClient.getObject('restaurant', req.params.file, function (err, dataStream) {
+        ObjectStorage.__minioClient.getObject('restaurant', req.params.file, function (err, dataStream) {
             if (err) {
                 res.status(404).json({
                     message: err.message
@@ -76,7 +73,7 @@ export default class ObjectStorage {
         const fileName = file.md5.slice(-6) + '-' + prefix + '-' + file.name
 
         return new Promise((resolve, reject) => {
-            minioClient.putObject('restaurant', fileName, file.data, function (err, _objInfo) {
+            ObjectStorage.__minioClient.putObject('restaurant', fileName, file.data, function (err, _objInfo) {
                 if (err)
                     return reject(err)
 
@@ -88,7 +85,7 @@ export default class ObjectStorage {
     static putImage(req: express.Request, res: express.Response): void {
         const fileName: string = String(req.params.file)
         const file = req.files.icon as UploadedFile
-        minioClient.putObject('restaurant', fileName, file.data, function (err, _objInfo) {
+        ObjectStorage.__minioClient.putObject('restaurant', fileName, file.data, function (err, _objInfo) {
             if (err)
                 res.status(500).end()
 
@@ -101,7 +98,7 @@ export default class ObjectStorage {
 
     static deleteImage(filename: string): Promise<boolean | Error> {
         return new Promise((resolve, reject) => {
-            minioClient.removeObject('restaurant', filename, function (err) {
+            ObjectStorage.__minioClient.removeObject('restaurant', filename, function (err) {
                 if (err)
                     reject(err)
 

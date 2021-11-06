@@ -7,11 +7,20 @@ import { Users } from "./entity/user";
 import PermissionsBuilder, { UserRoles } from "./lib/permissionsBuilder";
 import ObjectStorage from "./src/storage";
 
-const db_host: string = process.env['DB_HOST'] || 'localhost'
-const db_password: string = process.env['DB_PASSWORD'] || 'admin';
-const db_name: string = process.env['DB_NAME'] || 'restaurant'
+const DB_HOST: string = process.env['DB_HOST'] || 'localhost'
+const DB_USER = 'root'
+const DB_PASSWORD: string = process.env['DB_PASSWORD'] || 'admin';
+const DB_NAME: string = process.env['DB_NAME'] || 'restaurant'
+const MINIO_ACCESS_KEY: string = process.env['STORAGE_USER']
+const MINIO_SECRET_KEY: string = process.env['STORAGE_PASSWORD']
 
-ObjectStorage.connect() //TO DO settings should set here
+ObjectStorage.connect({
+  endPoint: 'minio',
+  port: 9000,
+  useSSL: false,
+  accessKey: MINIO_ACCESS_KEY,
+  secretKey: MINIO_SECRET_KEY
+})
   .then(_ => {
     console.log('[OK] Storage is connected')
   })
@@ -22,11 +31,11 @@ ObjectStorage.connect() //TO DO settings should set here
 
 db.createConnection({
   type: "mysql",
-  host: db_host,
+  host: DB_HOST,
   port: 3306,
-  username: 'root',
-  password: db_password,
-  database: db_name,
+  username: DB_USER,
+  password: DB_PASSWORD,
+  database: DB_NAME,
   entities: [
     "./entity/*[.ts]"
   ],
