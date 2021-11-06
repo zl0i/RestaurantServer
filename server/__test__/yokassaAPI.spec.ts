@@ -1,5 +1,5 @@
 import axios from "axios";
-import Orders from "../entity/orders";
+import OrdersPayment from "../entity/orders_payment";
 import YokassaAPI from "../src/yokassaAPI";
 
 describe('Test YokassaAPI:', () => {
@@ -9,16 +9,16 @@ describe('Test YokassaAPI:', () => {
             { id: 1, payment_id: 1 }
         ]
 
-        Orders.find = jest.fn().mockResolvedValue(orders)
+        OrdersPayment.find = jest.fn().mockResolvedValue(orders)
         axios.get = jest.fn()
             .mockResolvedValueOnce({ data: { status: 'succeeded' } })
             .mockResolvedValueOnce({ data: { status: 'canceled' } })
-        Orders.update = jest.fn().mockResolvedValue({})
+        OrdersPayment.update = jest.fn().mockResolvedValue({})
 
         await YokassaAPI.checkStatusPayments()
 
-        expect(Orders.find).toBeCalledTimes(1)
+        expect(OrdersPayment.find).toBeCalledTimes(1)
         expect(axios.get).toBeCalledTimes(orders.length)
-        //expect(Orders.update).toBeCalledTimes(orders.length) //should be two, but it is zero
+        expect(OrdersPayment.update).toBeCalledTimes(orders.length)
     })
 })

@@ -68,7 +68,7 @@ export default class YokassaAPI {
 
   static async checkStatusPayments() {
     const orders = await OrdersPayment.find({ status: OrderPaymentStatus.wait });
-    for(const order of orders) {
+    for (const order of orders) {
       try {
         const reply = await axios.get(`https://api.yookassa.ru/v3/payments/${order.payment_id}`, {
           auth: {
@@ -85,9 +85,9 @@ export default class YokassaAPI {
             break;
         }
       } catch (e) {
-        //console.log(e.message);
+        console.error(e);
       }
-    }    
+    }
   }
 
   static async handleHook(_req: express.Request, res: express.Response) {
