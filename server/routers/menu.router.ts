@@ -12,7 +12,7 @@ const router = express.Router();
 
 import MenuRecipes from './menuRecipes.router'
 import MenuIngredients from './menuIngredients.router'
-
+//TO DO add another routers
 router.use('/', MenuRecipes)
 router.use('/', MenuIngredients)
 
@@ -43,27 +43,14 @@ router.get('/:id',
     });
 
 
-router.get('/:id/additions',
+router.get('/:id/additions/category',
     [
         cache(180)
     ],
     async (req: express.Request, res: express.Response) => {
         try {
-            const provider = new DataProvider('AdditionsCategory')
-            res.json(await provider.index(req, { id_menu: Number(req.params.id) }, ['additions']))
-        } catch (error) {
-            HttpErrorHandler.handle(error, res)
-        }
-    });
-
-router.get('/:id/recipe',
-    [
-        cache(180)
-    ],
-    async (req: express.Request, res: express.Response) => {
-        try {
-            const provider = new DataProvider('MenuRecipes')
-            res.json(await provider.index(req, { id_menu: Number(req.params.id) }))
+            const provider = new DataProvider('Menu')
+            res.json(await provider.index(req, { id: Number(req.params.id) }, ['additions_category']))
         } catch (error) {
             HttpErrorHandler.handle(error, res)
         }

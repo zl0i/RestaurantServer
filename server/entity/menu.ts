@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, JoinColumn, DeleteResult, FindConditions, ObjectType, RemoveOptions, ManyToOne, AfterLoad, OneToOne, RelationId } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, JoinColumn, DeleteResult, FindConditions, ObjectType, RemoveOptions, ManyToOne, AfterLoad, OneToOne, RelationId, ManyToMany, JoinTable } from "typeorm";
 import ObjectStorage from "../src/storage";
 import AdditionsCategory from "./additions_category";
 import MenuCategory from "./menu_category";
@@ -41,7 +41,18 @@ export default class Menu extends BaseEntity {
     @Column({ default: '', length: 1000 })
     description: string
 
-    @OneToMany(() => AdditionsCategory, category => category.menu)
+    @ManyToMany(() => AdditionsCategory)
+    @JoinTable({
+        name: 'menu_additions_category',
+        inverseJoinColumn: {
+            name: "id_additions_category",
+            referencedColumnName: "id"
+        },
+        joinColumn: {
+            name: "id_menu",
+            referencedColumnName: 'id'
+        }
+    })
     additions_category: AdditionsCategory[]
 
     @OneToMany(() => MenuIngredients, ingredients => ingredients.menu)
@@ -51,7 +62,6 @@ export default class Menu extends BaseEntity {
     recipe: MenuRecipes
 
     async remove(): Promise<this> {
-        AdditionsCategory.delete({ id_menu: this.id }) //TO DO if ManyToMany then don't remove
         MenuIngredients.delete({ id_menu: this.id })
         MenuRecipes.delete({ id_menu: this.id })
         if (this.icon)
@@ -62,7 +72,6 @@ export default class Menu extends BaseEntity {
     static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
         const menu = await Menu.find(criteria)
         for (const m of menu) {
-            AdditionsCategory.delete({ id_menu: m.id }) //TO DO if ManyToMany then don't remove
             MenuIngredients.delete({ id_menu: m.id })
             MenuRecipes.delete({ id_menu: m.id })
             if (m.icon)

@@ -24,7 +24,7 @@ router.get('/',
 
 router.post('/',
     [
-        body({ name: String, id_menu: Number, mode: String }),
+        body({ name: String, ids_menu: Array, mode: String }),
         allow(Resources.menu, Actions.create)
     ],
     async (req: express.Request, res: express.Response) => {

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, OneToMany, DeleteResult, FindConditions, ObjectType, RemoveOptions, RelationId, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, DeleteResult, FindConditions, ObjectType, RemoveOptions, ManyToMany, JoinTable } from "typeorm";
 import Additions from "./additions";
 import Menu from "./menu";
 
@@ -17,13 +17,19 @@ export default class AdditionsCategory extends BaseEntity {
     @Column()
     name: string
 
-    @RelationId((ad: AdditionsCategory) => ad.menu)
-    @Column()
-    id_menu: number
-
-    @ManyToOne(() => Menu, menu => menu.id) //TO DO ManyToMany
-    @JoinColumn({ name: 'id_menu' })
-    menu: Menu
+    @ManyToMany(() => Menu, menu => menu.id, { cascade: true })
+    @JoinTable({
+        name: 'menu_additions_category',
+        joinColumn: {
+            name: "id_additions_category",
+            referencedColumnName: "id"
+        },
+        inverseJoinColumn: {
+            name: "id_menu",
+            referencedColumnName: 'id'
+        }
+    })
+    menu: Menu[]
 
     @Column()
     mode: AdditionsMode

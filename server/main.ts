@@ -11,7 +11,7 @@ const db_host: string = process.env['DB_HOST'] || 'localhost'
 const db_password: string = process.env['DB_PASSWORD'] || 'admin';
 const db_name: string = process.env['DB_NAME'] || 'restaurant'
 
-ObjectStorage.connect()
+ObjectStorage.connect() //TO DO settings should set here
   .then(_ => {
     console.log('[OK] Storage is connected')
   })
