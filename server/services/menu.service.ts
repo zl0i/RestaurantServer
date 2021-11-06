@@ -20,7 +20,7 @@ export default class MenuService {
             const item = new Menu()
             item.name = data.name
             item.cost = Number(data.cost)
-            item.id_category = category.id            
+            item.id_category = category.id
             item.description = data.description
             await item.save()
             if (data.icon) {
@@ -56,9 +56,13 @@ export default class MenuService {
     }
 
     static async delete(id: number) {
-        const item = await Menu.findOne({ id }) //TO DO throw error if item is undefined
-        if (item.icon)
-            await ObjectStorage.deleteImage(item.icon)
-        await item.remove()
+        const item = await Menu.findOne({ id })
+        if (item) {
+            if (item.icon)
+                await ObjectStorage.deleteImage(item.icon)
+            await item.remove()
+        } else {
+            throw new HttpError(400, 'Menu not found')
+        }
     }
 }
