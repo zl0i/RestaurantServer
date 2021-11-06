@@ -46,15 +46,16 @@ export function cache(seconds: number) {
         client.get(key, (_err: Error, value: string) => {
             if (value != null) {
                 const obj = JSON.parse(value)
-                //TO DO set status 
                 res[obj.method](obj.data)
             } else {
                 res.json = new Proxy(res.json, {
                     apply(target, thisArg, args) {
-                        client.set(key, JSON.stringify({
-                            method: 'json',
-                            data: args[0]
-                        }), 'EX', seconds)
+                        if (res.statusCode >= 200 && res.statusCode < 400) {
+                            client.set(key, JSON.stringify({
+                                method: 'json',
+                                data: args[0]
+                            }), 'EX', seconds)
+                        }
                         target.call(thisArg, args[0])
                     }
                 });
