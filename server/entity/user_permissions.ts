@@ -1,4 +1,4 @@
-import { Entity, Column, BaseEntity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, ManyToOne, RelationId, JoinColumn } from "typeorm";
 import { Users } from "./user";
 
 @Entity()
@@ -7,7 +7,7 @@ export class user_permissions extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number
 
-    @OneToOne(() => Users)
+    @RelationId((permissions: user_permissions) => permissions.user)
     @Column()
     id_user: number
 
@@ -17,9 +17,13 @@ export class user_permissions extends BaseEntity {
     @Column()
     action: string
 
-    @Column({default: ""})
+    @Column({ default: "" })
     scope: string
 
-    @Column({default: ""})
+    @Column({ default: "" })
     conditions: string
+
+    @ManyToOne(() => Users, user => user.id)
+    @JoinColumn({ name: 'id_user' })
+    user: Users
 }

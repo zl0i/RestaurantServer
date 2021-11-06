@@ -5,18 +5,24 @@ import { Actions, Resources } from '../lib/permissionsBuilder';
 import { cache } from '../middleware/cacheMiddleware';
 import UserService from '../services/users.service';
 import HttpErrorHandler from '../lib/httpErrorHandler';
+import DataProvider from '../lib/DataProvider';
+import { In } from 'typeorm';
 
 const router = express.Router();
 
-router.get('/', //TO DO new format response with pages and meta
+router.get('/',
   [
     allow(Resources.users, Actions.read),
     cache(600)
   ],
   async (req: express.Request, res: express.Response) => {
     try {
-      const users = await UserService.read(req.context?.condition)
-      res.status(200).json(users);
+      const condition: object = {}
+      if (req.context?.condition.value.length > 0) {
+        condition[req.context?.condition?.key] = In(req.context?.condition.value)
+      }
+      const provider = new DataProvider('Users')
+      res.json(await provider.index(req, condition))
     } catch (error) {
       HttpErrorHandler.handle(error, res)
     }
@@ -25,7 +31,7 @@ router.get('/', //TO DO new format response with pages and meta
 
 router.get('/profile',
   [
-    allow(Resources.users, Actions.read), //cache(600)
+    allow(Resources.users, Actions.read)
   ],
   async (req: express.Request, res: express.Response) => {
     try {
