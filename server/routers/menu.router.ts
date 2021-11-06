@@ -10,9 +10,15 @@ import HttpErrorHandler from '../lib/httpErrorHandler';
 
 const router = express.Router();
 
+import additionsCategoryRouter from './additionsCategory.router'
+import additionsRouter from './additions.router'
+import categoryRouter from './menuCategory.router'
 import MenuRecipes from './menuRecipes.router'
 import MenuIngredients from './menuIngredients.router'
-//TO DO add another routers
+
+router.use('/additions/category', additionsCategoryRouter);
+router.use('/additions', additionsRouter);
+router.use('/category', categoryRouter);
 router.use('/', MenuRecipes)
 router.use('/', MenuIngredients)
 

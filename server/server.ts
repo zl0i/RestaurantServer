@@ -7,9 +7,6 @@ import usersRouter from './routers/users.router'
 import orderRouter from './routers/order.router'
 import oauthRouter from './routers/oauth.router'
 import menuRouter from './routers/menu.router'
-import additionsCategoryRouter from './routers/additionsCategory.router'
-import additionsRouter from './routers/additions.router'
-import categoryRouter from './routers/menuCategory.router'
 import imageRouter from './routers/imagesRouter'
 import pointRouter from './routers/point.router'
 
@@ -32,9 +29,6 @@ app.use('/restaurant/api/oauth', oauthRouter);
 app.use('/restaurant/api/users', usersRouter);
 app.use('/restaurant/api/orders', orderRouter);
 app.use('/restaurant/api/point', pointRouter);
-app.use('/restaurant/api/menu/additions/category', additionsCategoryRouter);
-app.use('/restaurant/api/menu/additions', additionsRouter);
-app.use('/restaurant/api/menu/category', categoryRouter);
 app.use('/restaurant/api/menu', menuRouter);
 
 if (process.env['NODE_ENV'] == 'test') {
