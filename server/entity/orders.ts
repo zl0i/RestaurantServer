@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, CreateDateColumn, SaveOptions, DeleteResult, FindConditions, ObjectType, RemoveOptions, ManyToOne, OneToMany, RelationId, JoinColumn, AfterLoad } from "typeorm";
 import Menu from "./menu";
+import OrdersPayment from "./orders_payment";
 import OrderContent from "./order_content";
 import { Users } from "./user";
 
@@ -51,9 +52,6 @@ export default class Orders extends BaseEntity {
     status: OrderStatus
 
     @Column({ default: null })
-    payment_id: string
-
-    @Column({ default: null })
     comment: string
 
     @OneToMany(() => OrderContent, content => content.order)
@@ -68,6 +66,7 @@ export default class Orders extends BaseEntity {
     }
 
     async remove(): Promise<this> {
+        OrdersPayment.delete({ id_order: this.id })
         OrderContent.delete({ id_order: this.id })
         return super.remove()
     }
@@ -75,6 +74,7 @@ export default class Orders extends BaseEntity {
     static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
         const orders = await Orders.find(criteria)
         for (const o of orders) {
+            OrdersPayment.delete({ id_order: o.id })
             OrderContent.delete({ id_order: o.id })
         }
         return super.delete(criteria, options)

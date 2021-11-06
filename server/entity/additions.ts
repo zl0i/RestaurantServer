@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, DeleteResult, FindConditions, ObjectType, RemoveOptions, OneToMany, OneToOne, RelationId, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, DeleteResult, FindConditions, ObjectType, RemoveOptions, OneToMany, OneToOne, RelationId, JoinColumn, AfterLoad } from "typeorm";
 import AdditionsCategory from "./additions_category";
 import { AdditionsIngredients } from "./additions_ingredients";
 import { AdditionsRecipes } from "./addition_recipes";
@@ -6,6 +6,8 @@ import { AdditionsRecipes } from "./addition_recipes";
 
 @Entity()
 export default class Additions extends BaseEntity {
+
+    public qty: number = 0
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -43,6 +45,11 @@ export default class Additions extends BaseEntity {
             AdditionsRecipes.delete({ id_addition: a.id })
         }
         return super.delete(criteria, options)
+    }
+
+    @AfterLoad()
+    deleteQty() {
+        delete this.qty
     }
 }
 

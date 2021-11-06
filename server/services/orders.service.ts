@@ -3,78 +3,40 @@ import Menu from '../entity/menu';
 import { Users } from '../entity/user';
 import Orders from '../entity/orders'
 import { createQueryBuilder, In } from 'typeorm';
-import Additions from '../entity/additions';
 import AdditionsCategory from '../entity/additions_category';
 import YokassaAPI from '../src/yokassaAPI';
+import HttpError from '../lib/httpError';
+import Additions from '../entity/additions';
+import OrdersPayment from '../entity/orders_payment';
 
 
 export default class OrderService {
 
   static async create(user: Users, data: any) {
-    const ids: number[] = Array.from(data.menu).map(m => m['id'])
-    const menu = await Menu.find({ id: In(ids) })
+    const req_ids_menu: number[] = Array.from(data.menu).map(m => m['id'])
+    const menu = await Menu.find({ id: In(req_ids_menu) })
 
-    if (ids.length != menu.length)
-      throw new Error('any menu is undefined')
+    if (req_ids_menu.length != menu.length)
+      throw new HttpError(400, 'Any menu is undefined')
 
-    for (const m of menu) { //TO DO refractor
-      const req_menu = Array.from(data.menu).find(mn => mn['id'] === m.id)
-      m.qty = Number(req_menu['count'])
-      if (req_menu['additions']) {
-        const ad_ids = Array.from(req_menu['additions']).map(ad => ad['id'])
-        if (ad_ids.length > 0) {
-          const ad_cat = await createQueryBuilder()
-            .select('ad.*, ac.mode')
-            .from('additions_category', 'ac')
-            .leftJoin('additions', 'ad', 'ad.id_category = ac.id')
-            .where('ad.id in (:...id)', { id: ad_ids })
-            .andWhere('ac.id_menu = :menu', { menu: m.id })
-            .getRawMany();
-
-          console.log(ad_cat)
-
-          if (ad_cat.length != ad_ids.length)
-            throw new Error('any additions is undefined')
-
-          for (const ad of ad_cat) {
-            let category: AdditionsCategory
-            if (m.additions_category) {
-              category = m.additions_category.find(ac => ac.id === ad.idCategoryId)
-              if (!category) {
-                const num = m.additions_category.push({
-                  mode: ad.mode,
-                  additions: []
-                } as AdditionsCategory)
-                category = m.additions_category[num - 1]
-              }
-            } else {
-              m.additions_category = new Array()
-              m.additions_category.push({
-                id: ad.idCategoryId,
-                mode: ad.mode,
-                additions: []
-              } as AdditionsCategory)
-              category = m.additions_category[0]
-            }
-            if (ad.mode === 'single' && category.additions.length > 0)
-              throw new Error(`additions category ${ad.idCategoryId} is single`)
-
-            category.additions.push({
-              id: ad.id,
-              cost: ad.cost,
-              count: m.qty
-            } as unknown as Additions)
-          }
-        }
+    for (const item of menu) {
+      const req_item_menu = Array.from(data.menu).find(el => el['id'] === item.id)
+      item.qty = Number(req_item_menu['count'])
+      if (req_item_menu['additions'] && req_item_menu['additions'].length > 0) {
+        const req_ids_additions = Array.from(req_item_menu['additions']).map(add => add['id'])
+        item.additions_category = await OrderService.checkAndReturnAddtions(item, req_ids_additions);
       }
     }
+    console.log(JSON.stringify(menu))
     const order = new Orders(menu, user)
     order.comment = data.comment
     await order.save()
-    const payment = await YokassaAPI.createPaymentOrder(order.total, order.id, 'Your order')
-    order.payment_id = payment.payment_id
-    await order.save()
-    delete order.payment_id
+
+    //TO DO catch if crash create payment
+    const payment = await YokassaAPI.createPaymentOrder(order.total, 'Your order')
+    const orderPayment = new OrdersPayment(order.id, payment.payment_id, payment.idempotence_key)
+    await orderPayment.save()
+
     return {
       ...order,
       confirmation_token: payment.confirmation_token
@@ -84,6 +46,53 @@ export default class OrderService {
   static async delete(id: number) {
     await Orders.delete({ id })
     return 'ok'
+  }
+
+
+
+  private static async checkAndReturnAddtions(menu: Menu, ids_additions: number[]) {
+
+    const req_additions = await createQueryBuilder()
+      .select('mac.*, ac.mode, ad.`id` as `id_addition`, ad.cost')
+      .from('menu_additions_category', 'mac')
+      .leftJoin('additions_category', 'ac', 'ac.id = mac.id_additions_category')
+      .leftJoin('additions', 'ad', 'mac.id_additions_category = ad.id_category')
+      .leftJoin('menu', 'm', 'm.id = mac.id_menu')
+      .where('ad.id in (:...id)', { id: ids_additions })
+      .andWhere('m.id = :menu', { menu: menu.id })
+      .getRawMany();
+
+    if (req_additions.length != ids_additions.length)
+      throw new HttpError(400, 'Any additions is undefined')
+
+    menu.additions_category = new Array()
+    for (const item of req_additions) {
+
+      const category = menu.additions_category.find(cat => cat.id === item['id_additions_category'])
+
+      if (category) {
+        if (category.mode === 'many') {
+          category.additions.push({
+            id: item['id_addition'],
+            cost: item['cost'],
+            qty: menu.qty
+          } as Additions)
+        } else {
+          throw new HttpError(400, `Additions category ${item['id_additions_category']} is single`)
+        }
+      } else {
+        menu.additions_category.push({
+          id: item['id_additions_category'],
+          mode: item['mode'],
+          additions: [{
+            id: item['id_addition'],
+            cost: item['cost'],
+            qty: menu.qty
+          }] as Additions[]
+        } as AdditionsCategory)
+      }
+    }
+    return menu.additions_category
   }
 
 }

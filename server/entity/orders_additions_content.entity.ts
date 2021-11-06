@@ -11,8 +11,8 @@ export default class OrdersAdditionsContent extends BaseEntity {
         super()
         for (const ad of category?.additions || []) {
             this.id_addition = ad.id
-            this.count = ad['count']
-            this.cost = ad.cost * ad['count']
+            this.count = ad.qty
+            this.cost = ad.cost * ad.qty
         }
     }
 
