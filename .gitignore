@@ -116,3 +116,4 @@ dist
 #typescript build
 server/build
 
+env-secret.yaml

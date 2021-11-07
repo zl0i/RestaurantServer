@@ -1,0 +1,175 @@
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: app-ingress
+  annotations:
+    kubernetes.io/ingress.class: "traefik"
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: app-service
+                port:
+                  number: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+spec:
+  selector:
+    app: app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+  labels:
+    app: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+        - name: app
+          image: registry.gitlab.com/zl0i/restaurantserver/app:latest
+          envFrom:
+          - secretRef:
+              name: env-secret
+          ports:
+          - containerPort: 3000
+        - name: redis
+          image: redis:6.2.5-alpine
+          ports:
+          - containerPort: 6379
+      imagePullSecrets:
+        - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+spec:
+  selector:
+    app: mysql
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  serviceName: "mysql"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: mysql
+        image: mysql:8.0.24
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: env-secret
+              key: DB_PASSWORD
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: env-secret
+              key: DB_NAME
+        args: ["--default-authentication-plugin=mysql_native_password"]
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-service
+spec:
+  selector:
+    app: minio
+  ports:
+    - protocol: TCP
+      port: 9000
+      targetPort: 9000
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio
+spec:
+  selector:
+    matchLabels:
+      app: minio
+  serviceName: "minio"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: minio
+        image: bitnami/minio:2021.6.17
+        env:
+        - name: MINIO_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: env-secret
+              key: STORAGE_USER
+        - name: MINIO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: env-secret
+              key: STORAGE_PASSWORD
+        ports:
+        - containerPort: 9000
+        volumeMounts:
+        - name: minio-storage
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: minio-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
