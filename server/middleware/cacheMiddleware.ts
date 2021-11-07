@@ -2,10 +2,11 @@ import express from 'express'
 import redis from 'redis'
 
 let client: redis.RedisClient;
+const CACHE_HOST: string = process.env['CACHE_HOST'] || 'redis';
 
 if (process.env['NODE_ENV'] !== 'test') {
     client = redis.createClient({
-        host: 'redis'
+        host: CACHE_HOST
     })
 
     client.on("error", function (error) {

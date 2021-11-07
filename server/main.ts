@@ -11,11 +11,12 @@ const DB_HOST: string = process.env['DB_HOST'] || 'localhost'
 const DB_USER = 'root'
 const DB_PASSWORD: string = process.env['DB_PASSWORD'] || 'admin';
 const DB_NAME: string = process.env['DB_NAME'] || 'restaurant'
+const MINIO_HOST: string = process.env['STORAGE_HOST'] || 'minio'
 const MINIO_ACCESS_KEY: string = process.env['STORAGE_USER']
 const MINIO_SECRET_KEY: string = process.env['STORAGE_PASSWORD']
 
 ObjectStorage.connect({
-  endPoint: 'minio',
+  endPoint: MINIO_HOST,
   port: 9000,
   useSSL: false,
   accessKey: MINIO_ACCESS_KEY,
