@@ -1,13 +1,20 @@
-
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: app-ingress
   annotations:
-    kubernetes.io/ingress.class: "traefik"
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/enable-cors: "true"
 spec:
+  tls:
+  - hosts:
+      - zloi.space
+    secretName: app-cert
   rules:
-    - http:
+    - host: zloi.space
+      http:
         paths:
           - path: /
             pathType: Prefix
