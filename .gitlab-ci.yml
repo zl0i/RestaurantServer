@@ -43,7 +43,7 @@ deploy:
     - kubectl config use-context default-context
   script:
     - helm upgrade --install $CI_PROJECT_PATH_SLUG .helm 
-      --set image.tag=$CI_COMMIT_REF_SLUG.$CI_PIPELINE_ID
+      --set appImage.tag=$CI_COMMIT_REF_SLUG.$CI_PIPELINE_ID
   only:
     - master
   needs:
