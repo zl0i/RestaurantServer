@@ -37,8 +37,8 @@ export default class PointService {
         point.lon = data.lon || point.lon
         point.delivery_cost = data.delivery_cost || point.delivery_cost
         point.is_delivering = data.is_delivering == 'true' || point.is_delivering
-        if (!!data.files?.icon) {
-            const file = data.files.icon as UploadedFile
+        if (data.icon) {
+            const file = data.icon as UploadedFile
             point.icon = await ObjectStorage.uploadImage(file as UploadedFile, point.id) as string
         }
         return await point.save()
