@@ -30,7 +30,7 @@ metadata:
   name: {{.Chart.Name}}-service
 spec:
   selector:
-    app: {{.Chart.Name}}-deployment
+    app: {{.Chart.Name}}
   ports:
     - protocol: TCP
       port: 80
