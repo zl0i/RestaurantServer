@@ -55,14 +55,14 @@ spec:
     spec:
       containers:
         - name: {{.Chart.Name }}
-          image: "{{.Values.appImage.repository }}/{{.Values.appImage.name}}:{{.Values.appImage.tag}}"
+          image: "{{.Values.appImage.repository}}/{{.Values.appImage.name}}:{{.Values.appImage.tag}}"
           envFrom:
           - secretRef:
               name: env-secret
           ports:
           - containerPort: 3000
         - name: redis
-          image: {{.Values.redisImage }}
+          image: {{.Values.redisImage}}
           ports:
           - containerPort: 6379
       imagePullSecrets:
@@ -123,7 +123,7 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: {{.Values.storageMemory }}
+          storage: {{.Values.mysqlMemory}}
 ---
 apiVersion: v1
 kind: Service
@@ -174,9 +174,9 @@ spec:
           mountPath: /data
   volumeClaimTemplates:
   - metadata:
-      name: {{.Chart.Name }}-minio-storage
+      name: {{.Chart.Name}}-minio-storage
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: {{.Values.storageMemory }}
+          storage: {{.Values.storageMemory}}
