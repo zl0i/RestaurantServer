@@ -1,0 +1,182 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{.Chart.name }}-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+spec:
+  tls:
+  - hosts:
+      - zloi.space
+    secretName: app-cert
+  rules:
+    - host: zloi.space
+      http:
+        paths:
+          - path: /restaurant/
+            pathType: Prefix
+            backend:
+              service:
+                name: {{.Chart.name}}-service
+                port:
+                  number: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Chart.name }}-service
+spec:
+  selector:
+    app: {{.Chart.name }}
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Chart.name }}-deployment
+  labels:
+    app: {{.Chart.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{.Chart.name }}
+  template:
+    metadata:
+      labels:
+        app: {{.Chart.name }}
+    spec:
+      containers:
+        - name: {{.Chart.name }}
+          image: "{{.Values.appImage.repository }}/{{.Values.appImage.name}}:{{.Values.appImage.tag}}"
+          envFrom:
+          - secretRef:
+              name: env-secret
+          ports:
+          - containerPort: 3000
+        - name: redis
+          image: {{.Values.redisImage }}
+          ports:
+          - containerPort: 6379
+      imagePullSecrets:
+        - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Chart.name }}-mysql-service
+spec:
+  selector:
+    app: mysql
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{.Chart.name }}-mysql
+spec:
+  selector:
+    matchLabels:
+      app: {{.Chart.name }}-mysql
+  serviceName: {{.Chart.name }}-mysql
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{.Chart.name }}-mysql
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: mysql
+        image: {{.Values.mysqlImage }}
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: env-secret
+              key: DB_PASSWORD
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: env-secret
+              key: DB_NAME
+        args: ["--default-authentication-plugin=mysql_native_password"]
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+  - metadata:
+      name: {{.Chart.name }}-mysql-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{.Values.storageMemory }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Chart.name }}-minio-service
+spec:
+  selector:
+    app: {{.Chart.name }}-minio
+  ports:
+    - protocol: TCP
+      port: 9000
+      targetPort: 9000
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{.Chart.name }}-minio
+spec:
+  selector:
+    matchLabels:
+      app: {{.Chart.name }}-minio
+  serviceName: {{.Chart.name }}-minio
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{.Chart.name }}-minio
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: minio
+        image: {{.Values.storageImage }}
+        env:
+        - name: MINIO_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: env-secret
+              key: STORAGE_USER
+        - name: MINIO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: env-secret
+              key: STORAGE_PASSWORD
+        ports:
+        - containerPort: 9000
+        volumeMounts:
+        - name: {{.Chart.name }}-minio-storage
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: {{.Chart.name }}-minio-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{.Values.storageMemory }}
