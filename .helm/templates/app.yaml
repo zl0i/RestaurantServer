@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{.Chart.name }}-ingress
+  name: {{.Chart.Name }}-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
@@ -20,17 +20,17 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{.Chart.name}}-service
+                name: {{.Chart.Name}}-service
                 port:
                   number: 80
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{.Chart.name }}-service
+  name: {{.Chart.Name }}-service
 spec:
   selector:
-    app: {{.Chart.name }}
+    app: {{.Chart.Name }}
   ports:
     - protocol: TCP
       port: 80
@@ -40,21 +40,21 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{.Chart.name }}-deployment
+  name: {{.Chart.Name }}-deployment
   labels:
-    app: {{.Chart.name }}
+    app: {{.Chart.Name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{.Chart.name }}
+      app: {{.Chart.Name }}
   template:
     metadata:
       labels:
-        app: {{.Chart.name }}
+        app: {{.Chart.Name }}
     spec:
       containers:
-        - name: {{.Chart.name }}
+        - name: {{.Chart.Name }}
           image: "{{.Values.appImage.repository }}/{{.Values.appImage.name}}:{{.Values.appImage.tag}}"
           envFrom:
           - secretRef:
@@ -71,7 +71,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{.Chart.name }}-mysql-service
+  name: {{.Chart.Name }}-mysql-service
 spec:
   selector:
     app: mysql
@@ -83,17 +83,17 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{.Chart.name }}-mysql
+  name: {{.Chart.Name }}-mysql
 spec:
   selector:
     matchLabels:
-      app: {{.Chart.name }}-mysql
-  serviceName: {{.Chart.name }}-mysql
+      app: {{.Chart.Name }}-mysql
+  serviceName: {{.Chart.Name }}-mysql
   replicas: 1
   template:
     metadata:
       labels:
-        app: {{.Chart.name }}-mysql
+        app: {{.Chart.Name }}-mysql
     spec:
       terminationGracePeriodSeconds: 30
       containers:
@@ -114,11 +114,11 @@ spec:
         ports:
         - containerPort: 3306
         volumeMounts:
-        - name: mysql-storage
+        - name: {{.Chart.Name }}-mysql-storage
           mountPath: /var/lib/mysql
   volumeClaimTemplates:
   - metadata:
-      name: {{.Chart.name }}-mysql-storage
+      name: {{.Chart.Name }}-mysql-storage
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
@@ -128,10 +128,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{.Chart.name }}-minio-service
+  name: {{.Chart.Name }}-minio-service
 spec:
   selector:
-    app: {{.Chart.name }}-minio
+    app: {{.Chart.Name }}-minio
   ports:
     - protocol: TCP
       port: 9000
@@ -140,17 +140,17 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{.Chart.name }}-minio
+  name: {{.Chart.Name }}-minio
 spec:
   selector:
     matchLabels:
-      app: {{.Chart.name }}-minio
-  serviceName: {{.Chart.name }}-minio
+      app: {{.Chart.Name }}-minio
+  serviceName: {{.Chart.Name }}-minio
   replicas: 1
   template:
     metadata:
       labels:
-        app: {{.Chart.name }}-minio
+        app: {{.Chart.Name }}-minio
     spec:
       terminationGracePeriodSeconds: 10
       containers:
@@ -170,11 +170,11 @@ spec:
         ports:
         - containerPort: 9000
         volumeMounts:
-        - name: {{.Chart.name }}-minio-storage
+        - name: {{.Chart.Name }}-minio-storage
           mountPath: /data
   volumeClaimTemplates:
   - metadata:
-      name: {{.Chart.name }}-minio-storage
+      name: {{.Chart.Name }}-minio-storage
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
