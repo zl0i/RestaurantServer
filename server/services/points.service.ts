@@ -22,7 +22,7 @@ export default class PointService {
         point.is_delivering = data.is_delivering == 'true'
         await point.save()
         if (data.icon) {
-            const file = data.files.icon as UploadedFile
+            const file = data.icon as UploadedFile
             point.icon = await ObjectStorage.uploadImage(file as UploadedFile, point.id) as string
             await point.save()
         }
