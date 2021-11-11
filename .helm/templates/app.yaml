@@ -11,7 +11,7 @@ spec:
   tls:
   - hosts:
       - zloi.space
-    secretName: {{.Chart.Name}}-certificate
+    secretName: zloi.space-certificate
   rules:
     - host: zloi.space
       http:
