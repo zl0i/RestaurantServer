@@ -54,7 +54,7 @@ spec:
         app: {{.Chart.Name }}
     spec:
       containers:
-        - name: {{.Chart.Name }}
+        - name: app
           image: "{{.Values.appImage.repository}}/{{.Values.appImage.name}}:{{.Values.appImage.tag}}"
           envFrom:
           - secretRef:
@@ -63,9 +63,9 @@ spec:
           - name: CACHE_HOST
             value: localhost
           - name: DB_HOST
-            value: {{.Chart.Name }}-mysql-service
+            value: {{.Chart.Name}}-mysql-service
           - name: STORAGE_HOST
-            value: {{.Chart.Name }}-minio-service
+            value: {{.Chart.Name}}-minio-service
           ports:
           - containerPort: 3000
         - name: redis
@@ -78,10 +78,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{.Chart.Name }}-mysql-service
+  name: {{.Chart.Name}}-mysql-service
 spec:
   selector:
-    app: mysql
+    app: {{.Chart.Name}}-mysql
   ports:
     - protocol: TCP
       port: 3306
