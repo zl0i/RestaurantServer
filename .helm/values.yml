@@ -1,0 +1,9 @@
+appImage:
+  repository: registry.gitlab.com/zl0i/restaurantserver
+  name: app
+  tag: latest
+redisImage: redis:6.2.5-alpine
+mysqlImage: mysql:8.0.24
+mysqlMemory: 1Gi
+storageImage: bitnami/minio:2021.6.17
+storageMemory: 1Gi
