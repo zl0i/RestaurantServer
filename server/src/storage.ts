@@ -55,17 +55,18 @@ export default class ObjectStorage {
                 res.status(404).json({
                     message: err.message
                 })
+            } else {
+                dataStream.on('data', function (chunk) {
+                    res.write(chunk)
+                })
+                dataStream.on('end', function () {
+                    res.end()
+                })
+                dataStream.on('error', function (err) {
+                    console.log(err)
+                    res.status(500).end()
+                })
             }
-            dataStream.on('data', function (chunk) {
-                res.write(chunk)
-            })
-            dataStream.on('end', function () {
-                res.end()
-            })
-            dataStream.on('error', function (err) {
-                console.log(err)
-                res.status(500).end()
-            })
         })
     }
 
@@ -86,12 +87,13 @@ export default class ObjectStorage {
         const fileName: string = String(req.params.file)
         const file = req.files.icon as UploadedFile
         ObjectStorage.__minioClient.putObject('restaurant', fileName, file.data, function (err, _objInfo) {
-            if (err)
+            if (err) {
                 res.status(500).end()
-
-            res.json({
-                result: 'ok'
-            })
+            } else {
+                res.json({
+                    result: 'ok'
+                })
+            }
         })
 
     }
