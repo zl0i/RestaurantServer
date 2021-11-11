@@ -59,6 +59,13 @@ spec:
           envFrom:
           - secretRef:
               name: env-secret
+          env:
+          - name: CACHE_HOST
+            value: localhost
+          - name: DB_HOST
+            value: {{.Chart.Name }}-mysql-service
+          - name: STORAGE_HOST
+            value: {{.Chart.Name }}-minio-service
           ports:
           - containerPort: 3000
         - name: redis
