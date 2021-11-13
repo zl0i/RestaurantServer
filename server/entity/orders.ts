@@ -66,18 +66,18 @@ export default class Orders extends BaseEntity {
     }
 
     async remove(): Promise<this> {
-        OrdersPayment.delete({ id_order: this.id })
-        OrderContent.delete({ id_order: this.id })
-        return super.remove()
+        await OrdersPayment.delete({ id_order: this.id })
+        await OrderContent.delete({ id_order: this.id })
+        return await super.remove()
     }
 
     static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
         const orders = await Orders.find(criteria)
         for (const o of orders) {
-            OrdersPayment.delete({ id_order: o.id })
-            OrderContent.delete({ id_order: o.id })
+            await OrdersPayment.delete({ id_order: o.id })
+            await OrderContent.delete({ id_order: o.id })
         }
-        return super.delete(criteria, options)
+        return await super.delete(criteria, options)
     }
 
     @AfterLoad()
