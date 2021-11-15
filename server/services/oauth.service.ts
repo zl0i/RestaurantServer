@@ -83,7 +83,7 @@ export default class OAuthService {
                     return `${project_uri}?message=state_error`
             }
 
-            //TO DO if phone is undefined, than permission is guest and redirect to request phone page
+            //TODO: if phone is undefined, than permission is guest and redirect to request phone page
             const oauth_user = await oauth_users.findOne({ oauth_id: info.id, service: state })
             let user: Users
             if (oauth_user) {

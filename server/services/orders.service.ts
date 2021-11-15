@@ -32,7 +32,7 @@ export default class OrderService {
     order.comment = data.comment
     await order.save()
 
-    //TO DO catch if crash create payment
+    //TODO: catch if crash create payment
     const payment = await YokassaAPI.createPaymentOrder(order.total, 'Your order')
     const orderPayment = new OrdersPayment(order.id, payment.payment_id, payment.idempotence_key)
     await orderPayment.save()
