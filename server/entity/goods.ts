@@ -15,12 +15,6 @@ export class Goods extends BaseEntity {
     @Column()
     cost: number
 
-    @Column()
-    count: number
-
-    @Column()
-    weight: number
-
     @OneToMany(() => MenuIngredients, ingredients => ingredients.good)
     menu_ingredients: MenuIngredients[]
 

@@ -16,7 +16,8 @@ export const enum Resources {
     menu = 'menu',
     users = 'users',
     orders = 'orders',
-    category = 'category'
+    category = 'category',
+    warehouses = 'warehouses'
 }
 
 export enum Actions {
@@ -36,7 +37,7 @@ export const enum Scopes {
 export default class PermissionsBuilder {
     constructor() { }
 
-    //TO DO if roles are issued than do nothing
+    //TODO: if roles are issued than do nothing
     static async setUserRolePermissions(id_user: number, role: UserRoles) { 
         await user_permissions.delete({ id_user: id_user })
 
@@ -48,6 +49,7 @@ export default class PermissionsBuilder {
                 permissions.add(Resources.orders)
                 permissions.add(Resources.points)
                 permissions.add(Resources.menu)
+                permissions.add(Resources.warehouses)
                 break;
             /*case UserRoles.point_admin:
                 permissions.add(Resources.orders)

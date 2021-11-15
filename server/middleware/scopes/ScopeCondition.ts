@@ -5,6 +5,7 @@ import MenuScope from "./menuScope"
 import OrderScope from "./orderScope"
 import PointScope from "./pointScope"
 import UserScope from "./userScope"
+import WarehouseScope from "./warehouseScope"
 
 
 interface IScope {
@@ -23,7 +24,7 @@ export default class ScopeCondition {
         this._resource = rs
         this._user = user
         const obj = ScopeCondition.parseScope(scope)
-        this._scope = obj.object as Scopes //TO DO 
+        this._scope = obj.object as Scopes
         this._params = obj.params
     }
 
@@ -37,6 +38,8 @@ export default class ScopeCondition {
                 return new MenuScope()
             case Resources.points:
                 return new PointScope()
+            case Resources.warehouses:
+                return new WarehouseScope()
             default:
                 throw new Error('ScopeBuilder: undefined resource ' + this._resource)
         }

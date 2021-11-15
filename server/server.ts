@@ -9,6 +9,7 @@ import oauthRouter from './routers/oauth.router'
 import menuRouter from './routers/menu.router'
 import imageRouter from './routers/imagesRouter'
 import pointRouter from './routers/point.router'
+import warehouseRouter from './routers/warehouses.router'
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use('/restaurant/api/users', usersRouter);
 app.use('/restaurant/api/orders', orderRouter);
 app.use('/restaurant/api/point', pointRouter);
 app.use('/restaurant/api/menu', menuRouter);
+app.use('/restaurant/api/warehouse', warehouseRouter);
 
 if (process.env['NODE_ENV'] == 'test') {
     //It's magic!!! This need for the supertest.
