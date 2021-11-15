@@ -1,13 +1,10 @@
-import { Tokens } from "../entity/tokens"
-import { token_permissions } from "../entity/token_permissions"
 import { Users } from "../entity/user"
 import { user_permissions } from "../entity/user_permissions"
-import HttpError from "../lib/httpError"
 import PermissionsBuilder, { UserRoles } from "../lib/permissionsBuilder"
 import bcrypt from 'bcryptjs'
 import { ICondition } from "../middleware/scopes/basicScope"
 import { In } from "typeorm"
-import Orders from "../entity/orders"
+import HttpError from "../lib/httpError"
 
 
 export default class UserService {
@@ -51,18 +48,10 @@ export default class UserService {
     }
 
     static async delete(id: number) {
-        const user = await Users.findOne({ id })
-        if (user) {
-            await user_permissions.delete({ id_user: id })
-            await Orders.delete({ id_user: id })
-            const token = await Tokens.findOne({ id_user: id })
-            if (token) {
-                await token_permissions.delete({ id_token: token.id })
-                await token.remove()
-            }
-            await user.remove()
-        } else {
+        const result = await Users.delete({ id })
+        if (result.affected == 0)
             throw new HttpError(400, 'User not found')
-        }
+
+        return result
     }
 }
