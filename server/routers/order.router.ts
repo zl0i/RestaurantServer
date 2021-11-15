@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.get('/',
   [
-    cache(60),
+    cache(10),
     allow(Resources.orders, Actions.read)
   ],
   async (req: express.Request, res: express.Response) => {
