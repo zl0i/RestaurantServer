@@ -1,5 +1,5 @@
 import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, ManyToOne, RelationId, JoinColumn } from "typeorm";
-import { Users } from "./user";
+import { Users } from "./user.entity";
 
 @Entity()
 export class user_permissions extends BaseEntity {

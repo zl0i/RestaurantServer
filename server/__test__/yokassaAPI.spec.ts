@@ -1,5 +1,5 @@
 import axios from "axios";
-import OrdersPayment from "../entity/orders_payment";
+import OrdersPayment from "../entity/orders_payment.entity";
 import YokassaAPI from "../src/yokassaAPI";
 
 describe('Test YokassaAPI:', () => {

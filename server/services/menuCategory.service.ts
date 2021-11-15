@@ -1,8 +1,8 @@
 
 
 import { UploadedFile } from "express-fileupload"
-import Menu from "../entity/menu"
-import MenuCategory from "../entity/menu_category"
+import Menu from "../entity/menu.entity"
+import MenuCategory from "../entity/menu_category.entity"
 import HttpError from "../lib/httpError"
 import { ICondition } from "../middleware/scopes/basicScope"
 import ObjectStorage from "../src/storage"
@@ -47,8 +47,12 @@ export default class MenuCategoryService {
             throw new HttpError(400, 'Category isn\'t empty')
         }
         const category = await MenuCategory.findOne({ id })
+        if (!category)
+            throw new HttpError(400, 'Category not found')
+
         if (category.icon)
             await ObjectStorage.deleteImage(category.icon)
-        await category.remove()
+
+        return await category.remove()
     }
 }

@@ -1,6 +1,6 @@
 import express from 'express';
 import allow from '../middleware/permissionVaildator'
-import { MenuStatus } from '../entity/menu';
+import { MenuStatus } from '../entity/menu.entity';
 import { body } from '../middleware/schemaChecker';
 import { cache } from '../middleware/cacheMiddleware';
 import DataProvider from '../lib/DataProvider';
@@ -99,9 +99,7 @@ router.delete('/:id',
     async (req: express.Request, res: express.Response) => {
         try {
             await MenuService.delete(Number(req.params.id))
-            res.json({
-                result: 'ok'
-            })
+            res.json({ result: 'ok' })
         } catch (error) {
             HttpErrorHandler.handle(error, res)
         }

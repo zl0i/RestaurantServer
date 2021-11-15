@@ -85,9 +85,7 @@ router.delete('/:id',
     try {
       const user_id: number = Number(req.params.id)
       await UserService.delete(user_id)
-      res.json({
-        result: 'ok'
-      })
+      res.json({ result: 'ok' })
     } catch (error) {
       HttpErrorHandler.handle(error, res)
     }

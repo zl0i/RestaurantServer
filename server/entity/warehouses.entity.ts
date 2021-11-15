@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, JoinTable, ManyToMany, OneToMany, DeleteResult, FindConditions, ObjectType, RemoveOptions } from "typeorm";
 import HttpError from "../lib/httpError";
-import { Goods } from "./goods";
-import Points from "./points";
+import { Goods } from "./goods.entity";
+import Points from "./points.entity";
 import WarehousesGoods from "./warehouse_goods.entity";
 
 @Entity()
@@ -45,12 +45,14 @@ export default class Warehouses extends BaseEntity {
             throw new HttpError(400, "You cannot delete a non-empty warehouse")
         return await super.remove()
     }
-    
+
     static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
-        const warehouse = await Warehouses.findOne(criteria)
-        const goods = await WarehousesGoods.find({ id_warehouse: warehouse.id })
-        if (goods.length > 0)
-            throw new HttpError(400, "You cannot delete a non-empty warehouse")
+        const warehouses = await Warehouses.find(criteria)       
+        for(const wh of warehouses) {
+            const goods = await WarehousesGoods.find({ id_warehouse: wh.id })
+            if (goods.length > 0)
+                throw new HttpError(400, "You cannot delete a non-empty warehouse")
+        }        
         return await super.delete(criteria, options)
     }
 }

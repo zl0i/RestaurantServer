@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, SaveOptions, DeleteResult, FindConditions, ObjectType, RemoveOptions, ManyToOne, JoinColumn, OneToMany, RelationId, AfterLoad } from "typeorm";
-import Menu from "./menu";
-import Orders from "./orders";
+import Menu from "./menu.entity";
+import Orders from "./orders.entity";
 import OrdersAdditionsContent from "./orders_additions_content.entity";
 
 @Entity()

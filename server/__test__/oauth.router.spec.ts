@@ -1,9 +1,9 @@
 import app from "../server";
 import request from "supertest";
-import { Users } from "../entity/user";
+import { Users } from "../entity/user.entity";
 import PermissionsBuilder from "../lib/permissionsBuilder";
-import { oauth_users } from "../entity/oauth_users";
-import { Tokens } from "../entity/tokens";
+import { oauth_users } from "../entity/oauth_users.entity";
+import { Tokens } from "../entity/tokens.entity";
 
 describe('/oauth', () => {
 

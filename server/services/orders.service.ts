@@ -1,13 +1,13 @@
 
-import Menu from '../entity/menu';
-import { Users } from '../entity/user';
-import Orders from '../entity/orders'
+import Menu from '../entity/menu.entity';
+import { Users } from '../entity/user.entity';
+import Orders from '../entity/orders.entity'
 import { createQueryBuilder, In } from 'typeorm';
-import AdditionsCategory from '../entity/additions_category';
+import AdditionsCategory from '../entity/additions_category.entity';
 import YokassaAPI from '../src/yokassaAPI';
 import HttpError from '../lib/httpError';
-import Additions from '../entity/additions';
-import OrdersPayment from '../entity/orders_payment';
+import Additions from '../entity/additions.entity';
+import OrdersPayment from '../entity/orders_payment.entity';
 
 
 export default class OrderService {
@@ -44,8 +44,11 @@ export default class OrderService {
   }
 
   static async delete(id: number) {
-    await Orders.delete({ id })
-    return 'ok'
+    const result = await Orders.delete({ id })
+    if (result.affected == 0)
+        throw new HttpError(400, 'Order not found')
+
+    return result
   }
 
 

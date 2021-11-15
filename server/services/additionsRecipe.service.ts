@@ -1,4 +1,5 @@
-import { AdditionsRecipes } from "../entity/addition_recipes";
+import { AdditionsRecipes } from "../entity/addition_recipes.entity";
+import HttpError from "../lib/httpError";
 import { ICondition } from "../middleware/scopes/basicScope";
 
 
@@ -27,6 +28,10 @@ export default class AdditionsRecipeService {
     }
 
     static async delete(id: number) {
-        await AdditionsRecipes.delete({ id_addition: id })
+        const result = await AdditionsRecipes.delete({ id_addition: id })
+        if (result.affected == 0)
+            throw new HttpError(400, 'AdditionsRecipe not found')
+
+        return result
     }
 }

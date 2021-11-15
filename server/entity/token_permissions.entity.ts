@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToOne } from "typeorm";
-import { Tokens } from "./tokens";
+import { Tokens } from "./tokens.entity";
 
 @Entity()
 export class token_permissions extends BaseEntity {

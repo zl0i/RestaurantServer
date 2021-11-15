@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, RelationId, ManyToOne, JoinColumn } from "typeorm";
-import { Goods } from "./goods";
+import { Goods } from "./goods.entity";
 import Warehouses from "./warehouses.entity";
 
 

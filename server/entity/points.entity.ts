@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, DeleteResult, FindConditions, ObjectType, RemoveOptions, OneToMany } from "typeorm";
 import ObjectStorage from "../src/storage";
-import MenuCategory from "./menu_category";
+import MenuCategory from "./menu_category.entity";
 
 @Entity()
 export default class Points extends BaseEntity {

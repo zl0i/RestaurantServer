@@ -1,5 +1,5 @@
 import { BaseEntity, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, RelationId } from "typeorm"
-import Menu from "./menu"
+import Menu from "./menu.entity"
 
 
 @Entity()

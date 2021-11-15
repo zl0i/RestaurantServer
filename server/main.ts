@@ -3,7 +3,7 @@ import "reflect-metadata";
 import app from './server';
 import * as db from "typeorm";
 import YookassaAPI from './src/yokassaAPI';
-import { Users } from "./entity/user";
+import { Users } from "./entity/user.entity";
 import PermissionsBuilder, { UserRoles } from "./lib/permissionsBuilder";
 import ObjectStorage from "./src/storage";
 

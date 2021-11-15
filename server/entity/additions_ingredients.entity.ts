@@ -1,6 +1,6 @@
 import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, RelationId } from "typeorm";
-import Additions from "./additions";
-import { Goods } from "./goods";
+import Additions from "./additions.entity";
+import { Goods } from "./goods.entity";
 
 @Entity()
 export class AdditionsIngredients extends BaseEntity {

@@ -43,9 +43,7 @@ router.delete('/:id_menu/recipe',
         try {
             const id_menu = Number(req.params.id_menu)
             await MenuRecipeService.delete(id_menu)
-            res.json({
-                result: 'ok'
-            })
+            res.json({ result: 'ok' })
         } catch (error) {
             HttpErrorHandler.handle(error, res)
         }

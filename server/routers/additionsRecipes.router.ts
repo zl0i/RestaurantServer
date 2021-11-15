@@ -43,9 +43,7 @@ router.delete('/:id_add/recipe',
         try {
             const id_add = Number(req.params.id_add)
             await AdditionsRecipeService.delete(id_add)
-            res.json({
-                result: 'ok'
-            })
+            res.json({ result: 'ok' })
         } catch (error) {
             HttpErrorHandler.handle(error, res)
         }

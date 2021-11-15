@@ -1,5 +1,5 @@
-import { user_permissions } from "../entity/user_permissions"
-import { token_permissions } from '../entity/token_permissions';
+import { user_permissions } from "../entity/user_permissions.entity"
+import { token_permissions } from '../entity/token_permissions.entity';
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 
 export enum UserRoles {

@@ -57,8 +57,8 @@ router.delete('/:id',
   ],
   async (req: express.Request, res: express.Response) => {
     try {
-      const point = await PointService.delete(Number(req.params.id))
-      res.json(point)
+      await PointService.delete(Number(req.params.id))
+      res.json({ result: 'ok' })
     } catch (error) {
       HttpErrorHandler.handle(error, res)
     }

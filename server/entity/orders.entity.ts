@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, CreateDateColumn, SaveOptions, DeleteResult, FindConditions, ObjectType, RemoveOptions, ManyToOne, OneToMany, RelationId, JoinColumn, AfterLoad } from "typeorm";
-import Menu from "./menu";
-import OrdersPayment from "./orders_payment";
-import OrderContent from "./order_content";
-import { Users } from "./user";
+import Menu from "./menu.entity";
+import OrdersPayment from "./orders_payment.entity";
+import OrderContent from "./order_content.entity";
+import { Users } from "./user.entity";
 
 export enum OrderStatus {
     accepted = 'accepted',

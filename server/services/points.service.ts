@@ -1,6 +1,7 @@
 
 import { UploadedFile } from "express-fileupload"
-import Points from "../entity/points"
+import Points from "../entity/points.entity"
+import HttpError from "../lib/httpError"
 import { ICondition } from "../middleware/scopes/basicScope"
 import ObjectStorage from "../src/storage"
 
@@ -45,7 +46,10 @@ export default class PointService {
     }
 
     static async delete(id: number) {
-        const point = await Points.findOne({ id })
-        return await point.remove()
+        const result = await Points.delete({ id })
+        if (result.affected == 0)
+            throw new HttpError(400, 'Point not found')
+
+        return result
     }
 }

@@ -58,9 +58,7 @@ router.delete('/:id',
     async (req: express.Request, res: express.Response) => {
         try {
             await WarehousesService.delete(Number(req.params.id))
-            res.json({
-                result: 'ok'
-            })
+            res.json({ result: 'ok' })
         } catch (error) {
             HttpErrorHandler.handle(error, res)
         }

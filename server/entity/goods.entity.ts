@@ -1,6 +1,6 @@
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
-import { AdditionsIngredients } from "./additions_ingredients"
-import { MenuIngredients } from "./menu_ingredients"
+import { AdditionsIngredients } from "./additions_ingredients.entity"
+import { MenuIngredients } from "./menu_ingredients.entity"
 
 
 @Entity()

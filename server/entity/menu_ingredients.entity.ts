@@ -1,6 +1,6 @@
 import { BaseEntity, Entity, JoinColumn, PrimaryGeneratedColumn, Column, ManyToOne, RelationId } from "typeorm";
-import { Goods } from "./goods";
-import Menu from "./menu";
+import { Goods } from "./goods.entity";
+import Menu from "./menu.entity";
 
 @Entity()
 export class MenuIngredients extends BaseEntity {

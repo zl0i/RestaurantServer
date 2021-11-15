@@ -1,5 +1,5 @@
 import { BaseEntity, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, RelationId } from "typeorm"
-import Additions from "./additions"
+import Additions from "./additions.entity"
 
 
 @Entity()

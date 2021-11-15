@@ -2,7 +2,7 @@
 import express from 'express'
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid'
-import OrdersPayment, { OrderPaymentStatus } from '../entity/orders_payment';
+import OrdersPayment, { OrderPaymentStatus } from '../entity/orders_payment.entity';
 
 const shipId = process.env.SHIP_ID || '54401';
 const apikey = process.env.YOKASSA_APIKEY || 'test_Fh8hUAVVBGUGbjmlzba6TB0iyUbos_lueTHE-axOwM0';

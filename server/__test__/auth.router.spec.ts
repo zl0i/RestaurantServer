@@ -1,9 +1,9 @@
-import { Users } from '../entity/user';
+import { Users } from '../entity/user.entity';
 import AuthSrvice from '../services/auth.service'
 import request from 'supertest'
 import app from '../server'
 import PermissionsBuilder from '../lib/permissionsBuilder';
-import { Tokens } from '../entity/tokens';
+import { Tokens } from '../entity/tokens.entity';
 
 
 

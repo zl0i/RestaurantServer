@@ -1,4 +1,4 @@
-import { Users } from "../../entity/user"
+import { Users } from "../../entity/user.entity"
 import { Resources, Scopes } from "../../lib/permissionsBuilder"
 import BasicScope, { ICondition } from "./basicScope"
 import MenuScope from "./menuScope"

@@ -1,8 +1,8 @@
 import axios from 'axios';
 import bcrypt from 'bcryptjs'
 import HttpError from '../lib/httpError';
-import { Users } from '../entity/user';
-import { Tokens } from '../entity/tokens';
+import { Users } from '../entity/user.entity';
+import { Tokens } from '../entity/tokens.entity';
 import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder'
 import { MoreThan } from 'typeorm';
 

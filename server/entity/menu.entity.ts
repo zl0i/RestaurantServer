@@ -1,9 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, JoinColumn, DeleteResult, FindConditions, ObjectType, RemoveOptions, ManyToOne, AfterLoad, OneToOne, RelationId, ManyToMany, JoinTable } from "typeorm";
-import ObjectStorage from "../src/storage";
-import AdditionsCategory from "./additions_category";
-import MenuCategory from "./menu_category";
-import { MenuIngredients } from "./menu_ingredients";
-import { MenuRecipes } from "./menu_recipes";
+import AdditionsCategory from "./additions_category.entity";
+import MenuCategory from "./menu_category.entity";
+import { MenuIngredients } from "./menu_ingredients.entity";
+import { MenuRecipes } from "./menu_recipes.entity";
 
 export enum MenuStatus {
     active = 'active',
@@ -64,8 +63,6 @@ export default class Menu extends BaseEntity {
     async remove(): Promise<this> {
         MenuIngredients.delete({ id_menu: this.id })
         MenuRecipes.delete({ id_menu: this.id })
-        if (this.icon)
-            await ObjectStorage.deleteImage(this.icon)
         return super.remove()
     }
 
@@ -74,8 +71,6 @@ export default class Menu extends BaseEntity {
         for (const m of menu) {
             MenuIngredients.delete({ id_menu: m.id })
             MenuRecipes.delete({ id_menu: m.id })
-            if (m.icon)
-                await ObjectStorage.deleteImage(m.icon)
         }
         return super.delete(criteria, options)
     }

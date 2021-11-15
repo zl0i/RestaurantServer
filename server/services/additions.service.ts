@@ -1,8 +1,8 @@
 
 import { ICondition } from "../middleware/scopes/basicScope"
 import HttpError from "../lib/httpError"
-import Additions from "../entity/additions"
-import AdditionsCategory from "../entity/additions_category"
+import Additions from "../entity/additions.entity"
+import AdditionsCategory from "../entity/additions_category.entity"
 
 
 
@@ -42,6 +42,10 @@ export default class AdditionsService {
     }
 
     static async delete(id: number) {
-        await Additions.delete({ id })
+        const result = await Additions.delete({ id })
+        if (result.affected == 0)
+            throw new HttpError(400, 'Addition not found')
+
+        return result
     }
 }

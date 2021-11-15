@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, ObjectType, DeleteResult, FindConditions, RemoveOptions } from "typeorm";
-import Orders from "./orders";
-import { Tokens } from "./tokens";
-import { token_permissions } from "./token_permissions";
-import { user_permissions } from "./user_permissions";
+import Orders from "./orders.entity";
+import { Tokens } from "./tokens.entity";
+import { token_permissions } from "./token_permissions.entity";
+import { user_permissions } from "./user_permissions.entity";
 
 @Entity()
 export class Users extends BaseEntity {

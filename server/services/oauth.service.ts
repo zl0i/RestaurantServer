@@ -1,9 +1,9 @@
 import axios from 'axios';
 import qs from 'querystring';
 import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder';
-import { Users } from '../entity/user';
-import { Tokens } from '../entity/tokens';
-import { oauth_users } from '../entity/oauth_users';
+import { Users } from '../entity/user.entity';
+import { Tokens } from '../entity/tokens.entity';
+import { oauth_users } from '../entity/oauth_users.entity';
 
 const redirect_uri = "https://zloi.space/restaurant/api/oauth/code";
 const project_uri = "https://gossy.link"

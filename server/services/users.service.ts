@@ -1,5 +1,5 @@
-import { Users } from "../entity/user"
-import { user_permissions } from "../entity/user_permissions"
+import { Users } from "../entity/user.entity"
+import { user_permissions } from "../entity/user_permissions.entity"
 import PermissionsBuilder, { UserRoles } from "../lib/permissionsBuilder"
 import bcrypt from 'bcryptjs'
 import { ICondition } from "../middleware/scopes/basicScope"

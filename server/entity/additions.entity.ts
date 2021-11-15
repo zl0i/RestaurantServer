@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToOne, DeleteResult, FindConditions, ObjectType, RemoveOptions, OneToMany, OneToOne, RelationId, JoinColumn, AfterLoad } from "typeorm";
-import AdditionsCategory from "./additions_category";
-import { AdditionsIngredients } from "./additions_ingredients";
-import { AdditionsRecipes } from "./addition_recipes";
+import AdditionsCategory from "./additions_category.entity";
+import { AdditionsIngredients } from "./additions_ingredients.entity";
+import { AdditionsRecipes } from "./addition_recipes.entity";
 
 
 @Entity()

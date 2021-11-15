@@ -1,4 +1,4 @@
-import { Users } from '../../entity/user'
+import { Users } from '../../entity/user.entity'
 import BasicScope, { ICondition } from './basicScope'
 
 export default class OrderScope extends BasicScope {

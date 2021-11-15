@@ -1,5 +1,5 @@
 import { In } from "typeorm"
-import Points from "../entity/points"
+import Points from "../entity/points.entity"
 import Warehouses from "../entity/warehouses.entity"
 import HttpError from "../lib/httpError"
 import { ICondition } from "../middleware/scopes/basicScope"
@@ -43,6 +43,9 @@ export default class WarehousesService {
     }
 
     static async delete(id: number) {
-        return await Warehouses.delete({ id })
+        const result = await Warehouses.delete({ id })
+        if (result.affected == 0)
+            throw new HttpError(400, 'Warehouse not found')
+        return result
     }
 }

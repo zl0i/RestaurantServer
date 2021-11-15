@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, SaveOptions, ManyToOne, JoinColumn, RelationId } from "typeorm";
-import Additions from "./additions";
-import AdditionsCategory from "./additions_category";
-import OrderContent from "./order_content";
+import Additions from "./additions.entity";
+import AdditionsCategory from "./additions_category.entity";
+import OrderContent from "./order_content.entity";
 
 
 @Entity()

@@ -73,9 +73,7 @@ router.delete('/:id_menu/ingredients/:id_ingr',
             const id_menu = Number(req.params.id_menu)
             const id_ingr = Number(req.params.id_ingr)
             await MenuIngredientsService.delete(id_menu, id_ingr)
-            res.json({
-                result: 'ok'
-            })
+            res.json({ result: 'ok' })
         } catch (error) {
             HttpErrorHandler.handle(error, res)
         }

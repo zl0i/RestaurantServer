@@ -1,8 +1,8 @@
 
-import Menu from "../entity/menu"
+import Menu from "../entity/menu.entity"
 import { ICondition } from "../middleware/scopes/basicScope"
 import HttpError from "../lib/httpError"
-import AdditionsCategory from "../entity/additions_category"
+import AdditionsCategory from "../entity/additions_category.entity"
 import { In } from "typeorm"
 
 
@@ -42,6 +42,10 @@ export default class AdditionsCategoryService {
     }
 
     static async delete(id: number) {
-        await AdditionsCategory.delete({ id })
+        const result = await AdditionsCategory.delete({ id })
+        if (result.affected == 0)
+            throw new HttpError(400, 'AdditionsCategory not found')
+
+        return result
     }
 }

@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, DeleteResult, FindConditions, ObjectType, RemoveOptions, ManyToMany, JoinTable } from "typeorm";
-import Additions from "./additions";
-import Menu from "./menu";
+import Additions from "./additions.entity";
+import Menu from "./menu.entity";
 
 
 export enum AdditionsMode {

@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToOne, CreateDateColumn, DeleteResult, ObjectType, FindConditions, RemoveOptions, In } from "typeorm";
 import jwt from 'jsonwebtoken'
-import { Users } from "./user";
-import { token_permissions } from "./token_permissions";
+import { Users } from "./user.entity";
+import { token_permissions } from "./token_permissions.entity";
 
 const secret_key = process.env['APP_SECRET'] || 'shhhh'
 
