@@ -1,8 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, ObjectType, DeleteResult, FindConditions, RemoveOptions } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, ObjectType, DeleteResult, FindConditions, RemoveOptions, ManyToMany } from "typeorm";
 import Orders from "./orders.entity";
+import Points from "./points.entity";
 import { Tokens } from "./tokens.entity";
 import { token_permissions } from "./token_permissions.entity";
 import { user_permissions } from "./user_permissions.entity";
+import Warehouses from "./warehouses.entity";
 
 @Entity()
 export class Users extends BaseEntity {
@@ -46,6 +48,12 @@ export class Users extends BaseEntity {
     @OneToMany(() => user_permissions, permissions => permissions.user)
     permissions: user_permissions[]
 
+    @ManyToMany(() => Warehouses, warehouses => warehouses.users)
+    warehouses: Warehouses[]
+
+    @ManyToMany(() => Points, point => point.users)
+    points: Points[]
+
     removePrivateData() {
         delete this.password
         delete this.sms_code
@@ -66,7 +74,7 @@ export class Users extends BaseEntity {
 
     static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
         const users = await Users.find(criteria)
-        for(const user of users) {
+        for (const user of users) {
             await user_permissions.delete({ id_user: user.id })
             await Orders.delete({ id_user: user.id })
             const token = await Tokens.findOne({ id_user: user.id })
@@ -74,7 +82,7 @@ export class Users extends BaseEntity {
                 await token_permissions.delete({ id_token: token.id })
                 await token.remove()
             }
-        }        
+        }
         return super.delete(criteria, options)
     }
 }

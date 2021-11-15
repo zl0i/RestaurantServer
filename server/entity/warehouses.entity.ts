@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, JoinTable, ManyToMa
 import HttpError from "../lib/httpError";
 import { Goods } from "./goods.entity";
 import Points from "./points.entity";
+import { Users } from "./user.entity";
 import WarehousesGoods from "./warehouse_goods.entity";
 
 @Entity()
@@ -36,6 +37,20 @@ export default class Warehouses extends BaseEntity {
     })
     points: Points[]
 
+    @ManyToMany(() => Users, user => user.warehouses)
+    @JoinTable({
+        name: "users_warehouses",
+        joinColumn: {
+            name: "id_warehouse",
+            referencedColumnName: "id"
+        },
+        inverseJoinColumn: {
+            name: "id_user",
+            referencedColumnName: "id"
+        }
+    })
+    users: Users[]
+
     @OneToMany(() => WarehousesGoods, wg => wg.good)
     goods: Goods[]
 
@@ -47,12 +62,12 @@ export default class Warehouses extends BaseEntity {
     }
 
     static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
-        const warehouses = await Warehouses.find(criteria)       
-        for(const wh of warehouses) {
+        const warehouses = await Warehouses.find(criteria)
+        for (const wh of warehouses) {
             const goods = await WarehousesGoods.find({ id_warehouse: wh.id })
             if (goods.length > 0)
                 throw new HttpError(400, "You cannot delete a non-empty warehouse")
-        }        
+        }
         return await super.delete(criteria, options)
     }
 }
