@@ -1,6 +1,6 @@
 import axios from 'axios';
 import bcrypt from 'bcryptjs'
-import HttpError from '../lib/httpError';
+import { DomainError, InternalError, UnauthorizedError } from '../lib/errors';
 import { Users } from '../entity/user.entity';
 import { Tokens } from '../entity/tokens.entity';
 import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder'
@@ -72,7 +72,7 @@ export default class DefaultAuth {
         token: token.token
       }
     } else {
-      throw new HttpError(401, 'login or password isn\'t correct')
+      throw new UnauthorizedError('login or password isn\'t correct')
     }
   }
 
@@ -84,7 +84,7 @@ export default class DefaultAuth {
       await newToken.save()
       return { token: newToken.token }
     } else {
-      throw new HttpError(401, 'token is not valid')
+      throw new UnauthorizedError('token is not valid')
     }
   }
 
@@ -93,7 +93,7 @@ export default class DefaultAuth {
   static async sendSMSCode(phone: string): Promise<string> {
 
     if (!this.validatePhone(phone))
-      throw new HttpError(400, 'bad number phone');
+      throw new DomainError('bad number phone');
 
     if (phone == '+79999999999' || smsApiKey == 'test')
       return '9674'
@@ -106,19 +106,20 @@ export default class DefaultAuth {
     if (reply.data.status_code === 100) {
       return code
     } else {
-      throw new HttpError(500, 'sms not send');
+      throw new InternalError('Sms not send');
     }
   }
 
   static async validateCode(phone: string, code: string): Promise<Users> {
     if (code == '')
-      throw new HttpError(401, 'code not right');
+      throw new UnauthorizedError('Code not right');
 
     const user = await Users.findOne({ phone: phone, sms_code: code });
+    //TODO: refractor
     if (user) {
       return user;
     } else {
-      throw new HttpError(401, 'code not right');
+      throw new UnauthorizedError('Code not right');
     }
   }
 }

@@ -1,7 +1,7 @@
 
 import Menu from "../entity/menu.entity"
 import { ICondition } from "../middleware/scopes/basicScope"
-import HttpError from "../lib/httpError"
+import { NotFoundError } from "../lib/errors"
 import AdditionsCategory from "../entity/additions_category.entity"
 import { In } from "typeorm"
 
@@ -22,7 +22,7 @@ export default class AdditionsCategoryService {
             item.mode = data.mode
             return await item.save()
         } else {
-            throw new HttpError(400, 'Dish not found')
+            throw new NotFoundError('Dish not found')
         }
     }
 
@@ -35,7 +35,7 @@ export default class AdditionsCategoryService {
             if (menu.length === data.ids_menu.length) {
                 item.menu = menu
             } else {
-                throw new HttpError(400, 'Dish not found')
+                throw new NotFoundError('Dish not found')
             }
         }
         return await item.save()
@@ -44,7 +44,7 @@ export default class AdditionsCategoryService {
     static async delete(id: number) {
         const result = await AdditionsCategory.delete({ id })
         if (result.affected == 0)
-            throw new HttpError(400, 'AdditionsCategory not found')
+            throw new NotFoundError('AdditionsCategory not found')
 
         return result
     }

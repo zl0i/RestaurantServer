@@ -1,6 +1,6 @@
 
 import { ICondition } from "../middleware/scopes/basicScope"
-import HttpError from "../lib/httpError"
+import { DomainError } from "../lib/errors"
 import Additions from "../entity/additions.entity"
 import AdditionsCategory from "../entity/additions_category.entity"
 
@@ -15,6 +15,7 @@ export default class AdditionsService {
 
     static async create(data: any) {
         const category = await AdditionsCategory.findOne({ id: data.id_additions })
+        //TODO: refractor
         if (category) {
             const item = new Additions()
             item.name = data.name
@@ -22,7 +23,7 @@ export default class AdditionsService {
             item.id_category = category.id
             return await item.save()
         } else {
-            throw new HttpError(400, 'Additions Category not found')
+            throw new DomainError('Additions Category not found')
         }
     }
 
@@ -35,7 +36,7 @@ export default class AdditionsService {
             if (category) {
                 item.id_category = category.id
             } else {
-                throw new HttpError(400, 'a')
+                throw new DomainError('Cannot update category')
             }
         }
         return await item.save()
@@ -44,7 +45,7 @@ export default class AdditionsService {
     static async delete(id: number) {
         const result = await Additions.delete({ id })
         if (result.affected == 0)
-            throw new HttpError(400, 'Addition not found')
+            throw new DomainError('Addition not found')
 
         return result
     }

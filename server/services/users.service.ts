@@ -4,7 +4,7 @@ import PermissionsBuilder, { UserRoles } from "../lib/permissionsBuilder"
 import bcrypt from 'bcryptjs'
 import { ICondition } from "../middleware/scopes/basicScope"
 import { In } from "typeorm"
-import HttpError from "../lib/httpError"
+import { NotFoundError } from "../lib/errors"
 
 
 export default class UserService {
@@ -50,7 +50,7 @@ export default class UserService {
     static async delete(id: number) {
         const result = await Users.delete({ id })
         if (result.affected == 0)
-            throw new HttpError(400, 'User not found')
+            throw new NotFoundError('User not found')
 
         return result
     }

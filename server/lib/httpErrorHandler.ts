@@ -1,14 +1,14 @@
 import express from "express";
 import { TypeORMError } from "typeorm";
-import HttpError from "./httpError";
+import { HttpError } from "./errors";
 
 const IS_TEST = process.env['NODE_ENV'] == 'test'
 
 export default class HttpErrorHandler {
-    static handle(error: Error, res: express.Response) {
+    static handle(error: any, res: express.Response) {
         console.error(error)
         if (error instanceof HttpError) {
-            res.status(error.status).json({
+            res.status(error.code).json({
                 result: 'error',
                 mesage: error.message
             });

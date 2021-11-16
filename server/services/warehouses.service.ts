@@ -1,7 +1,7 @@
 import { In } from "typeorm"
 import Points from "../entity/points.entity"
 import Warehouses from "../entity/warehouses.entity"
-import HttpError from "../lib/httpError"
+import { NotFoundError } from "../lib/errors"
 import { ICondition } from "../middleware/scopes/basicScope"
 
 
@@ -23,7 +23,7 @@ export default class WarehousesService {
             item.points = points
             return await item.save()
         } else {
-            throw new HttpError(400, 'Points not found')
+            throw new NotFoundError('Points not found')
         }
     }
 
@@ -38,14 +38,15 @@ export default class WarehousesService {
             item.points = points ?? item.points
             return await item.save()
         } else {
-            throw new HttpError(400, 'Points not found')
+            throw new NotFoundError('Points not found')
         }
     }
 
     static async delete(id: number) {
         const result = await Warehouses.delete({ id })
         if (result.affected == 0)
-            throw new HttpError(400, 'Warehouse not found')
+            throw new NotFoundError('Warehouse not found')
+
         return result
     }
 }

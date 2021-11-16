@@ -3,7 +3,7 @@
 import { UploadedFile } from "express-fileupload"
 import Menu from "../entity/menu.entity"
 import MenuCategory from "../entity/menu_category.entity"
-import HttpError from "../lib/httpError"
+import { DomainError, NotFoundError } from "../lib/errors"
 import { ICondition } from "../middleware/scopes/basicScope"
 import ObjectStorage from "../src/storage"
 
@@ -44,11 +44,11 @@ export default class MenuCategoryService {
     static async delete(id: number) {
         const menu = await Menu.find({ id_category: id })
         if (menu.length > 0) {
-            throw new HttpError(400, 'Category isn\'t empty')
+            throw new DomainError('Category isn\'t empty')
         }
         const category = await MenuCategory.findOne({ id })
         if (!category)
-            throw new HttpError(400, 'Category not found')
+            throw new NotFoundError('Category not found')
 
         if (category.icon)
             await ObjectStorage.deleteImage(category.icon)

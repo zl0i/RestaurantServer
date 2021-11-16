@@ -1,6 +1,6 @@
 import { getManager } from "typeorm";
 import express from 'express'
-import HttpError from "./httpError";
+import { BadRequestError } from "./errors";
 
 
 export default class DataProvider {
@@ -62,11 +62,11 @@ export default class DataProvider {
                 delete req.query['per-page']
                 delete req.query['page']
             } else {
-                throw new HttpError(400, 'page and per-page must be definite')
+                throw new BadRequestError('page and per-page must be definite')
             }
         }
         if (pagination['take'] < 1 || pagination['skip'] < 0) {
-            throw new HttpError(400, 'page and per-page must be greater than zero')
+            throw new BadRequestError('page and per-page must be greater than zero')
         }
         return pagination;
     }

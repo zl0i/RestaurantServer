@@ -1,6 +1,6 @@
 import Additions from "../entity/additions.entity";
 import { AdditionsIngredients } from "../entity/additions_ingredients.entity";
-import HttpError from "../lib/httpError";
+import { NotFoundError } from "../lib/errors";
 import { ICondition } from "../middleware/scopes/basicScope";
 
 
@@ -39,7 +39,7 @@ export default class AdditionsIngredientsService {
     static async delete(id_add: number, id_ingr: number) {
         const result = await AdditionsIngredients.delete({ id: id_ingr, id_addition: id_add })
         if (result.affected == 0)
-            throw new HttpError(400, 'AdditionsIngredient not found')
+            throw new NotFoundError('AdditionsIngredient not found')
 
         return result
     }

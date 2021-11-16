@@ -1,6 +1,6 @@
 import Menu from "../entity/menu.entity";
 import { MenuIngredients } from "../entity/menu_ingredients.entity";
-import HttpError from "../lib/httpError";
+import { NotFoundError } from "../lib/errors";
 import { ICondition } from "../middleware/scopes/basicScope";
 
 
@@ -40,7 +40,7 @@ export default class MenuIngredientsService {
     static async delete(id_menu: number, id_ingr: number) {
         const result =  await MenuIngredients.delete({ id: id_ingr, id_menu: id_menu })
         if (result.affected == 0)
-            throw new HttpError(400, 'MenuIngredient not found')
+            throw new NotFoundError('MenuIngredient not found')
 
         return result
     }

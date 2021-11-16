@@ -1,5 +1,5 @@
 import { MenuRecipes } from "../entity/menu_recipes.entity";
-import HttpError from "../lib/httpError";
+import { NotFoundError } from "../lib/errors";
 import { ICondition } from "../middleware/scopes/basicScope";
 
 
@@ -29,7 +29,7 @@ export default class MenuRecipeService {
     static async delete(id: number) {
         const result = await MenuRecipes.delete({ id })
         if (result.affected == 0)
-            throw new HttpError(400, 'MenuRecipe not found')
+            throw new NotFoundError('MenuRecipe not found')
 
         return result
     }

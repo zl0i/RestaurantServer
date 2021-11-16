@@ -5,7 +5,7 @@ import Orders from '../entity/orders.entity'
 import { createQueryBuilder, In } from 'typeorm';
 import AdditionsCategory from '../entity/additions_category.entity';
 import YokassaAPI from '../src/yokassaAPI';
-import HttpError from '../lib/httpError';
+import { DomainError, NotFoundError } from '../lib/errors';
 import Additions from '../entity/additions.entity';
 import OrdersPayment from '../entity/orders_payment.entity';
 
@@ -17,7 +17,7 @@ export default class OrderService {
     const menu = await Menu.find({ id: In(req_ids_menu) })
 
     if (req_ids_menu.length != menu.length)
-      throw new HttpError(400, 'Any menu is undefined')
+      throw new NotFoundError('Any menu is undefined')
 
     for (const item of menu) {
       const req_item_menu = Array.from(data.menu).find(el => el['id'] === item.id)
@@ -46,7 +46,7 @@ export default class OrderService {
   static async delete(id: number) {
     const result = await Orders.delete({ id })
     if (result.affected == 0)
-        throw new HttpError(400, 'Order not found')
+        throw new NotFoundError('Order not found')
 
     return result
   }
@@ -66,7 +66,7 @@ export default class OrderService {
       .getRawMany();
 
     if (req_additions.length != ids_additions.length)
-      throw new HttpError(400, 'Any additions is undefined')
+      throw new NotFoundError('Any additions is undefined')
 
     menu.additions_category = new Array()
     for (const item of req_additions) {
@@ -81,7 +81,7 @@ export default class OrderService {
             qty: menu.qty
           } as Additions)
         } else {
-          throw new HttpError(400, `Additions category ${item['id_additions_category']} is single`)
+          throw new DomainError(`Additions category ${item['id_additions_category']} is single`)
         }
       } else {
         menu.additions_category.push({
