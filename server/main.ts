@@ -15,8 +15,8 @@ const MINIO_HOST: string = process.env['STORAGE_HOST'] || 'minio'
 const MINIO_ACCESS_KEY: string = process.env['STORAGE_USER']
 const MINIO_SECRET_KEY: string = process.env['STORAGE_PASSWORD']
 
-if (process.env['NODE_ENV'] == 'test') {
-  console.log('[WARNING] This app started in test env!')
+if (process.env['NODE_ENV'] == 'dev') {
+  console.log('[WARNING] This app started in dev mode!')
 }
 
 ObjectStorage.connect({

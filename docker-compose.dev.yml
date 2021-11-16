@@ -50,7 +50,7 @@ services:
     entrypoint: npm run start:dev
     env_file: ./.env
     environment:
-      - NODE_ENV=test
+      - NODE_ENV=dev
     networks:
       - backend
     expose:
