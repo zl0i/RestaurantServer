@@ -20,23 +20,23 @@ services:
     image: bitnami/minio:2021.6.17
     container_name: minio
     restart: always
-    volumes: 
+    volumes:
       - storage:/data
     environment:
       - MINIO_ACCESS_KEY=${STORAGE_USER}
       - MINIO_SECRET_KEY=${STORAGE_PASSWORD}
     networks:
       - backend
-    expose: 
+    expose:
       - 9000
 
   redis:
     image: redis:6.2.5-alpine
     container_name: redis
     restart: always
-    volumes: 
+    volumes:
       - redis:/data
-    networks: 
+    networks:
       - backend
     expose:
       - 6379
@@ -49,6 +49,8 @@ services:
       - ./server/:/opt/server/
     entrypoint: npm run start:dev
     env_file: ./.env
+    environment:
+      - NODE_ENV=test
     expose:
       - 3000
     networks:
@@ -98,7 +100,8 @@ services:
     command:
       - "--path.procfs=/host/proc"
       - "--path.sysfs=/host/sys"
-      - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
+      - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)(\
+        $$|/)"
     restart: unless-stopped
     expose:
       - 9100
@@ -108,8 +111,7 @@ services:
   nginxexporter:
     image: nginx/nginx-prometheus-exporter:0.8.0
     container_name: nginxexporter
-    command: -nginx.scrape-uri http://proxy:80/nginx_status
-      -nginx.retries=10
+    command: -nginx.scrape-uri http://proxy:80/nginx_status -nginx.retries=10
       -web.telemetry-path=/metrics
     restart: unless-stopped
     expose:
@@ -120,19 +122,19 @@ services:
   mysqlexporter:
     image: bitnami/mysqld-exporter:0.13.0
     container_name: mysqlexporter
-    environment: 
+    environment:
       - DATA_SOURCE_NAME=root:${DB_PASSWORD}@(db:3306)/
     restart: unless-stopped
-    expose: 
+    expose:
       - 9104
-    networks: 
+    networks:
       - backend
 
   redisexporter:
     image: bitnami/redis-exporter:1.26.0
     restart: always
     container_name: redis-exporter
-    environment: 
+    environment:
       - REDIS_ADDR=redis://redis:6379
     expose:
       - 9121
@@ -153,7 +155,7 @@ services:
       - "--storage.tsdb.retention=200h"
       - "--web.enable-lifecycle"
     restart: unless-stopped
-    ports: 
+    ports:
       - 9090:9090
     networks:
       - backend

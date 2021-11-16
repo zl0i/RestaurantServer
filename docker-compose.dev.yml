@@ -20,7 +20,7 @@ services:
     image: bitnami/minio:2021.6.17
     container_name: minio
     restart: always
-    volumes: 
+    volumes:
       - storage:/data
     environment:
       - MINIO_ACCESS_KEY=${STORAGE_USER}
@@ -34,12 +34,12 @@ services:
     image: redis:6.2.5-alpine
     container_name: redis
     restart: always
-    volumes: 
+    volumes:
       - redis:/data
-    networks: 
+    networks:
       - backend
     expose:
-      - 6379  
+      - 6379
 
   app:
     image: node:12.18.4-alpine
@@ -49,6 +49,8 @@ services:
       - ./server/:/opt/server/
     entrypoint: npm run start:dev
     env_file: ./.env
+    environment:
+      - NODE_ENV=test
     networks:
       - backend
     expose:
