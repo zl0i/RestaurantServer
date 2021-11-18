@@ -1,7 +1,8 @@
 import { In } from "typeorm"
 import Points from "../entity/points.entity"
 import Warehouses from "../entity/warehouses.entity"
-import { NotFoundError } from "../lib/errors"
+import WarehousesGoods from "../entity/warehouse_goods.entity"
+import { BadRequestError, NotFoundError } from "../lib/errors"
 import { ICondition } from "../middleware/scopes/basicScope"
 
 
@@ -40,6 +41,31 @@ export default class WarehousesService {
         } else {
             throw new NotFoundError('Points not found')
         }
+    }
+
+    static async updateCountGood(id_warehouse: number, id_good: number, data: any) {
+        let wh_good = await WarehousesGoods.findOne({ id_warehouse, id_good })
+
+        if (wh_good && wh_good.unit != data.unit) {
+            throw new BadRequestError('Units should equals')
+        }
+
+        if (!wh_good) {
+            wh_good = new WarehousesGoods()
+            wh_good.id_good = id_good
+            wh_good.id_warehouse = id_warehouse
+            wh_good.unit = data.unit
+            wh_good.count = 0
+        }
+        wh_good.count += data.count
+        if (wh_good.count == 0) {
+            wh_good.remove()
+            return {result: 'ok', message: 'Good count is zero'}
+        } else if (wh_good.count < 0) {
+            throw new BadRequestError('The quantity cannot be less than zero')
+        }
+
+        return await wh_good.save()
     }
 
     static async delete(id: number) {

@@ -38,6 +38,22 @@ router.post('/',
         }
     });
 
+router.post('/:id_warehouse/goods/:id_good/change',
+    [
+        allow(Resources.warehouses, Actions.update),
+        body({ count: Number })
+    ],
+    async (req: express.Request, res: express.Response) => {
+        try {
+            const id_warehouse = Number(req.params.id_warehouse)
+            const id_good = Number(req.params.id_good)
+            const data = await WarehousesService.updateCountGood(id_warehouse, id_good, req.body)
+            res.json(data)
+        } catch (error) {
+            HttpErrorHandler.handle(error, res)
+        }
+    });
+
 router.patch('/:id',
     [
         allow(Resources.warehouses, Actions.update)

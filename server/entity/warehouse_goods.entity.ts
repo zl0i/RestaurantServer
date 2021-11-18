@@ -17,7 +17,7 @@ export default class WarehousesGoods extends BaseEntity {
     @Column()
     id_warehouse: number
 
-    @Column()
+    @Column({ type: 'double', default: 0 })
     count: number
 
     @Column()
