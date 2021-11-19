@@ -17,9 +17,12 @@ export class token_permissions extends BaseEntity {
     @Column()
     action: string
 
-    @Column({default: null})
+    @Column({ default: null })
     scope: string
 
-    @Column({default: null})
+    @Column({ default: null })
     conditions: string
+
+    @Column({ default: '[]' })
+    forbid_fields: string
 }

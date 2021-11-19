@@ -1,6 +1,7 @@
 import { getManager } from "typeorm";
 import express from 'express'
 import { BadRequestError } from "./errors";
+import { forbidFields } from "../middleware/fieldsValidator";
 
 
 export default class DataProvider {
@@ -45,7 +46,7 @@ export default class DataProvider {
         const count = Number(model.pop())
 
         return {
-            data: model,
+            data: forbidFields(req, model as any[]),
             meta: {
                 lenght: count,
                 pages: Math.ceil(count / pagination['take']) || (count > 0 ? 1 : 0)

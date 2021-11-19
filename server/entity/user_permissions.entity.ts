@@ -23,6 +23,9 @@ export class user_permissions extends BaseEntity {
     @Column({ default: "" })
     conditions: string
 
+    @Column({default: '[]'})
+    forbid_fields: string
+
     @ManyToOne(() => Users, user => user.id)
     @JoinColumn({ name: 'id_user' })
     user: Users

@@ -16,6 +16,7 @@ declare global {
             context?: {
                 user: Users
                 permission: string
+                forbidFields: any,
                 condition?: ICondition,
                 isOwn: boolean,
                 isAll: boolean
@@ -75,6 +76,7 @@ export default function allow(resource: Resources, action: Actions) {
 
             req.context = {
                 permission: `${resource}:${action}:${permissions.scope}`,
+                forbidFields: JSON.parse(permissions.forbid_fields),
                 isOwn: permissions.scope === Scopes.own,
                 isAll: permissions.scope === Scopes.all,
                 user: user
