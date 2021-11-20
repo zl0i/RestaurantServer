@@ -11,7 +11,7 @@ export enum UserRoles {
     custom
 }
 
-export const enum Resources {
+export enum Resources {
     points = 'points',
     menu = 'menu',
     users = 'users',
@@ -27,7 +27,7 @@ export enum Actions {
     delete = 'delete'
 }
 
-export const enum Scopes {
+export enum Scopes {
     orders = 'orders',
     points = 'points',
     own = 'own',
@@ -38,7 +38,7 @@ export default class PermissionsBuilder {
     constructor() { }
 
     //TODO: if roles are issued than do nothing
-    static async setUserRolePermissions(id_user: number, role: UserRoles) { 
+    static async setUserRolePermissions(id_user: number, role: UserRoles) {
         await user_permissions.delete({ id_user: id_user })
 
         const permissions: PermissionSet = new PermissionSet();
@@ -82,9 +82,24 @@ export default class PermissionsBuilder {
         await user_permissions.insert(user_permission as QueryDeepPartialEntity<user_permissions>[])
     }
 
+    static async setUserPermissions(id_user: number, permissions: string[]) {
+        await user_permissions.delete({ id_user: id_user })
+        const user_permission = new Array()
+        for (const p of permissions) {
+            const fields = p.split(':')
+            user_permission.push({
+                id_user: id_user,
+                resource: fields[0],
+                action: fields[1],
+                scope: fields[2]
+            })
+        }
+        await user_permissions.insert(user_permission as QueryDeepPartialEntity<user_permissions>[])
+    }
+
     static async createTokenPermissionsByUser(id_user: number, id_token: number) {
         const permissions = await user_permissions.find({ id_user: id_user })
-        for(const p of permissions) {
+        for (const p of permissions) {
             await token_permissions.insert({
                 id_token: id_token,
                 resource: p.resource,

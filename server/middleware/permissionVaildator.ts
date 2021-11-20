@@ -3,6 +3,8 @@ import { MoreThan } from 'typeorm'
 import { Tokens } from '../entity/tokens.entity'
 import { token_permissions } from '../entity/token_permissions.entity'
 import { Users } from '../entity/user.entity'
+import { ForbiddenError, UnauthorizedError } from '../lib/errors'
+import HttpErrorHandler from '../lib/httpErrorHandler'
 import { Actions, Resources, Scopes } from '../lib/permissionsBuilder'
 import { getCache, setCache } from './cacheMiddleware'
 import { ICondition } from './scopes/basicScope'
@@ -28,7 +30,7 @@ export default function allow(resource: Resources, action: Actions) {
         try {
             const token = await Tokens.findOne({ token: req.headers.authorization?.split(" ")[1], expired_at: MoreThan(new Date()) })
             if (!token)
-                return res.status(401).json({ message: "Token invalid" })
+                throw new UnauthorizedError('Token invalid')
 
             const key_cache = `permissions_token_${token.token}`
             let data_cache = await getCache(key_cache)
@@ -44,7 +46,7 @@ export default function allow(resource: Resources, action: Actions) {
             } else {
                 user = await Users.findOne({ id: token?.id_user })
                 if (!user)
-                    return res.status(401).json({ message: "User not found" })
+                    throw new UnauthorizedError('User not found')
 
                 permissions = await token_permissions.findOne({ resource: resource, action: action, id_token: token?.id })
 
@@ -54,24 +56,21 @@ export default function allow(resource: Resources, action: Actions) {
                 }), 1800)
             }
 
-            if (permissions) {
-                req.context = {
-                    permission: `${resource}:${action}:${permissions.scope}`,
-                    isOwn: permissions.scope === Scopes.own,
-                    isAll: permissions.scope === Scopes.all,
-                    user: user
-                }
+            if (!permissions)
+                throw new ForbiddenError('You don\'t have permissions for it')
 
-                const condition = new ScopeCondition(resource, permissions.scope, user)
-                req.context.condition = condition.getCondition()
-
-                next()
-            } else {
-                res.status(403).end()
+            req.context = {
+                permission: `${resource}:${action}:${permissions.scope}`,
+                isOwn: permissions.scope === Scopes.own,
+                isAll: permissions.scope === Scopes.all,
+                user: user
             }
+
+            const condition = new ScopeCondition(resource, permissions.scope, user)
+            req.context.condition = condition.getCondition()
+            next()
         } catch (e) {
-            console.log(e)
-            res.status(500).end()
+            HttpErrorHandler.handle(e, res)
         }
     }
 }

@@ -31,6 +31,7 @@ export default class DefaultAuth {
       await Tokens.delete({ id_user: user.id })
     } else {
       const newUsers = new Users()
+      newUsers.login = phone
       newUsers.phone = phone
       newUsers.sms_code = code
       await newUsers.save()

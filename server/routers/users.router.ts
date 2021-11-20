@@ -44,15 +44,13 @@ router.get('/profile',
 
 router.post('/',
   [
-    body({ login: String, password: String }),
-    allow(Resources.users, Actions.create)
+    allow(Resources.users, Actions.create),
+    body({ login: String, password: String, permissions: Array })
   ],
   async (req: express.Request, res: express.Response) => {
     try {
-      await UserService.create(req.body.login, req.body.password)
-      res.status(200).json({
-        result: "ok"
-      });
+      const user = await UserService.create(req.context.user, req.body)
+      res.json(user);
     } catch (error) {
       HttpErrorHandler.handle(error, res)
     }

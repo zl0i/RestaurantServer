@@ -57,7 +57,7 @@ export default class ScopeCondition {
             case Scopes.all:
                 return { key: '', value: [] }
             default:
-                throw new Error('ScopeBuilder: undefined scope ' + this._scope)
+                throw new Error('ScopeBuilder: undefined scope: ' + this._scope)
         }
     }
 
@@ -74,7 +74,7 @@ export default class ScopeCondition {
 
         return {
             object: scope.slice(0, start),
-            params: scope.slice(start + 1, end).split(',').map((el) => el.trim())
+            params: scope.slice(start + 1, end).split(',').map((el) => Number(el.trim()))
         }
     }
 }

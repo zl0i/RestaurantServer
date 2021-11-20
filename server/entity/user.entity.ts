@@ -18,7 +18,7 @@ export class Users extends BaseEntity {
     @Column({ default: '' })
     lastname: string;
 
-    @Column({ default: null })
+    @Column({ unique: true })
     login: string;
 
     @Column({ default: null })

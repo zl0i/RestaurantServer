@@ -90,6 +90,7 @@ export default class OAuthService {
                 user = await Users.findOne({ id: oauth_user.id_user })
             } else {
                 user = new Users()
+                user.login = info.login
                 user.name = info.name;
                 user.lastname = info.lastname
                 user.phone = info.phone
