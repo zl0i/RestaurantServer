@@ -52,8 +52,6 @@ export default class UserService {
 
             if (!resource || !action || !scope)
                 throw new BadRequestError('Bad permissions')
-
-
             if (!Object.values(Resources).includes(resource as Resources))
                 throw new BadRequestError(`The resources "${resource}" does not exist`)
             if (!Object.values(Actions).includes(action as Actions))

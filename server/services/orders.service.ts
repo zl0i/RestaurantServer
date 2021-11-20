@@ -5,7 +5,7 @@ import Orders from '../entity/orders.entity'
 import { createQueryBuilder, In } from 'typeorm';
 import AdditionsCategory from '../entity/additions_category.entity';
 import YokassaAPI from '../src/yokassaAPI';
-import { DomainError, NotFoundError } from '../lib/errors';
+import { BadRequestError, NotFoundError } from '../lib/errors';
 import Additions from '../entity/additions.entity';
 import OrdersPayment from '../entity/orders_payment.entity';
 
@@ -80,7 +80,7 @@ export default class OrderService {
             qty: menu.qty
           } as Additions)
         } else {
-          throw new DomainError(`Additions category ${item['id_additions_category']} is single`)
+          throw new BadRequestError(`Additions category ${item['id_additions_category']} is single`)
         }
       } else {
         menu.additions_category.push({

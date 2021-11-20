@@ -1,6 +1,6 @@
 import Additions from "../entity/additions.entity";
 import { AdditionsIngredients } from "../entity/additions_ingredients.entity";
-import { NotFoundError } from "../lib/errors";
+import { BadRequestError, NotFoundError } from "../lib/errors";
 import { ICondition } from "../middleware/scopes/basicScope";
 
 
@@ -22,18 +22,18 @@ export default class AdditionsIngredientsService {
             new_ingr.id_good = ingr.id_good
             await new_ingr.save()
         }
-        return { resut: 'ok' }
+        return data
     }
 
     static async update(id_add: number, id_ingr: number, data: any) {
         const item = await AdditionsIngredients.findOne({ id: id_ingr, id_addition: id_add })
-        if (item) {
-            item.id_good = data.id_good ?? item.id_good
-            item.count = data.count ?? item.count
-            item.eatable = data.eatable ?? item.eatable
-            return await item.save()
-        }
-        return { result: 'error', messgae: 'Ingredients not found' }
+        if (!item)
+            throw new BadRequestError('Ingredients not found')
+
+        item.id_good = data.id_good ?? item.id_good
+        item.count = data.count ?? item.count
+        item.eatable = data.eatable ?? item.eatable
+        return await item.save()
     }
 
     static async delete(id_add: number, id_ingr: number) {

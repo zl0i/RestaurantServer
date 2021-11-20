@@ -1,6 +1,6 @@
 import axios from 'axios';
 import bcrypt from 'bcryptjs'
-import { DomainError, InternalError, UnauthorizedError } from '../lib/errors';
+import { BadRequestError, InternalError, UnauthorizedError } from '../lib/errors';
 import { Users } from '../entity/user.entity';
 import { Tokens } from '../entity/tokens.entity';
 import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder'
@@ -63,38 +63,34 @@ export default class DefaultAuth {
 
   static async viaPassword(login: string, password: string) {
     const user = await Users.findOne({ login })
-    if (user && bcrypt.compareSync(password, user.password)) {
-      await Tokens.delete({ id_user: user.id })
-      const token = new Tokens(user.id)
-      await token.save()
-      await PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
-      return {
-        result: "ok",
-        token: token.token
-      }
-    } else {
+    if (!user || !bcrypt.compareSync(password, user.password))
       throw new UnauthorizedError('login or password isn\'t correct')
+
+    await Tokens.delete({ id_user: user.id })
+    const token = new Tokens(user.id)
+    await token.save()
+    await PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
+    return {
+      result: "ok",
+      token: token.token
     }
   }
 
   static async viaToken(req_token: string) {
     const token = await Tokens.findOne({ token: req_token, expired_at: MoreThan(new Date()) })
-    if (token) {
-      const newToken = new Tokens(token.id_user)
-      await token.remove()
-      await newToken.save()
-      return { token: newToken.token }
-    } else {
-      throw new UnauthorizedError('token is not valid')
-    }
+    if (!token)
+      throw new UnauthorizedError('Token invalid')
+
+    const newToken = new Tokens(token.id_user)
+    await token.remove()
+    await newToken.save()
+    return { token: newToken.token }
   }
-
-
 
   static async sendSMSCode(phone: string): Promise<string> {
 
     if (!this.validatePhone(phone))
-      throw new DomainError('bad number phone');
+      throw new BadRequestError('Bad number phone');
 
     if (phone == '+79999999999' || smsApiKey == 'test')
       return '9674'
@@ -104,11 +100,10 @@ export default class DefaultAuth {
       `https://sms.ru/sms/send?api_id=${smsApiKey}5&to=${phone}&msg=${code}&json=1&from=MyRestaurant`,
     );
 
-    if (reply.data.status_code === 100) {
-      return code
-    } else {
+    if (reply.data.status_code !== 100)
       throw new InternalError('Sms not send');
-    }
+
+    return code
   }
 
   static async validateCode(phone: string, code: string): Promise<Users> {
@@ -116,11 +111,9 @@ export default class DefaultAuth {
       throw new UnauthorizedError('Code not right');
 
     const user = await Users.findOne({ phone: phone, sms_code: code });
-    //TODO: refractor
-    if (user) {
-      return user;
-    } else {
+    if (!user)
       throw new UnauthorizedError('Code not right');
-    }
+
+    return user
   }
 }

@@ -110,7 +110,7 @@ export default class OAuthService {
 
             const token = new Tokens(user.id)
             await token.save()
-            PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
+            await PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
             return `${project_uri}?token=${token.token}`
         } catch (error) {
             return `${project_uri}?message=${error.message}`

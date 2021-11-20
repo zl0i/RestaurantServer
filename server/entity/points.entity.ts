@@ -57,7 +57,7 @@ export default class Points extends BaseEntity {
     static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
         const points = await Points.find(criteria)
         for (const p of points) {
-            MenuCategory.delete({ id_point: p.id })
+            await MenuCategory.delete({ id_point: p.id })
             if (p.icon)
                 await ObjectStorage.deleteImage(p.icon)
         }

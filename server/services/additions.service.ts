@@ -1,10 +1,8 @@
 
 import { ICondition } from "../middleware/scopes/basicScope"
-import { DomainError } from "../lib/errors"
+import { BadRequestError } from "../lib/errors"
 import Additions from "../entity/additions.entity"
 import AdditionsCategory from "../entity/additions_category.entity"
-
-
 
 
 export default class AdditionsService {
@@ -15,16 +13,14 @@ export default class AdditionsService {
 
     static async create(data: any) {
         const category = await AdditionsCategory.findOne({ id: data.id_additions })
-        //TODO: refractor
-        if (category) {
-            const item = new Additions()
-            item.name = data.name
-            item.cost = data.cost
-            item.id_category = category.id
-            return await item.save()
-        } else {
-            throw new DomainError('Additions Category not found')
-        }
+        if (!category)
+            throw new BadRequestError('Additions Category not found')
+
+        const item = new Additions()
+        item.name = data.name
+        item.cost = data.cost
+        item.id_category = category.id
+        return await item.save()
     }
 
     static async update(id: number, data: any) {
@@ -33,11 +29,10 @@ export default class AdditionsService {
         item.cost = data.cost || item.cost
         if (data.id_additions) {
             const category = await AdditionsCategory.findOne({ id: data.id_additions })
-            if (category) {
-                item.id_category = category.id
-            } else {
-                throw new DomainError('Cannot update category')
-            }
+            if (category)
+                throw new BadRequestError('Cannot update category')
+
+            item.id_category = category.id
         }
         return await item.save()
     }
@@ -45,7 +40,7 @@ export default class AdditionsService {
     static async delete(id: number) {
         const result = await Additions.delete({ id })
         if (result.affected == 0)
-            throw new DomainError('Addition not found')
+            throw new BadRequestError('Addition not found')
 
         return result
     }

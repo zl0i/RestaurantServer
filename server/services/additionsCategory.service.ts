@@ -15,15 +15,14 @@ export default class AdditionsCategoryService {
 
     static async create(data: any) {
         const menu = await Menu.find({ id: In(data.ids_menu as number[]) })
-        if (menu.length === data.ids_menu.length) {
-            const item = new AdditionsCategory()
-            item.name = data.name
-            item.menu = menu
-            item.mode = data.mode
-            return await item.save()
-        } else {
+        if (menu.length !== data.ids_menu.length)
             throw new NotFoundError('Dish not found')
-        }
+
+        const item = new AdditionsCategory()
+        item.name = data.name
+        item.menu = menu
+        item.mode = data.mode
+        return await item.save()
     }
 
     static async update(id: number, data: any) {
@@ -32,11 +31,10 @@ export default class AdditionsCategoryService {
         item.mode = data.mode || item.mode
         if (data.ids_menu) {
             const menu = await Menu.find({ id: In(data.ids_menu as number[]) })
-            if (menu.length === data.ids_menu.length) {
-                item.menu = menu
-            } else {
+            if (menu.length !== data.ids_menu.length)
                 throw new NotFoundError('Dish not found')
-            }
+
+            item.menu = menu
         }
         return await item.save()
     }
