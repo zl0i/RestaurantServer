@@ -1,4 +1,5 @@
-import { Entity, PrimaryColumn, Column, BaseEntity, CreateDateColumn } from "typeorm";
+import { Entity, PrimaryColumn, Column, BaseEntity, CreateDateColumn, ManyToOne, JoinColumn, RelationId } from "typeorm";
+import Orders from "./orders.entity";
 
 
 export enum OrderPaymentStatus {
@@ -10,13 +11,15 @@ export enum OrderPaymentStatus {
 @Entity()
 export default class OrdersPayment extends BaseEntity {
 
-    constructor(id_order: number, payment_id: string, key: string) {
+    constructor(id_order: number, token: string, payment_id: string, key: string) {
         super()
         this.id_order = id_order
         this.payment_id = payment_id
+        this.token = token
         this.idempotence_key = key
     }
 
+    @RelationId((payment: OrdersPayment) => payment.order)
     @PrimaryColumn()
     id_order: number;
 
@@ -27,10 +30,15 @@ export default class OrdersPayment extends BaseEntity {
     status: OrderPaymentStatus
 
     @Column()
-    idempotence_key: string
+    token: string
 
+    @Column()
+    idempotence_key: string
 
     @CreateDateColumn()
     created_at: Date
 
+    @ManyToOne(() => Orders, order => order.id)
+    @JoinColumn({ name: 'id_order' })
+    order: Orders
 }

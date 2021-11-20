@@ -33,7 +33,7 @@ export default class OrderService {
 
     //TODO: catch if crash create payment
     const payment = await YokassaAPI.createPaymentOrder(order.total, 'Your order')
-    const orderPayment = new OrdersPayment(order.id, payment.payment_id, payment.idempotence_key)
+    const orderPayment = new OrdersPayment(order.id, payment.confirmation_token, payment.payment_id, payment.idempotence_key)
     await orderPayment.save()
 
     return {
@@ -45,7 +45,7 @@ export default class OrderService {
   static async delete(id: number) {
     const result = await Orders.delete({ id })
     if (result.affected == 0)
-        throw new NotFoundError('Order not found')
+      throw new NotFoundError('Order not found')
 
     return result
   }

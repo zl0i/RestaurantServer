@@ -57,6 +57,9 @@ export default class Orders extends BaseEntity {
     @OneToMany(() => OrderContent, content => content.order)
     content: OrderContent[]
 
+    @OneToMany(() => OrdersPayment, payment => payment.order)
+    payments: OrdersPayment[]
+
     async save(options?: SaveOptions): Promise<this> {
         const s = await super.save(options)
         for (const c of this._content) {
