@@ -27,7 +27,6 @@ export default class OrderService {
         item.additions_category = await OrderService.checkAndReturnAddtions(item, req_ids_additions);
       }
     }
-    console.log(JSON.stringify(menu))
     const order = new Orders(menu, user)
     order.comment = data.comment
     await order.save()
