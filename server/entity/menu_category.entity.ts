@@ -15,13 +15,13 @@ export default class MenuCategory extends BaseEntity {
     @Column({ default: null })
     icon: string
 
-    @RelationId((category: MenuCategory) => category.points)
+    @RelationId((category: MenuCategory) => category.point)
     @Column()
     id_point: number
 
     @ManyToOne(() => Points, point => point.id)
     @JoinColumn({ name: "id_point" })
-    points: Points
+    point: Points
 
     @Column({ default: '', length: 1000 })
     description: string

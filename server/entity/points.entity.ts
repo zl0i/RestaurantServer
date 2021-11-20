@@ -30,7 +30,7 @@ export default class Points extends BaseEntity {
     @Column({ default: "" })
     icon: string
 
-    @OneToMany(() => MenuCategory, category => category.points)
+    @OneToMany(() => MenuCategory, category => category.point)
     categories: MenuCategory[]
 
     @ManyToMany(() => Users, user => user.points)
