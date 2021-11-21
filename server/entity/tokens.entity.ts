@@ -42,12 +42,12 @@ export class Tokens extends BaseEntity {
 
     async remove(): Promise<this> {
         await TokenPermissions.delete({ id_token: this.id })
-        return super.remove()
+        return await super.remove()
     }
 
     static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
         const token = await Tokens.find(criteria)
-        TokenPermissions.delete({ id_token: In(token.map((t) => t.id)) })
-        return super.delete(criteria, options)
+        await TokenPermissions.delete({ id_token: In(token.map((t) => t.id)) })
+        return await super.delete(criteria, options)
     }
 }

@@ -38,14 +38,14 @@ export default class AdditionsCategory extends BaseEntity {
     additions: Additions[]
 
     async remove(): Promise<this> {
-        Additions.delete({ id_category: this.id })
+        await Additions.delete({ id_category: this.id })
         return super.remove()
     }
 
     static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
         const additionsCategory = await AdditionsCategory.find(criteria)
         for (const ad of additionsCategory) {
-            Additions.delete({ id_category: ad.id })
+            await Additions.delete({ id_category: ad.id })
         }
         return super.delete(criteria, options)
     }

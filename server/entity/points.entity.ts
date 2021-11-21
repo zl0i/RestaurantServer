@@ -1,5 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, DeleteResult, FindConditions, ObjectType, RemoveOptions, OneToMany, JoinTable, ManyToMany } from "typeorm";
-import ObjectStorage from "../src/storage";
 import MenuCategory from "./menu_category.entity";
 import { Users } from "./user.entity";
 
@@ -48,9 +47,7 @@ export default class Points extends BaseEntity {
     users: Users[]
 
     async remove(): Promise<this> {
-        MenuCategory.delete({ id_point: this.id })
-        if (this.icon)
-            await ObjectStorage.deleteImage(this.icon)
+        await MenuCategory.delete({ id_point: this.id })
         return super.remove()
     }
 
@@ -58,8 +55,6 @@ export default class Points extends BaseEntity {
         const points = await Points.find(criteria)
         for (const p of points) {
             await MenuCategory.delete({ id_point: p.id })
-            if (p.icon)
-                await ObjectStorage.deleteImage(p.icon)
         }
         return super.delete(criteria, options)
     }

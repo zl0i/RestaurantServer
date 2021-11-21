@@ -41,8 +41,8 @@ export default class Additions extends BaseEntity {
     static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
         const additions = await Additions.find(criteria)
         for (const a of additions) {
-            AdditionsIngredients.delete({ id_addition: a.id })
-            AdditionsRecipes.delete({ id_addition: a.id })
+            await AdditionsIngredients.delete({ id_addition: a.id })
+            await AdditionsRecipes.delete({ id_addition: a.id })
         }
         return super.delete(criteria, options)
     }

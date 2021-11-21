@@ -61,16 +61,16 @@ export default class Menu extends BaseEntity {
     recipe: MenuRecipes
 
     async remove(): Promise<this> {
-        MenuIngredients.delete({ id_menu: this.id })
-        MenuRecipes.delete({ id_menu: this.id })
+        await MenuIngredients.delete({ id_menu: this.id })
+        await MenuRecipes.delete({ id_menu: this.id })
         return super.remove()
     }
 
     static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
         const menu = await Menu.find(criteria)
         for (const m of menu) {
-            MenuIngredients.delete({ id_menu: m.id })
-            MenuRecipes.delete({ id_menu: m.id })
+            await MenuIngredients.delete({ id_menu: m.id })
+            await MenuRecipes.delete({ id_menu: m.id })
         }
         return super.delete(criteria, options)
     }

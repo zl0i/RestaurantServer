@@ -86,6 +86,6 @@ export class Users extends BaseEntity {
                 await token.remove()
             }
         }
-        return super.delete(criteria, options)
+        return await super.delete(criteria, options)
     }
 }

@@ -46,10 +46,13 @@ export default class PointService {
     }
 
     static async delete(id: number) {
-        const result = await Points.delete({ id })
-        if (result.affected == 0)
+        const point = await Points.findOne({ id })
+        if (!point)
             throw new NotFoundError('Point not found')
 
-        return result
+        if (point.icon)
+            await ObjectStorage.deleteImage(point.icon)
+
+        return await point.remove()
     }
 }
