@@ -68,6 +68,10 @@ export default class WarehousesService {
     }
 
     static async delete(id: number) {
+        const goods = await WarehousesGoods.find({ id_warehouse: id })
+        if (goods.length > 0)
+            throw new BadRequestError('Warehouse not empty')
+
         const result = await Warehouses.delete({ id })
         if (result.affected == 0)
             throw new NotFoundError('Warehouse not found')

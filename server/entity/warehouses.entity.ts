@@ -1,5 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, JoinTable, ManyToMany, OneToMany, DeleteResult, FindConditions, ObjectType, RemoveOptions } from "typeorm";
-import { DomainError } from "../lib/errors";
 import { Goods } from "./goods.entity";
 import Points from "./points.entity";
 import { Users } from "./user.entity";
@@ -55,19 +54,14 @@ export default class Warehouses extends BaseEntity {
     goods: Goods[]
 
     async remove(): Promise<this> {
-        const goods = await WarehousesGoods.find({ id_warehouse: this.id })
-        if (goods.length > 0)
-            throw new DomainError("You cannot delete a non-empty warehouse")
+        await WarehousesGoods.delete({ id_warehouse: this.id })
         return await super.remove()
     }
 
     static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
         const warehouses = await Warehouses.find(criteria)
         for (const wh of warehouses) {
-            const goods = await WarehousesGoods.find({ id_warehouse: wh.id })
-            //TODO: domain logic
-            if (goods.length > 0)
-                throw new DomainError("You cannot delete a non-empty warehouse")
+            await WarehousesGoods.delete({ id_warehouse: wh.id })
         }
         return await super.delete(criteria, options)
     }

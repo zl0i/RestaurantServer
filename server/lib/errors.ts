@@ -1,7 +1,6 @@
 
 export class HttpError extends Error { code: number }
 
-export class DomainError extends HttpError { code = 400 } //400
 export class BadRequestError extends HttpError { code = 400 } //400
 export class UnauthorizedError extends HttpError { code = 401 } //401
 export class ForbiddenError extends HttpError { code = 403 } //403
