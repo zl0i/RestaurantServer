@@ -2,12 +2,12 @@ import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, ManyToOne, Relation
 import { Users } from "./user.entity";
 
 @Entity()
-export class user_permissions extends BaseEntity {
+export class UserPermissions extends BaseEntity {
 
     @PrimaryGeneratedColumn()
     id: number
 
-    @RelationId((permissions: user_permissions) => permissions.user)
+    @RelationId((permissions: UserPermissions) => permissions.user)
     @Column()
     id_user: number
 

@@ -1,5 +1,5 @@
-import { user_permissions } from "../entity/user_permissions.entity"
-import { token_permissions } from '../entity/token_permissions.entity';
+import { UserPermissions } from "../entity/user_permissions.entity"
+import { TokenPermissions } from '../entity/token_permissions.entity';
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity";
 
 export enum UserRoles {
@@ -39,7 +39,7 @@ export default class PermissionsBuilder {
 
     //TODO: if roles are issued than do nothing
     static async setUserRolePermissions(id_user: number, role: UserRoles) {
-        await user_permissions.delete({ id_user: id_user })
+        await UserPermissions.delete({ id_user: id_user })
 
         const permissions: PermissionSet = new PermissionSet();
 
@@ -79,11 +79,11 @@ export default class PermissionsBuilder {
                 ...p
             })
         }
-        await user_permissions.insert(user_permission as QueryDeepPartialEntity<user_permissions>[])
+        await UserPermissions.insert(user_permission as QueryDeepPartialEntity<UserPermissions>[])
     }
 
     static async setUserPermissions(id_user: number, permissions: string[]) {
-        await user_permissions.delete({ id_user: id_user })
+        await UserPermissions.delete({ id_user: id_user })
         const user_permission = new Array()
         for (const p of permissions) {
             const fields = p.split(':')
@@ -94,13 +94,13 @@ export default class PermissionsBuilder {
                 scope: fields[2]
             })
         }
-        await user_permissions.insert(user_permission as QueryDeepPartialEntity<user_permissions>[])
+        await UserPermissions.insert(user_permission as QueryDeepPartialEntity<UserPermissions>[])
     }
 
     static async createTokenPermissionsByUser(id_user: number, id_token: number) {
-        const permissions = await user_permissions.find({ id_user: id_user })
+        const permissions = await UserPermissions.find({ id_user: id_user })
         for (const p of permissions) {
-            await token_permissions.insert({
+            await TokenPermissions.insert({
                 id_token: id_token,
                 resource: p.resource,
                 action: p.action,

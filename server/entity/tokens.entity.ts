@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, CreateDateColumn, DeleteResult, ObjectType, FindConditions, RemoveOptions, In, ManyToOne, RelationId, JoinColumn, OneToMany } from "typeorm";
 import jwt from 'jsonwebtoken'
 import { Users } from "./user.entity";
-import { token_permissions } from "./token_permissions.entity";
+import { TokenPermissions } from "./token_permissions.entity";
 
 const secret_key = process.env['APP_SECRET'] || 'shhhh'
 
@@ -37,17 +37,17 @@ export class Tokens extends BaseEntity {
     @JoinColumn({ name: 'id_user' })
     user: Users
 
-    @OneToMany(() => token_permissions, permissions => permissions.token)
-    permissions: token_permissions[]
+    @OneToMany(() => TokenPermissions, permissions => permissions.token)
+    permissions: TokenPermissions[]
 
     async remove(): Promise<this> {
-        await token_permissions.delete({ id_token: this.id })
+        await TokenPermissions.delete({ id_token: this.id })
         return super.remove()
     }
 
     static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
         const token = await Tokens.find(criteria)
-        token_permissions.delete({ id_token: In(token.map((t) => t.id)) })
+        TokenPermissions.delete({ id_token: In(token.map((t) => t.id)) })
         return super.delete(criteria, options)
     }
 }

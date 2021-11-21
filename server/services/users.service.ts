@@ -1,5 +1,5 @@
 import { Users } from "../entity/user.entity"
-import { user_permissions } from "../entity/user_permissions.entity"
+import { UserPermissions } from "../entity/user_permissions.entity"
 import PermissionsBuilder, { Actions, Resources, Scopes } from "../lib/permissionsBuilder"
 import bcrypt from 'bcryptjs'
 import { ICondition } from "../middleware/scopes/basicScope"
@@ -18,7 +18,7 @@ export default class UserService {
 
         const users: any = await Users.find(condition)
         for (const user of users) {
-            const permissions = await user_permissions.find({ id_user: user.id })
+            const permissions = await UserPermissions.find({ id_user: user.id })
             user.permissions = new Array()
             user.removePrivateData()
             for (const perm of permissions) {
@@ -42,7 +42,7 @@ export default class UserService {
         user.birthday = data.birthday
         user.phone = data.phone
 
-        const parentPermissions = await user_permissions.find({ where: { id_user: parent.id } })
+        const parentPermissions = await UserPermissions.find({ where: { id_user: parent.id } })
 
         if (data.permissions.length == 0)
             throw new BadRequestError('Permissions must be defined')

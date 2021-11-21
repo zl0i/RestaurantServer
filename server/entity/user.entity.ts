@@ -2,8 +2,8 @@ import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, ObjectTy
 import Orders from "./orders.entity";
 import Points from "./points.entity";
 import { Tokens } from "./tokens.entity";
-import { token_permissions } from "./token_permissions.entity";
-import { user_permissions } from "./user_permissions.entity";
+import { TokenPermissions } from "./token_permissions.entity";
+import { UserPermissions } from "./user_permissions.entity";
 import Warehouses from "./warehouses.entity";
 
 @Entity()
@@ -45,8 +45,8 @@ export class Users extends BaseEntity {
     @OneToMany(() => Orders, order => order.id)
     orders: Orders[]
 
-    @OneToMany(() => user_permissions, permissions => permissions.user)
-    permissions: user_permissions[]
+    @OneToMany(() => UserPermissions, permissions => permissions.user)
+    permissions: UserPermissions[]
 
     @ManyToMany(() => Warehouses, warehouses => warehouses.users)
     warehouses: Warehouses[]
@@ -65,11 +65,11 @@ export class Users extends BaseEntity {
     }
 
     async remove(): Promise<this> {
-        await user_permissions.delete({ id_user: this.id })
+        await UserPermissions.delete({ id_user: this.id })
         await Orders.delete({ id_user: this.id })
         const token = await Tokens.findOne({ id_user: this.id })
         if (token) {
-            await token_permissions.delete({ id_token: token.id })
+            await TokenPermissions.delete({ id_token: token.id })
             await token.remove()
         }
         return super.remove()
@@ -78,11 +78,11 @@ export class Users extends BaseEntity {
     static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
         const users = await Users.find(criteria)
         for (const user of users) {
-            await user_permissions.delete({ id_user: user.id })
+            await UserPermissions.delete({ id_user: user.id })
             await Orders.delete({ id_user: user.id })
             const token = await Tokens.findOne({ id_user: user.id })
             if (token) {
-                await token_permissions.delete({ id_token: token.id })
+                await TokenPermissions.delete({ id_token: token.id })
                 await token.remove()
             }
         }

@@ -2,12 +2,12 @@ import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, RelationId, ManyToO
 import { Tokens } from "./tokens.entity";
 
 @Entity()
-export class token_permissions extends BaseEntity {
+export class TokenPermissions extends BaseEntity {
 
     @PrimaryGeneratedColumn()
     id: number;
 
-    @RelationId((permissions: token_permissions) => permissions.token)
+    @RelationId((permissions: TokenPermissions) => permissions.token)
     @Column()
     id_token: number
 

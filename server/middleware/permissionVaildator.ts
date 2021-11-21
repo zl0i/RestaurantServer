@@ -1,7 +1,7 @@
 import express from 'express'
 import { MoreThan } from 'typeorm'
 import { Tokens } from '../entity/tokens.entity'
-import { token_permissions } from '../entity/token_permissions.entity'
+import { TokenPermissions } from '../entity/token_permissions.entity'
 import { Users } from '../entity/user.entity'
 import { ForbiddenError, UnauthorizedError } from '../lib/errors'
 import HttpErrorHandler from '../lib/httpErrorHandler'
@@ -34,11 +34,11 @@ export default function allow(resource: Resources, action: Actions) {
 
             const key_cache = `permissions_token_${token.token}`
             let data_cache = await getCache(key_cache)
-            let user: Users, permissions: token_permissions;
+            let user: Users, permissions: TokenPermissions;
 
             if (data_cache) {
                 data_cache = (JSON.parse(data_cache))
-                permissions = Array<token_permissions>(...data_cache.permissions).find((value) => {
+                permissions = Array<TokenPermissions>(...data_cache.permissions).find((value) => {
                     if (value.resource == resource && value.action == action)
                         return true
                 })
@@ -48,11 +48,11 @@ export default function allow(resource: Resources, action: Actions) {
                 if (!user)
                     throw new UnauthorizedError('User not found')
 
-                permissions = await token_permissions.findOne({ resource: resource, action: action, id_token: token?.id })
+                permissions = await TokenPermissions.findOne({ resource: resource, action: action, id_token: token?.id })
 
                 setCache(key_cache, JSON.stringify({
                     user: user,
-                    permissions: await token_permissions.find({ id_token: token?.id })
+                    permissions: await TokenPermissions.find({ id_token: token?.id })
                 }), 1800)
             }
 
