@@ -1,16 +1,15 @@
 
 import Menu from "../entity/menu.entity"
-import { ICondition } from "../middleware/scopes/basicScope"
 import { NotFoundError } from "../lib/errors"
 import AdditionsCategory from "../entity/additions_category.entity"
-import { In } from "typeorm"
+import { FindManyOptions, In } from "typeorm"
 
 
 
 export default class AdditionsCategoryService {
 
-    static async read(icondition: ICondition) {
-
+    static async read(options: FindManyOptions<AdditionsCategory>) {
+        return await AdditionsCategory.find(options)
     }
 
     static async create(data: any) {

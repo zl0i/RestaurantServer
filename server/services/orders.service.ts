@@ -2,7 +2,7 @@
 import Menu from '../entity/menu.entity';
 import { Users } from '../entity/user.entity';
 import Orders from '../entity/orders.entity'
-import { createQueryBuilder, In } from 'typeorm';
+import { createQueryBuilder, FindManyOptions, In } from 'typeorm';
 import AdditionsCategory from '../entity/additions_category.entity';
 import YokassaAPI from '../src/yokassaAPI';
 import { BadRequestError, NotFoundError } from '../lib/errors';
@@ -11,6 +11,12 @@ import OrdersPayment from '../entity/orders_payment.entity';
 
 
 export default class OrderService {
+
+
+  static async read(options: FindManyOptions<Orders>) {
+    return await Orders.find(options)
+  }
+
 
   static async create(user: Users, data: any) {
     const req_ids_menu: number[] = Array.from(data.menu).map(m => m['id'])

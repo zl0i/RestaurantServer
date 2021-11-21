@@ -1,17 +1,17 @@
 
 import { UploadedFile } from "express-fileupload"
+import { FindManyOptions } from "typeorm"
 import Menu from "../entity/menu.entity"
 import MenuCategory from "../entity/menu_category.entity"
 import { NotFoundError } from "../lib/errors"
-import { ICondition } from "../middleware/scopes/basicScope"
 import ObjectStorage from "../src/storage"
 
 
 
 export default class MenuService {
 
-    static async read(icondition: ICondition) {
-
+    static async read(options: FindManyOptions<Menu>) {
+        return await Menu.find(options)
     }
 
     static async create(data: any) {

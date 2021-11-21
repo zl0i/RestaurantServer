@@ -1,14 +1,14 @@
 
-import { ICondition } from "../middleware/scopes/basicScope"
 import { BadRequestError } from "../lib/errors"
 import Additions from "../entity/additions.entity"
 import AdditionsCategory from "../entity/additions_category.entity"
+import { FindManyOptions } from "typeorm"
 
 
 export default class AdditionsService {
 
-    static async read(icondition: ICondition) {
-
+    static async read(options: FindManyOptions<Additions>) {
+        return await Additions.find(options)
     }
 
     static async create(data: any) {

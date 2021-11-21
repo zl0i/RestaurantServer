@@ -1,12 +1,11 @@
+import { FindManyOptions } from "typeorm";
 import { AdditionsRecipes } from "../entity/addition_recipes.entity";
 import { NotFoundError } from "../lib/errors";
-import { ICondition } from "../middleware/scopes/basicScope";
-
 
 export default class AdditionsRecipeService {
 
-    static async read(icondition: ICondition) {
-
+    static async read(options: FindManyOptions<AdditionsRecipes>) {
+        return await AdditionsRecipes.find(options)
     }
 
     static async create(id_addition: number, data: any) {

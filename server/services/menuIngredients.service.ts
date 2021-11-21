@@ -1,13 +1,13 @@
+import { FindManyOptions } from "typeorm";
 import Menu from "../entity/menu.entity";
 import { MenuIngredients } from "../entity/menu_ingredients.entity";
 import { BadRequestError, NotFoundError } from "../lib/errors";
-import { ICondition } from "../middleware/scopes/basicScope";
 
 
 export default class MenuIngredientsService {
 
-    static async read(icondition: ICondition) {
-
+    static async read(options: FindManyOptions<MenuIngredients>) {
+        return await MenuIngredients.find(options)
     }
 
     static async create(id_menu: number, data: any, append: boolean = false) {

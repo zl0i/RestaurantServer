@@ -2,15 +2,14 @@
 import { UploadedFile } from "express-fileupload"
 import Points from "../entity/points.entity"
 import { NotFoundError } from "../lib/errors"
-import { ICondition } from "../middleware/scopes/basicScope"
 import ObjectStorage from "../src/storage"
-
+import { FindManyOptions } from "typeorm"
 
 
 export default class PointService {
 
-    static async read(_icondition: ICondition) {
-
+    static async read(options: FindManyOptions<Points>) {
+        return await Points.find(options)
     }
 
     static async create(data: any) {

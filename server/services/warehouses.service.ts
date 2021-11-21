@@ -1,16 +1,15 @@
-import { In } from "typeorm"
+import { FindManyOptions, In } from "typeorm"
 import Points from "../entity/points.entity"
 import Warehouses from "../entity/warehouses.entity"
 import WarehousesGoods from "../entity/warehouse_goods.entity"
 import { BadRequestError, NotFoundError } from "../lib/errors"
-import { ICondition } from "../middleware/scopes/basicScope"
 
 
 
 export default class WarehousesService {
 
-    static async read(icondition: ICondition) {
-
+    static async read(options: FindManyOptions<Warehouses>) {
+        return await Warehouses.find(options)
     }
 
     static async create(data: any) {
