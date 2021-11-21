@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToOne, CreateDateColumn, DeleteResult, ObjectType, FindConditions, RemoveOptions, In } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, CreateDateColumn, DeleteResult, ObjectType, FindConditions, RemoveOptions, In, ManyToOne, RelationId, JoinColumn, OneToMany } from "typeorm";
 import jwt from 'jsonwebtoken'
 import { Users } from "./user.entity";
 import { token_permissions } from "./token_permissions.entity";
@@ -26,12 +26,19 @@ export class Tokens extends BaseEntity {
     @Column()
     expired_at: Date
 
-    @OneToOne(() => Users)
+    @RelationId((token: Tokens) => token.user)
     @Column()
     id_user: number
 
     @CreateDateColumn()
     create_date: Date
+
+    @ManyToOne(() => Users, user => user.tokens)
+    @JoinColumn({ name: 'id_user' })
+    user: Users
+
+    @OneToMany(() => token_permissions, permissions => permissions.token)
+    permissions: token_permissions[]
 
     async remove(): Promise<this> {
         await token_permissions.delete({ id_token: this.id })

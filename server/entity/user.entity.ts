@@ -54,6 +54,9 @@ export class Users extends BaseEntity {
     @ManyToMany(() => Points, point => point.users)
     points: Points[]
 
+    @OneToMany(() => Tokens, token => token.user)
+    tokens: Tokens[]
+
     removePrivateData() {
         delete this.password
         delete this.sms_code
