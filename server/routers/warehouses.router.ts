@@ -18,7 +18,7 @@ router.get('/',
     async (req: express.Request, res: express.Response) => {
         try {
             const provide = new DataProvider('Warehouses')
-            res.json(await provide.index(req))
+            res.json(await provide.index(req, req.context.condition.findCondition))
         } catch (error) {
             HttpErrorHandler.handle(error, res)
         }
@@ -56,7 +56,7 @@ router.post('/:id_warehouse/goods/:id_good/change',
 
 router.patch('/:id',
     [
-        allow(Resources.warehouses, Actions.update)
+        allow(Resources.warehouses, Actions.update, 'id')
     ],
     async (req: express.Request, res: express.Response) => {
         try {
@@ -69,7 +69,7 @@ router.patch('/:id',
 
 router.delete('/:id',
     [
-        allow(Resources.warehouses, Actions.delete)
+        allow(Resources.warehouses, Actions.delete, 'id')
     ],
     async (req: express.Request, res: express.Response) => {
         try {

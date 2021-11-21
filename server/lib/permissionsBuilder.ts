@@ -28,6 +28,7 @@ export enum Actions {
 }
 
 export enum Scopes {
+    warehouses = 'warehouses',
     orders = 'orders',
     points = 'points',
     own = 'own',

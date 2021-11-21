@@ -1,5 +1,5 @@
 import express from 'express'
-import { MoreThan } from 'typeorm'
+import { BaseEntity, MoreThan } from 'typeorm'
 import { Tokens } from '../entity/tokens.entity'
 import { TokenPermissions } from '../entity/token_permissions.entity'
 import { Users } from '../entity/user.entity'
@@ -16,7 +16,7 @@ declare global {
             context?: {
                 user: Users
                 permission: string
-                condition?: ICondition,
+                condition?: ICondition<BaseEntity>,
                 isOwn: boolean,
                 isAll: boolean
             }
@@ -25,7 +25,7 @@ declare global {
 }
 
 
-export default function allow(resource: Resources, action: Actions) {
+export default function allow(resource: Resources, action: Actions, param: string = '') {
     return async (req: express.Request, res: express.Response, next: Function) => {
         try {
             const token = await Tokens.findOne({ token: req.headers.authorization?.split(" ")[1], expired_at: MoreThan(new Date()) })
@@ -67,7 +67,14 @@ export default function allow(resource: Resources, action: Actions) {
             }
 
             const condition = new ScopeCondition(resource, permissions.scope, user)
-            req.context.condition = condition.getCondition()
+            req.context.condition = await condition.getCondition()
+
+            if (!param)
+                return next()
+
+            if (!req.context.isAll && !req.context.condition.value.includes(Number(req.params[param])))
+                throw new ForbiddenError('You   don\'t have permissions for it')
+
             next()
         } catch (e) {
             HttpErrorHandler.handle(e, res)

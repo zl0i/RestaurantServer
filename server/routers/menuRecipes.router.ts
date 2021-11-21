@@ -23,7 +23,7 @@ router.get('/:id_menu/recipe/',
 
 router.post('/:id_menu/recipe/',
     [
-        allow(Resources.menu, Actions.create)
+        allow(Resources.menu, Actions.update, 'id_menu')
     ],
     async (req: express.Request, res: express.Response) => {
         try {
@@ -37,7 +37,7 @@ router.post('/:id_menu/recipe/',
 
 router.delete('/:id_menu/recipe',
     [
-        allow(Resources.menu, Actions.delete)
+        allow(Resources.menu, Actions.delete, 'id_menu')
     ],
     async (req: express.Request, res: express.Response) => {
         try {

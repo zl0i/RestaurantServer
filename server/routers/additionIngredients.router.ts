@@ -23,7 +23,7 @@ router.get('/:id/ingredients/',
 
 router.post('/:id_add/ingredients/',
     [
-        allow(Resources.menu, Actions.create)
+        allow(Resources.menu, Actions.create, 'id_add')
     ],
     async (req: express.Request, res: express.Response) => {
         try {

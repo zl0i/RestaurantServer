@@ -39,7 +39,7 @@ router.post('/',
 
 router.patch('/:id',
   [
-    allow(Resources.points, Actions.update)
+    allow(Resources.points, Actions.update, 'id')
   ],
   async (req: express.Request, res: express.Response) => {
     try {
@@ -53,7 +53,7 @@ router.patch('/:id',
 
 router.delete('/:id',
   [
-    allow(Resources.points, Actions.delete)
+    allow(Resources.points, Actions.delete, 'id')
   ],
   async (req: express.Request, res: express.Response) => {
     try {

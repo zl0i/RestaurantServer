@@ -6,7 +6,6 @@ import { cache } from '../middleware/cacheMiddleware';
 import UserService from '../services/users.service';
 import HttpErrorHandler from '../lib/httpErrorHandler';
 import DataProvider from '../lib/DataProvider';
-import { In } from 'typeorm';
 
 const router = express.Router();
 
@@ -17,12 +16,8 @@ router.get('/',
   ],
   async (req: express.Request, res: express.Response) => {
     try {
-      const condition: object = {}
-      if (req.context?.condition.value.length > 0) {
-        condition[req.context?.condition?.key] = In(req.context?.condition.value)
-      }
       const provider = new DataProvider('Users')
-      res.json(await provider.index(req, condition))
+      res.json(await provider.index(req, req.context.condition.findCondition))
     } catch (error) {
       HttpErrorHandler.handle(error, res)
     }
@@ -35,7 +30,8 @@ router.get('/profile',
   ],
   async (req: express.Request, res: express.Response) => {
     try {
-      const user = await UserService.read({ key: 'id', value: [req.context.user.id] })
+      //TODO: refractor
+      const user = await UserService.read([req.context.user.id])
       res.status(200).json(user);
     } catch (error) {
       HttpErrorHandler.handle(error, res)
@@ -58,18 +54,12 @@ router.post('/',
 
 router.patch('/:id',
   [
-    allow(Resources.users, Actions.update)
+    allow(Resources.users, Actions.update, 'id')
   ],
   async (req: express.Request, res: express.Response) => {
     try {
-      if (req.context.isAll || req.context.condition.value.includes(Number(req.params.id))) {
-        const user = await UserService.update(Number(req.params['id']), req.body)
-        res.status(200).json(user);
-      } else {
-        res.status(403).json({
-          result: 'error'
-        });
-      }
+      const user = await UserService.update(Number(req.params['id']), req.body)
+      res.json(user);
     } catch (error) {
       HttpErrorHandler.handle(error, res)
     }
@@ -77,7 +67,7 @@ router.patch('/:id',
 
 router.delete('/:id',
   [
-    allow(Resources.users, Actions.delete)
+    allow(Resources.users, Actions.delete, 'id')
   ],
   async (req: express.Request, res: express.Response) => {
     try {

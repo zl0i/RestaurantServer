@@ -1,13 +1,16 @@
+import { BaseEntity, FindConditions } from "typeorm";
 
-export interface ICondition {
+export interface ICondition<T extends BaseEntity> {
+    findCondition: FindConditions<T>,
     key: string,
-    value: Array<number>
+    value: number[]
 }
 
 export default abstract class BasicScope {
-    constructor() { }    
+    constructor() { }
 
-    abstract own(): ICondition
-    abstract points(ids: Array<number>): ICondition    
-    abstract orders(ids: Array<number>): ICondition
+    abstract own(): Promise<ICondition<BaseEntity>>
+    abstract points(ids: number[]): Promise<ICondition<BaseEntity>>
+    abstract orders(ids: number[]): Promise<ICondition<BaseEntity>>
+    abstract warehouses(ids: number[]): Promise<ICondition<BaseEntity>>
 }

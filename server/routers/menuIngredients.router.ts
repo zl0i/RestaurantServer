@@ -23,7 +23,7 @@ router.get('/:id/ingredients/',
 
 router.post('/:id_menu/ingredients/',
     [
-        allow(Resources.menu, Actions.create)
+        allow(Resources.menu, Actions.create, 'id_menu')
     ],
     async (req: express.Request, res: express.Response) => {
         try {
@@ -51,7 +51,7 @@ router.post('/:id_menu/ingredients/append',
 
 router.patch('/:id_menu/ingredients/:id_ingr',
     [
-        allow(Resources.menu, Actions.update)
+        allow(Resources.menu, Actions.update, 'id_menu')
     ],
     async (req: express.Request, res: express.Response) => {
         try {
@@ -66,7 +66,7 @@ router.patch('/:id_menu/ingredients/:id_ingr',
 
 router.delete('/:id_menu/ingredients/:id_ingr',
     [
-        allow(Resources.menu, Actions.delete)
+        allow(Resources.menu, Actions.delete, 'id_menu')
     ],
     async (req: express.Request, res: express.Response) => {
         try {

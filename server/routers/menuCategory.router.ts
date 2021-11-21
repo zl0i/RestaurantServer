@@ -40,7 +40,7 @@ router.post('/',
 
 router.patch('/:id',
     [
-        allow(Resources.menu, Actions.update)
+        allow(Resources.menu, Actions.update, 'id')
     ],
     async (req: express.Request, res: express.Response) => {
         try {
@@ -55,7 +55,7 @@ router.patch('/:id',
 
 router.delete('/:id',
     [
-        allow(Resources.menu, Actions.delete)
+        allow(Resources.menu, Actions.delete, 'id')
     ],
     async (req: express.Request, res: express.Response) => {
         try {

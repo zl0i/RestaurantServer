@@ -1,3 +1,4 @@
+import { BaseEntity } from "typeorm"
 import { Users } from "../../entity/user.entity"
 import { Resources, Scopes } from "../../lib/permissionsBuilder"
 import BasicScope, { ICondition } from "./basicScope"
@@ -37,25 +38,31 @@ export default class ScopeCondition {
             case Resources.menu:
                 return new MenuScope()
             case Resources.points:
-                return new PointScope()
+                return new PointScope(this._user)
             case Resources.warehouses:
-                return new WarehouseScope()
+                return new WarehouseScope(this._user)
             default:
                 throw new Error('ScopeBuilder: undefined resource ' + this._resource)
         }
     }
 
-    getCondition(): ICondition {
+    async getCondition(): Promise<ICondition<BaseEntity>> {
         const sclass = this.createScopeClass()
         switch (this._scope) {
             case Scopes.own:
                 return sclass.own()
             case Scopes.points:
-                return sclass.points(this._params)
+                return await sclass.points(this._params)
             case Scopes.orders:
-                return sclass.orders(this._params)
+                return await sclass.orders(this._params)
+            case Scopes.warehouses:
+                return await sclass.warehouses(this._params)
             case Scopes.all:
-                return { key: '', value: [] }
+                return {
+                    findCondition: {},
+                    key: '',
+                    value: []
+                }
             default:
                 throw new Error('ScopeBuilder: undefined scope: ' + this._scope)
         }

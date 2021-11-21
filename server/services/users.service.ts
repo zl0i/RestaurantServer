@@ -2,7 +2,6 @@ import { Users } from "../entity/user.entity"
 import { UserPermissions } from "../entity/user_permissions.entity"
 import PermissionsBuilder, { Actions, Resources, Scopes } from "../lib/permissionsBuilder"
 import bcrypt from 'bcryptjs'
-import { ICondition } from "../middleware/scopes/basicScope"
 import { In } from "typeorm"
 import { BadRequestError, ForbiddenError, NotFoundError } from "../lib/errors"
 import ScopeCondition from "../middleware/scopes/ScopeCondition"
@@ -10,10 +9,11 @@ import ScopeCondition from "../middleware/scopes/ScopeCondition"
 
 export default class UserService {
 
-    static async read(icondition: ICondition) {
+    static async read(permitedIds: number[]) {
+        //TODO: refractor FindManyOptions
         const condition: object = {}
-        if (icondition.value.length > 0) {
-            condition[icondition.key] = In(icondition.value)
+        if (permitedIds.length > 0) {
+            condition['id'] = In(permitedIds)
         }
 
         const users: any = await Users.find(condition)

@@ -4,12 +4,13 @@ import { body } from '../middleware/schemaChecker';
 import YokassaAPI from '../src/yokassaAPI';
 import OrderService from '../services/orders.service';
 import { cache } from '../middleware/cacheMiddleware';
-import { In } from 'typeorm';
 import DataProvider from '../lib/DataProvider';
 import { Resources, Actions } from '../lib/permissionsBuilder';
 import HttpErrorHandler from '../lib/httpErrorHandler';
 
 const router = express.Router();
+
+router.post('/payment', YokassaAPI.handleHook)
 
 router.get('/',
   [
@@ -18,12 +19,8 @@ router.get('/',
   ],
   async (req: express.Request, res: express.Response) => {
     try {
-      const condition: object = {}
-      if (req.context?.condition.value.length > 0) {
-        condition[req.context?.condition?.key] = In(req.context?.condition.value)
-      }
       const provider = new DataProvider('Orders')
-      res.json(await provider.index(req, condition))
+      res.json(await provider.index(req, req.context.condition.findCondition))
     } catch (error) {
       HttpErrorHandler.handle(error, res)
     }
@@ -45,10 +42,9 @@ router.post(
   })
 
 
-router.delete(
-  '/:id',
+router.delete('/:id',
   [
-    allow(Resources.orders, Actions.delete)
+    allow(Resources.orders, Actions.delete, 'id')
   ],
   async (req: express.Request, res: express.Response) => {
     try {
@@ -59,6 +55,6 @@ router.delete(
     }
   })
 
-router.post('/payment', YokassaAPI.handleHook)
+
 
 export default router
