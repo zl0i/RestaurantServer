@@ -2,7 +2,7 @@ import { FindManyOptions, In } from "typeorm"
 import Points from "../entity/points.entity"
 import Warehouses from "../entity/warehouses.entity"
 import WarehousesGoods from "../entity/warehouse_goods.entity"
-import { BadRequestError, NotFoundError } from "../lib/errors"
+import { BadRequestError, NotFoundError } from "../lib/httpErrorHandler"
 
 
 
@@ -24,7 +24,6 @@ export default class WarehousesService {
         item.lon = data.lon
         item.points = points
         return await item.save()
-
     }
 
     static async update(id: number, data: any) {

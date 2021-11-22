@@ -1,6 +1,6 @@
 
 import Menu from "../entity/menu.entity"
-import { NotFoundError } from "../lib/errors"
+import { NotFoundError } from "../lib/httpErrorHandler"
 import AdditionsCategory from "../entity/additions_category.entity"
 import { FindManyOptions, In } from "typeorm"
 

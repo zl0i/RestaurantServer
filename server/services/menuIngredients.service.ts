@@ -1,7 +1,7 @@
 import { FindManyOptions } from "typeorm";
 import Menu from "../entity/menu.entity";
 import { MenuIngredients } from "../entity/menu_ingredients.entity";
-import { BadRequestError, NotFoundError } from "../lib/errors";
+import { BadRequestError, NotFoundError } from "../lib/httpErrorHandler";
 
 
 export default class MenuIngredientsService {

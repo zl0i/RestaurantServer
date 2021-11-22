@@ -1,6 +1,6 @@
 import { Any, Between, Equal, getManager, In, LessThan, LessThanOrEqual, Like, MoreThan, MoreThanOrEqual, Not } from "typeorm";
 import express from 'express'
-import { BadRequestError } from "./errors";
+import { BadRequestError } from "./httpErrorHandler";
 
 
 export default class DataProvider {

@@ -1,5 +1,5 @@
 
-import { BadRequestError } from "../lib/errors"
+import { BadRequestError } from "../lib/httpErrorHandler"
 import Additions from "../entity/additions.entity"
 import AdditionsCategory from "../entity/additions_category.entity"
 import { FindManyOptions } from "typeorm"

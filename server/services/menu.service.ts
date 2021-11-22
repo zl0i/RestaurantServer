@@ -3,7 +3,7 @@ import { UploadedFile } from "express-fileupload"
 import { FindManyOptions } from "typeorm"
 import Menu from "../entity/menu.entity"
 import MenuCategory from "../entity/menu_category.entity"
-import { NotFoundError } from "../lib/errors"
+import { NotFoundError } from "../lib/httpErrorHandler"
 import ObjectStorage from "../src/storage"
 
 

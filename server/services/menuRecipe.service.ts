@@ -1,6 +1,6 @@
 import { FindManyOptions } from "typeorm";
 import { MenuRecipes } from "../entity/menu_recipes.entity";
-import { NotFoundError } from "../lib/errors";
+import { NotFoundError } from "../lib/httpErrorHandler";
 
 
 export default class MenuRecipeService {

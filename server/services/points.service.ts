@@ -1,7 +1,7 @@
 
 import { UploadedFile } from "express-fileupload"
 import Points from "../entity/points.entity"
-import { NotFoundError } from "../lib/errors"
+import { NotFoundError } from "../lib/httpErrorHandler"
 import ObjectStorage from "../src/storage"
 import { FindManyOptions } from "typeorm"
 

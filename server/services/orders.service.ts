@@ -5,7 +5,7 @@ import Orders from '../entity/orders.entity'
 import { createQueryBuilder, FindManyOptions, In } from 'typeorm';
 import AdditionsCategory from '../entity/additions_category.entity';
 import YokassaAPI from '../src/yokassaAPI';
-import { BadRequestError, NotFoundError } from '../lib/errors';
+import { BadRequestError, NotFoundError } from '../lib/httpErrorHandler';
 import Additions from '../entity/additions.entity';
 import OrdersPayment from '../entity/orders_payment.entity';
 

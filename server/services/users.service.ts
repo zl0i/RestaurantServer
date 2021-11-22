@@ -3,7 +3,7 @@ import { UserPermissions } from "../entity/user_permissions.entity"
 import PermissionsBuilder, { Actions, Resources, Scopes } from "../lib/permissionsBuilder"
 import bcrypt from 'bcryptjs'
 import { In } from "typeorm"
-import { BadRequestError, ForbiddenError, NotFoundError } from "../lib/errors"
+import { BadRequestError, ForbiddenError, NotFoundError } from "../lib/httpErrorHandler"
 import ScopeCondition from "../middleware/scopes/ScopeCondition"
 
 

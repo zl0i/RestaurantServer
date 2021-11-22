@@ -1,7 +1,7 @@
 import { FindManyOptions } from "typeorm";
 import Additions from "../entity/additions.entity";
 import { AdditionsIngredients } from "../entity/additions_ingredients.entity";
-import { BadRequestError, NotFoundError } from "../lib/errors";
+import { BadRequestError, NotFoundError } from "../lib/httpErrorHandler";
 
 
 export default class AdditionsIngredientsService {

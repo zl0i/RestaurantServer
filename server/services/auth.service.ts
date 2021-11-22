@@ -1,6 +1,6 @@
 import axios from 'axios';
 import bcrypt from 'bcryptjs'
-import { BadRequestError, InternalError, UnauthorizedError } from '../lib/errors';
+import { BadRequestError, InternalError, UnauthorizedError } from '../lib/httpErrorHandler';
 import { Users } from '../entity/user.entity';
 import { Tokens } from '../entity/tokens.entity';
 import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder'
