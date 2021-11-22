@@ -2,30 +2,26 @@ import { Users } from "../entity/user.entity"
 import { UserPermissions } from "../entity/user_permissions.entity"
 import PermissionsBuilder, { Actions, Resources, Scopes } from "../lib/permissionsBuilder"
 import bcrypt from 'bcryptjs'
-import { In } from "typeorm"
+import { FindManyOptions } from "typeorm"
 import { BadRequestError, ForbiddenError, NotFoundError } from "../lib/httpErrorHandler"
 import ScopeCondition from "../middleware/scopes/ScopeCondition"
+import { Serializer } from "../lib/Serializer"
 
 
 export default class UserService {
 
-    static async read(permitedIds: number[]) {
-        //TODO: refractor FindManyOptions
-        const condition: object = {}
-        if (permitedIds.length > 0) {
-            condition['id'] = In(permitedIds)
-        }
-
-        const users: any = await Users.find(condition)
+    static async read(options: FindManyOptions<Users>) {
+        const users: any[] = await Users.find(options)
+        console.log(users)
         for (const user of users) {
             const permissions = await UserPermissions.find({ id_user: user.id })
-            user.permissions = new Array()
+            user.permissions = []
             user.removePrivateData()
             for (const perm of permissions) {
                 user.permissions.push(`${perm.resource}:${perm.action}:${perm.scope}`)
             }
         }
-        return users;
+        return Serializer.serialize(users, await Users.count(options))
     }
 
     static async create(parent: Users, data: any) {

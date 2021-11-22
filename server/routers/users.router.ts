@@ -5,7 +5,8 @@ import { Actions, Resources } from '../lib/permissionsBuilder';
 import { cache } from '../middleware/cacheMiddleware';
 import UserService from '../services/users.service';
 import HttpErrorHandler from '../lib/httpErrorHandler';
-import DataProvider from '../lib/DataProvider';
+import FindOptionsParser from '../lib/FindOptionsParser';
+
 
 const router = express.Router();
 
@@ -16,8 +17,8 @@ router.get('/',
   ],
   async (req: express.Request, res: express.Response) => {
     try {
-      const provider = new DataProvider('Users')
-      res.json(await provider.index(req, req.context.condition.findCondition))
+      const options = FindOptionsParser.parse(req)
+      res.json(await UserService.read(options))
     } catch (error) {
       HttpErrorHandler.handle(error, res)
     }
@@ -30,9 +31,8 @@ router.get('/profile',
   ],
   async (req: express.Request, res: express.Response) => {
     try {
-      //TODO: refractor
-      const user = await UserService.read([req.context.user.id])
-      res.status(200).json(user);
+      const options = FindOptionsParser.parse(req, { id: req.context.user.id })
+      res.json(await UserService.read(options))
     } catch (error) {
       HttpErrorHandler.handle(error, res)
     }

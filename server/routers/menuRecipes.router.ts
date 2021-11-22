@@ -1,10 +1,10 @@
 import express from 'express';
 import { cache } from '../middleware/cacheMiddleware';
-import DataProvider from '../lib/DataProvider';
 import HttpErrorHandler from '../lib/httpErrorHandler';
 import { Resources, Actions } from '../lib/permissionsBuilder';
 import allow from '../middleware/permissionVaildator';
 import MenuRecipeService from '../services/menuRecipe.service';
+import FindOptionsParser from '../lib/FindOptionsParser';
 
 const router = express.Router();
 
@@ -14,8 +14,8 @@ router.get('/:id_menu/recipe/',
     ],
     async (req: express.Request, res: express.Response) => {
         try {
-            const provider = new DataProvider('MenuRecipes')
-            res.json(await provider.index(req, { id_menu: Number(req.params.id_menu) }))
+            const options = FindOptionsParser.parse(req, { id_menu: Number(req.params.id_menu) })
+            res.json(await MenuRecipeService.read(options))            
         } catch (error) {
             HttpErrorHandler.handle(error, res)
         }
