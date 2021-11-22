@@ -29,7 +29,6 @@ export default class MenuIngredientsService {
 
     static async update(id_menu: number, id_ingr: number, data: any) {
         const item = await MenuIngredients.findOne({ id: id_ingr, id_menu: id_menu })
-        console.log(data.eatable)
         if (!item)
             throw new BadRequestError('Ingredients not found')
 

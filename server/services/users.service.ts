@@ -12,7 +12,6 @@ export default class UserService {
 
     static async read(options: FindManyOptions<Users>) {
         const users: any[] = await Users.find(options)
-        console.log(users)
         for (const user of users) {
             const permissions = await UserPermissions.find({ id_user: user.id })
             user.permissions = []

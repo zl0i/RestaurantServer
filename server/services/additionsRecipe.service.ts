@@ -18,7 +18,6 @@ export default class AdditionsRecipeService {
             const newRecipe = new AdditionsRecipes()
             newRecipe.recipe = String(data.recipe)
             newRecipe.id_addition = id_addition
-            console.log(newRecipe)
             return await newRecipe.save()
         }
     }

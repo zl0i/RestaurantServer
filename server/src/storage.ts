@@ -32,7 +32,6 @@ export default class ObjectStorage {
     }
 
     static listImages(_req: express.Request, res: express.Response) {
-        console.log(ObjectStorage.__minioClient)
         const stream = ObjectStorage.__minioClient.listObjects('restaurant', '', true)
         res.setHeader('Content-Type', 'application/json')
         res.write('[')

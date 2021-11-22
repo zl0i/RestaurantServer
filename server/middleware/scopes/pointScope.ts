@@ -48,7 +48,6 @@ export default class PointScope extends BasicScope {
             .where('id_warehouse IN (:...id)', { id: ids })
             .getRawMany();
         const point_ids = wh.map(item => item.id_point)
-        console.log(ids, wh)
         return {
             findCondition: { id: In(point_ids) },
             key: 'id',
