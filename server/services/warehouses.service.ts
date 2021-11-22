@@ -3,16 +3,18 @@ import Points from "../entity/points.entity"
 import Warehouses from "../entity/warehouses.entity"
 import WarehousesGoods from "../entity/warehouse_goods.entity"
 import { BadRequestError, NotFoundError } from "../lib/httpErrorHandler"
+import { Serializer } from "../lib/Serializer"
 
 
 
 export default class WarehousesService {
 
     static async read(options: FindManyOptions<Warehouses>) {
-        return await Warehouses.find(options)
+        return Serializer.serialize(await Warehouses.find(options), await Warehouses.count())
     }
 
     static async create(data: any) {
+
         const points = await Points.find({ id: In(data.ids_points as number[]) })
         if (points.length !== data.ids_points.length)
             throw new NotFoundError('Points not found')
@@ -75,5 +77,9 @@ export default class WarehousesService {
             throw new NotFoundError('Warehouse not found')
 
         return result
+    }
+
+    static async count() {
+        return await Warehouses.count()
     }
 }

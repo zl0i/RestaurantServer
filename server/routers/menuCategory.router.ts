@@ -2,10 +2,10 @@ import express from 'express';
 import allow from '../middleware/permissionVaildator'
 import { body } from '../middleware/schemaChecker';
 import { cache } from '../middleware/cacheMiddleware';
-import DataProvider from '../lib/DataProvider';
 import { Resources, Actions } from '../lib/permissionsBuilder';
 import MenuCategoryService from '../services/menuCategory.service';
 import HttpErrorHandler from '../lib/httpErrorHandler';
+import FindOptionsParser from '../lib/FindOptionsParser';
 
 const router = express.Router();
 
@@ -15,8 +15,8 @@ router.get('/',
     ],
     async (req: express.Request, res: express.Response) => {
         try {
-            const provider = new DataProvider('MenuCategory')
-            res.json(await provider.index(req))
+            const options = FindOptionsParser.parse(req)
+            res.json(await MenuCategoryService.read(options))
         } catch (error) {
             HttpErrorHandler.handle(error, res)
         }

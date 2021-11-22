@@ -8,13 +8,14 @@ import YokassaAPI from '../src/yokassaAPI';
 import { BadRequestError, NotFoundError } from '../lib/httpErrorHandler';
 import Additions from '../entity/additions.entity';
 import OrdersPayment from '../entity/orders_payment.entity';
+import { Serializer } from '../lib/Serializer';
 
 
 export default class OrderService {
 
 
   static async read(options: FindManyOptions<Orders>) {
-    return await Orders.find(options)
+    return Serializer.serialize(await Orders.find(options), await Orders.count())
   }
 
 

@@ -3,13 +3,14 @@ import Menu from "../entity/menu.entity"
 import { NotFoundError } from "../lib/httpErrorHandler"
 import AdditionsCategory from "../entity/additions_category.entity"
 import { FindManyOptions, In } from "typeorm"
+import { Serializer } from "../lib/Serializer"
 
 
 
 export default class AdditionsCategoryService {
 
     static async read(options: FindManyOptions<AdditionsCategory>) {
-        return await AdditionsCategory.find(options)
+        return Serializer.serialize(await AdditionsCategory.find(options), await AdditionsCategory.count())
     }
 
     static async create(data: any) {

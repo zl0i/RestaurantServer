@@ -1,11 +1,12 @@
 import { FindManyOptions } from "typeorm";
 import { AdditionsRecipes } from "../entity/addition_recipes.entity";
 import { NotFoundError } from "../lib/httpErrorHandler";
+import { Serializer } from "../lib/Serializer";
 
 export default class AdditionsRecipeService {
 
     static async read(options: FindManyOptions<AdditionsRecipes>) {
-        return await AdditionsRecipes.find(options)
+        return Serializer.serialize(await AdditionsRecipes.find(options), await AdditionsRecipes.count())
     }
 
     static async create(id_addition: number, data: any) {

@@ -3,12 +3,13 @@ import { BadRequestError } from "../lib/httpErrorHandler"
 import Additions from "../entity/additions.entity"
 import AdditionsCategory from "../entity/additions_category.entity"
 import { FindManyOptions } from "typeorm"
+import { Serializer } from "../lib/Serializer"
 
 
 export default class AdditionsService {
 
     static async read(options: FindManyOptions<Additions>) {
-        return await Additions.find(options)
+        return Serializer.serialize(await Additions.find(options), await Additions.count())
     }
 
     static async create(data: any) {

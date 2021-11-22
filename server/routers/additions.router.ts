@@ -12,6 +12,7 @@ const router = express.Router();
 
 import AdditionRecipes from './additionsRecipes.router'
 import AdditionsIngredients from './additionIngredients.router'
+import FindOptionsParser from '../lib/FindOptionsParser';
 
 router.use('/', AdditionRecipes)
 router.use('/', AdditionsIngredients)
@@ -22,8 +23,8 @@ router.get('/',
     ],
     async (req: express.Request, res: express.Response) => {
         try {
-            const provider = new DataProvider('Additions')
-            res.json(await provider.index(req))
+            const options = FindOptionsParser.parse(req)
+            res.json(await AdditionsService.read(options))
         } catch (error) {
             HttpErrorHandler.handle(error, res)
         }

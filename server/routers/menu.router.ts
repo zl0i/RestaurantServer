@@ -1,6 +1,5 @@
 import express from 'express';
 import allow from '../middleware/permissionVaildator'
-import { MenuStatus } from '../entity/menu.entity';
 import { body } from '../middleware/schemaChecker';
 import { cache } from '../middleware/cacheMiddleware';
 import DataProvider from '../lib/DataProvider';
@@ -15,6 +14,7 @@ import additionsRouter from './additions.router'
 import categoryRouter from './menuCategory.router'
 import MenuRecipes from './menuRecipes.router'
 import MenuIngredients from './menuIngredients.router'
+import FindOptionsParser from '../lib/FindOptionsParser';
 
 router.use('/additions/category', additionsCategoryRouter);
 router.use('/additions', additionsRouter);
@@ -28,8 +28,8 @@ router.get('/',
     ],
     async (req: express.Request, res: express.Response) => {
         try {
-            const provider = new DataProvider('Menu')
-            res.json(await provider.index(req, { status: MenuStatus.active }))
+            const options = FindOptionsParser.parse(req)
+            res.json(await MenuService.read(options))
         } catch (error) {
             HttpErrorHandler.handle(error, res)
         }

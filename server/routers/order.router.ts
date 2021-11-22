@@ -4,9 +4,9 @@ import { body } from '../middleware/schemaChecker';
 import YokassaAPI from '../src/yokassaAPI';
 import OrderService from '../services/orders.service';
 import { cache } from '../middleware/cacheMiddleware';
-import DataProvider from '../lib/DataProvider';
 import { Resources, Actions } from '../lib/permissionsBuilder';
 import HttpErrorHandler from '../lib/httpErrorHandler';
+import FindOptionsParser from '../lib/FindOptionsParser';
 
 const router = express.Router();
 
@@ -19,8 +19,8 @@ router.get('/',
   ],
   async (req: express.Request, res: express.Response) => {
     try {
-      const provider = new DataProvider('Orders')
-      res.json(await provider.index(req, req.context.condition.findCondition))
+      const options = FindOptionsParser.parse(req)
+      res.json(await OrderService.read(options))
     } catch (error) {
       HttpErrorHandler.handle(error, res)
     }

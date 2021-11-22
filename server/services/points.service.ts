@@ -4,12 +4,13 @@ import Points from "../entity/points.entity"
 import { NotFoundError } from "../lib/httpErrorHandler"
 import ObjectStorage from "../src/storage"
 import { FindManyOptions } from "typeorm"
+import { Serializer } from "../lib/Serializer"
 
 
 export default class PointService {
 
     static async read(options: FindManyOptions<Points>) {
-        return await Points.find(options)
+        return Serializer.serialize(await Points.find(options), await Points.count())
     }
 
     static async create(data: any) {

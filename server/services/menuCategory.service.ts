@@ -5,6 +5,7 @@ import { FindManyOptions } from "typeorm"
 import Menu from "../entity/menu.entity"
 import MenuCategory from "../entity/menu_category.entity"
 import { BadRequestError, NotFoundError } from "../lib/httpErrorHandler"
+import { Serializer } from "../lib/Serializer"
 import ObjectStorage from "../src/storage"
 
 
@@ -13,7 +14,7 @@ import ObjectStorage from "../src/storage"
 export default class MenuCategoryService {
 
     static async read(options: FindManyOptions<MenuCategory>) {
-        return await MenuCategory.find(options)
+        return Serializer.serialize(await MenuCategory.find(options), await MenuCategory.count())
     }
 
     static async create(data: any) {

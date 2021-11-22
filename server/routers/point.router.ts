@@ -1,11 +1,11 @@
 import express from 'express';
-import DataProvider from '../lib/DataProvider';
 import { Resources, Actions } from '../lib/permissionsBuilder';
 import { cache } from '../middleware/cacheMiddleware'
 import { body } from '../middleware/schemaChecker';
 import allow from '../middleware/permissionVaildator'
 import PointService from '../services/points.service';
 import HttpErrorHandler from '../lib/httpErrorHandler';
+import FindOptionsParser from '../lib/FindOptionsParser';
 
 const router = express.Router();
 
@@ -15,8 +15,8 @@ router.get('/',
   ],
   async (req: express.Request, res: express.Response) => {
     try {
-      const provide = new DataProvider('Points')
-      res.json(await provide.index(req))
+      const options = FindOptionsParser.parse(req)
+      res.json(await PointService.read(options))
     } catch (error) {
       HttpErrorHandler.handle(error, res)
     }

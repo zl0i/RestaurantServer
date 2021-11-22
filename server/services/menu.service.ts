@@ -1,9 +1,10 @@
 
 import { UploadedFile } from "express-fileupload"
 import { FindManyOptions } from "typeorm"
-import Menu from "../entity/menu.entity"
+import Menu, { MenuStatus } from "../entity/menu.entity"
 import MenuCategory from "../entity/menu_category.entity"
 import { NotFoundError } from "../lib/httpErrorHandler"
+import { Serializer } from "../lib/Serializer"
 import ObjectStorage from "../src/storage"
 
 
@@ -11,7 +12,8 @@ import ObjectStorage from "../src/storage"
 export default class MenuService {
 
     static async read(options: FindManyOptions<Menu>) {
-        return await Menu.find(options)
+        options.where = Object.assign(options.where, { status: MenuStatus.active })
+        return Serializer.serialize(await Menu.find(options), await Menu.count())
     }
 
     static async create(data: any) {

@@ -2,12 +2,13 @@ import { FindManyOptions } from "typeorm";
 import Menu from "../entity/menu.entity";
 import { MenuIngredients } from "../entity/menu_ingredients.entity";
 import { BadRequestError, NotFoundError } from "../lib/httpErrorHandler";
+import { Serializer } from "../lib/Serializer";
 
 
 export default class MenuIngredientsService {
 
     static async read(options: FindManyOptions<MenuIngredients>) {
-        return await MenuIngredients.find(options)
+        return Serializer.serialize(await MenuIngredients.find(options), await MenuIngredients.count())
     }
 
     static async create(id_menu: number, data: any, append: boolean = false) {
