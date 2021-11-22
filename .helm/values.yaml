@@ -2,6 +2,10 @@ app:
   repository: registry.gitlab.com/zl0i/restaurantserver
   name: app
   tag: latest
+web:
+  repository: registry.gitlab.com/zl0i/restaurantserver
+  name: web
+  tag: latest
 redis:
   image: redis:6.2.5-alpine
 mysql:

@@ -3,8 +3,6 @@ image: docker:19.03.12
 services:
   - docker:19.03.12-dind
 
-
-
 stages:
   - test
   - build
@@ -33,8 +31,22 @@ build_app:
   only:
     - master
 
+build_web:
+  stage: build
+  before_script:
+    - apk --no-cache add git
+    - git clone "https://github.com/GoSSy4691/React-app_e-shop_GoSSy.link"
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build -t ${CI_REGISTRY_IMAGE}/web:$CI_COMMIT_REF_SLUG.$CI_PIPELINE_ID ./React-app_e-shop_GoSSy.link/
+    - docker push ${CI_REGISTRY_IMAGE}/web:$CI_COMMIT_REF_SLUG.$CI_PIPELINE_ID
+  after_script:
+    - docker logout
+  only:
+    - master
+
 deploy:
-  stage: deploy  
+  stage: deploy
   image: lwolf/helm-kubectl-docker:v1.21.1-v3.6.0
   before_script:
     - kubectl config set-cluster my-cluster --server="$K3S_URL" --insecure-skip-tls-verify=true
@@ -42,9 +54,11 @@ deploy:
     - kubectl config set-context default-context --cluster=my-cluster --user=admin
     - kubectl config use-context default-context
   script:
-    - helm upgrade --install $CI_PROJECT_PATH_SLUG .helm 
+    - helm upgrade --install $CI_PROJECT_PATH_SLUG .helm
       --set app.tag=$CI_COMMIT_REF_SLUG.$CI_PIPELINE_ID
+      --set web.tag=$CI_COMMIT_REF_SLUG.$CI_PIPELINE_ID
   only:
     - master
   needs:
     - build_app
+    - build_web
