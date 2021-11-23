@@ -1,5 +1,6 @@
 import { FindManyOptions, In } from "typeorm"
 import Points from "../entity/points.entity"
+import { Users } from "../entity/user.entity"
 import Warehouses from "../entity/warehouses.entity"
 import WarehousesGoods from "../entity/warehouse_goods.entity"
 import { BadRequestError, NotFoundError } from "../lib/httpErrorHandler"
@@ -25,20 +26,35 @@ export default class WarehousesService {
         item.lat = data.lat
         item.lon = data.lon
         item.points = points
+
+        if (data.ids_users) {
+            const users = await Users.find({ id: In(data.ids_users as number[]) })
+            if (users.length !== data.ids_users.length)
+                throw new NotFoundError('Users not found')
+            item.users = users
+        }
         return await item.save()
     }
 
     static async update(id: number, data: any) {
-        const points = await Points.find({ id: In(data.ids_points as number[]) })
-        if (points.length !== data.ids_points.length)
-            throw new NotFoundError('Points not found')
-
         const item = await Warehouses.findOne({ id })
         item.name = data.name ?? item.name
         item.address = data.address ?? item.address
         item.lat = data.lat ?? item.lat
-        item.lon = data.lon ?? item.lon
-        item.points = points ?? item.points
+        item.lon = data.lon ?? item.lon       
+
+        if (data.ids_points) {
+            const points = await Points.find({ id: In(data.ids_points as number[]) })
+            if (points.length !== data.ids_points.length)
+            throw new NotFoundError('Points not found')
+            item.points = points ?? item.points
+        }
+        if (data.ids_users) {
+            const users = await Users.find({ id: In(data.ids_users as number[]) })
+            if (users.length !== data.ids_users.length)
+                throw new NotFoundError('Users not found')
+            item.users = users
+        }
         return await item.save()
     }
 
