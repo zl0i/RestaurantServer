@@ -11,7 +11,7 @@ import { Serializer } from "../lib/Serializer"
 export default class WarehousesService {
 
     static async read(options: FindManyOptions<Warehouses>) {
-        return Serializer.serialize(await Warehouses.find(options), await Warehouses.count())
+        return Serializer.serialize(await Warehouses.find(options), await Warehouses.count(options))
     }
 
     static async create(data: any) {
@@ -37,6 +37,7 @@ export default class WarehousesService {
     }
 
     static async update(id: number, data: any) {
+        //TODO: if not find then throw error
         const item = await Warehouses.findOne({ id })
         item.name = data.name ?? item.name
         item.address = data.address ?? item.address
@@ -93,9 +94,5 @@ export default class WarehousesService {
             throw new NotFoundError('Warehouse not found')
 
         return result
-    }
-
-    static async count() {
-        return await Warehouses.count()
     }
 }

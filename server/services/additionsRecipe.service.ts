@@ -6,7 +6,7 @@ import { Serializer } from "../lib/Serializer";
 export default class AdditionsRecipeService {
 
     static async read(options: FindManyOptions<AdditionsRecipes>) {
-        return Serializer.serialize(await AdditionsRecipes.find(options), await AdditionsRecipes.count())
+        return Serializer.serialize(await AdditionsRecipes.find(options), await AdditionsRecipes.count(options))
     }
 
     static async create(id_addition: number, data: any) {

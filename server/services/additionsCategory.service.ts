@@ -10,7 +10,7 @@ import { Serializer } from "../lib/Serializer"
 export default class AdditionsCategoryService {
 
     static async read(options: FindManyOptions<AdditionsCategory>) {
-        return Serializer.serialize(await AdditionsCategory.find(options), await AdditionsCategory.count())
+        return Serializer.serialize(await AdditionsCategory.find(options), await AdditionsCategory.count(options))
     }
 
     static async create(data: any) {

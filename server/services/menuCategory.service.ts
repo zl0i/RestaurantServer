@@ -14,7 +14,7 @@ import ObjectStorage from "../src/storage"
 export default class MenuCategoryService {
 
     static async read(options: FindManyOptions<MenuCategory>) {
-        return Serializer.serialize(await MenuCategory.find(options), await MenuCategory.count())
+        return Serializer.serialize(await MenuCategory.find(options), await MenuCategory.count(options))
     }
 
     static async create(data: any) {

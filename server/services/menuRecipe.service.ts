@@ -7,7 +7,7 @@ import { Serializer } from "../lib/Serializer";
 export default class MenuRecipeService {
 
     static async read(options: FindManyOptions<MenuRecipes>) {
-        return Serializer.serialize(await MenuRecipes.find(options), await MenuRecipes.count())
+        return Serializer.serialize(await MenuRecipes.find(options), await MenuRecipes.count(options))
     }
 
     static async create(id_menu: number, data: any) {

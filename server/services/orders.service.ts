@@ -15,7 +15,7 @@ export default class OrderService {
 
 
   static async read(options: FindManyOptions<Orders>) {
-    return Serializer.serialize(await Orders.find(options), await Orders.count())
+    return Serializer.serialize(await Orders.find(options), await Orders.count(options))
   }
 
 

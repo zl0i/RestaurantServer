@@ -13,7 +13,7 @@ export default class MenuService {
 
     static async read(options: FindManyOptions<Menu>) {
         options.where = Object.assign(options.where, { status: MenuStatus.active })
-        return Serializer.serialize(await Menu.find(options), await Menu.count())
+        return Serializer.serialize(await Menu.find(options), await Menu.count(options))
     }
 
     static async create(data: any) {

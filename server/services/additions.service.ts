@@ -9,7 +9,7 @@ import { Serializer } from "../lib/Serializer"
 export default class AdditionsService {
 
     static async read(options: FindManyOptions<Additions>) {
-        return Serializer.serialize(await Additions.find(options), await Additions.count())
+        return Serializer.serialize(await Additions.find(options), await Additions.count(options))
     }
 
     static async create(data: any) {

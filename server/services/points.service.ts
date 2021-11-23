@@ -11,7 +11,7 @@ import { Users } from "../entity/user.entity"
 export default class PointService {
 
     static async read(options: FindManyOptions<Points>) {
-        return Serializer.serialize(await Points.find(options), await Points.count())
+        return Serializer.serialize(await Points.find(options), await Points.count(options))
     }
 
     static async create(data: any) {
