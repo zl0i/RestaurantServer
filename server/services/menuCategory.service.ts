@@ -33,6 +33,9 @@ export default class MenuCategoryService {
 
     static async update(id: number, data: any) {
         const category = await MenuCategory.findOne({ id })
+        if (!category)
+            throw new NotFoundError('Category not found')
+
         category.name = data.name || category.name
         category.description = data.description || category.description
         if (data.icon) {

@@ -37,17 +37,19 @@ export default class WarehousesService {
     }
 
     static async update(id: number, data: any) {
-        //TODO: if not find then throw error
         const item = await Warehouses.findOne({ id })
+        if (!item)
+            throw new NotFoundError('Warehouse not found')
+            
         item.name = data.name ?? item.name
         item.address = data.address ?? item.address
         item.lat = data.lat ?? item.lat
-        item.lon = data.lon ?? item.lon       
+        item.lon = data.lon ?? item.lon
 
         if (data.ids_points) {
             const points = await Points.find({ id: In(data.ids_points as number[]) })
             if (points.length !== data.ids_points.length)
-            throw new NotFoundError('Points not found')
+                throw new NotFoundError('Points not found')
             item.points = points ?? item.points
         }
         if (data.ids_users) {

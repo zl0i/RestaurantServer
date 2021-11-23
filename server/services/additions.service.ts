@@ -1,5 +1,5 @@
 
-import { BadRequestError } from "../lib/httpErrorHandler"
+import { BadRequestError, NotFoundError } from "../lib/httpErrorHandler"
 import Additions from "../entity/additions.entity"
 import AdditionsCategory from "../entity/additions_category.entity"
 import { FindManyOptions } from "typeorm"
@@ -26,11 +26,14 @@ export default class AdditionsService {
 
     static async update(id: number, data: any) {
         const item = await Additions.findOne({ id })
+        if (!item)
+            throw new NotFoundError('Additions not found')
+
         item.name = data.name || item.name
         item.cost = data.cost || item.cost
         if (data.id_additions) {
             const category = await AdditionsCategory.findOne({ id: data.id_additions })
-            if (category)
+            if (!category)
                 throw new BadRequestError('Cannot update category')
 
             item.id_category = category.id

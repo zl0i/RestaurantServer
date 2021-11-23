@@ -80,6 +80,9 @@ export default class UserService {
 
     static async update(id: number, data: any) {
         const user = await Users.findOne({ id: id })
+        if (!user)
+            throw new NotFoundError('User not found')
+            
         user.name = data.name ?? user.name
         user.lastname = data.lastname ?? user.lastname
         user.login = data.login ?? user.login

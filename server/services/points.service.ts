@@ -41,6 +41,9 @@ export default class PointService {
 
     static async update(id: number, data: any) {
         const point = await Points.findOne({ id })
+        if (!point)
+            throw new NotFoundError('Point not found')
+            
         point.name = data.name || point.name
         point.address = data.address || point.address
         point.lat = data.lat || point.lat

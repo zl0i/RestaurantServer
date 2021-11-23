@@ -37,6 +37,9 @@ export default class MenuService {
 
     static async update(id: number, data: any) {
         const item = await Menu.findOne({ id: id })
+        if (!item)
+            throw new NotFoundError('Item not found')
+
         item.name = data.name || item.name
         item.cost = Number(data.cost) || item.cost
         item.description = data.description || item.description

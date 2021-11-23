@@ -27,6 +27,9 @@ export default class AdditionsCategoryService {
 
     static async update(id: number, data: any) {
         const item = await AdditionsCategory.findOne({ id })
+        if (!item)
+            throw new NotFoundError('AdditionsCategory not found')
+
         item.name = data.name || item.name
         item.mode = data.mode || item.mode
         if (data.ids_menu) {
