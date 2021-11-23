@@ -2,7 +2,6 @@ import express from 'express';
 import allow from '../middleware/permissionVaildator'
 import { body } from '../middleware/schemaChecker';
 import { cache } from '../middleware/cacheMiddleware';
-import DataProvider from '../lib/DataProvider';
 import { Resources, Actions } from '../lib/permissionsBuilder';
 import AdditionsService from '../services/additions.service';
 import HttpErrorHandler from '../lib/httpErrorHandler';
@@ -36,8 +35,8 @@ router.get('/:id',
     ],
     async (req: express.Request, res: express.Response) => {
         try {
-            const provider = new DataProvider('Additions')
-            res.json(await provider.index(req, { id: Number(req.params.id) }))
+            const options = FindOptionsParser.parse(req, { id: Number(req.params.id) })
+            res.json(await AdditionsService.read(options))
         } catch (error) {
             HttpErrorHandler.handle(error, res)
         }

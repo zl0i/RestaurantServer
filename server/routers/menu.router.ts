@@ -2,7 +2,6 @@ import express from 'express';
 import allow from '../middleware/permissionVaildator'
 import { body } from '../middleware/schemaChecker';
 import { cache } from '../middleware/cacheMiddleware';
-import DataProvider from '../lib/DataProvider';
 import { Resources, Actions } from '../lib/permissionsBuilder';
 import MenuService from '../services/menu.service';
 import HttpErrorHandler from '../lib/httpErrorHandler';
@@ -41,8 +40,8 @@ router.get('/:id',
     ],
     async (req: express.Request, res: express.Response) => {
         try {
-            const provider = new DataProvider('Menu')
-            res.json(await provider.index(req, { id: Number(req.params.id) }))
+            const options = FindOptionsParser.parse(req, { id: Number(req.params.id) })
+            res.json(await MenuService.read(options))
         } catch (error) {
             HttpErrorHandler.handle(error, res)
         }
@@ -55,8 +54,8 @@ router.get('/:id/additions/category',
     ],
     async (req: express.Request, res: express.Response) => {
         try {
-            const provider = new DataProvider('Menu')
-            res.json(await provider.index(req, { id: Number(req.params.id) }, ['additions_category']))
+            const options = FindOptionsParser.parse(req, { id: Number(req.params.id) }, ['additions_category'])
+            res.json(await MenuService.read(options))
         } catch (error) {
             HttpErrorHandler.handle(error, res)
         }
