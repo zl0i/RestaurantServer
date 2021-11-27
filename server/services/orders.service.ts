@@ -34,7 +34,7 @@ export default class OrderService {
         item.additions_category = await OrderService.checkAndReturnAddtions(item, req_ids_additions);
       }
     }
-    const order = new Orders(menu, user)
+    const order = new Orders(menu, user.id)
     order.comment = data.comment
     await order.save()
 

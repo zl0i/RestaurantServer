@@ -3,6 +3,7 @@ import Orders from "./orders.entity";
 import Points from "./points.entity";
 import { Tokens } from "./tokens.entity";
 import { TokenPermissions } from "./token_permissions.entity";
+import { UsersInfo } from "./users_info.entity";
 import { UserPermissions } from "./user_permissions.entity";
 import Warehouses from "./warehouses.entity";
 
@@ -57,16 +58,10 @@ export class Users extends BaseEntity {
     @OneToMany(() => Tokens, token => token.user)
     tokens: Tokens[]
 
-    removePrivateData() {
-        delete this.password
-        delete this.sms_code
-        delete this.sms_code_expired_at
-        return this
-    }
-
     async remove(): Promise<this> {
         await UserPermissions.delete({ id_user: this.id })
         await Orders.delete({ id_user: this.id })
+        await UsersInfo.delete({ id: this.id })
         const token = await Tokens.findOne({ id_user: this.id })
         if (token) {
             await TokenPermissions.delete({ id_token: token.id })

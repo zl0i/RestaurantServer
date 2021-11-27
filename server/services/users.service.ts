@@ -6,21 +6,21 @@ import { FindManyOptions } from "typeorm"
 import { BadRequestError, ForbiddenError, NotFoundError } from "../lib/httpErrorHandler"
 import ScopeCondition from "../middleware/scopes/ScopeCondition"
 import { Serializer } from "../lib/Serializer"
+import { UsersInfo } from "../entity/users_info.entity"
 
 
 export default class UserService {
 
-    static async read(options: FindManyOptions<Users>) {
-        const users: any[] = await Users.find(options)
+    static async read(options: FindManyOptions<UsersInfo>) {
+        const users: any[] = await UsersInfo.find(options)
         for (const user of users) {
             const permissions = await UserPermissions.find({ id_user: user.id })
             user.permissions = []
-            user.removePrivateData()
             for (const perm of permissions) {
                 user.permissions.push(`${perm.resource}:${perm.action}:${perm.scope}`)
             }
         }
-        return Serializer.serialize(users, await Users.count(options))
+        return Serializer.serialize(users, await UsersInfo.count(options))
     }
 
     static async create(parent: Users, data: any) {
@@ -29,10 +29,10 @@ export default class UserService {
             throw new BadRequestError('User with this login already exists')
 
         const user = new Users()
+        user.password = bcrypt.hashSync(data.password, 5)
         user.login = data.login
         user.name = data.name
         user.lastname = data.lastname
-        user.password = bcrypt.hashSync(data.password, 5)
         user.age = data.age
         user.birthday = data.birthday
         user.phone = data.phone
@@ -74,22 +74,30 @@ export default class UserService {
         }
 
         await user.save()
+        const info = new UsersInfo()
+        info.id = user.id
+        info.login = data.login
+        info.name = data.name
+        info.lastname = data.lastname
+        info.age = data.age
+        info.birthday = data.birthday
+        info.phone = data.phone
+        await info.save()
         await PermissionsBuilder.setUserPermissions(user.id, data.permissions)
-        return user
+        return info
     }
 
     static async update(id: number, data: any) {
-        const user = await Users.findOne({ id: id })
+        const user = await UsersInfo.findOne({ id: id })
         if (!user)
             throw new NotFoundError('User not found')
-            
+
         user.name = data.name ?? user.name
         user.lastname = data.lastname ?? user.lastname
         user.login = data.login ?? user.login
         user.age = Number(data.age) ?? user.age
         user.birthday = new Date(data.birthday) ?? user.birthday
-        await user.save()
-        return user.removePrivateData()
+        return await user.save()
     }
 
     static async delete(id: number) {
