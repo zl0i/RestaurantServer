@@ -61,7 +61,9 @@ db.createConnection({
     newAdmin.login = 'admin'
     newAdmin.password = '$2a$05$njMr04iy.MTsL/aG49i8/e5dxzsdKf3I1IgBWEkoVAsPrS3VZwd5m'
     await newAdmin.save()
-    PermissionsBuilder.setUserRolePermissions(newAdmin.id, UserRoles.admin)
+    await PermissionsBuilder.setUserRolePermissions(newAdmin.id, UserRoles.admin)
+  } else {
+    await PermissionsBuilder.setUserRolePermissions(admin.id, UserRoles.admin)
   }
 }).catch((err) => {
   console.error('[ERROR] DB isn\'t connected');
