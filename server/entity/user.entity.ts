@@ -73,6 +73,7 @@ export class Users extends BaseEntity {
     static async delete<T extends BaseEntity>(this: ObjectType<T>, criteria: FindConditions<T>, options?: RemoveOptions): Promise<DeleteResult> {
         const users = await Users.find(criteria)
         for (const user of users) {
+            await UsersInfo.delete({ id: user.id })
             await UserPermissions.delete({ id_user: user.id })
             await Orders.delete({ id_user: user.id })
             const token = await Tokens.findOne({ id_user: user.id })
