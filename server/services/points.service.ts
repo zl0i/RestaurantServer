@@ -5,7 +5,7 @@ import { NotFoundError } from "../lib/httpErrorHandler"
 import ObjectStorage from "../src/storage"
 import { FindManyOptions, In } from "typeorm"
 import { Serializer } from "../lib/Serializer"
-import { Users } from "../entity/user.entity"
+import { UsersInfo } from "../entity/users_info.entity"
 
 
 export default class PointService {
@@ -24,7 +24,7 @@ export default class PointService {
         point.is_delivering = data.is_delivering == 'true'
 
         if (data.ids_users) {
-            const users = await Users.find({ id: In(JSON.parse(data.ids_users) as number[]) })
+            const users = await UsersInfo.find({ id: In(JSON.parse(data.ids_users) as number[]) })
             if (users.length !== data.ids_users.length)
                 throw new NotFoundError('Users not found')
             point.users = users
@@ -56,7 +56,7 @@ export default class PointService {
         }
         if (data.ids_users) {
             const ids_users = JSON.parse(data.ids_users)
-            const users = await Users.find({ id: In(ids_users as number[]) })
+            const users = await UsersInfo.find({ id: In(ids_users as number[]) })
             if (users.length !== ids_users.length)
                 throw new NotFoundError('Users not found')
             point.users = users

@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, CreateDateColumn, S
 import Menu from "./menu.entity";
 import OrdersPayment from "./orders_payment.entity";
 import OrderContent from "./order_content.entity";
-import { Users } from "./user.entity";
+import { UsersInfo } from "./users_info.entity";
 
 export enum OrderStatus {
     accepted = 'accepted',
@@ -44,9 +44,9 @@ export default class Orders extends BaseEntity {
     @Column()
     id_user: number
 
-    @ManyToOne(() => Users, user => user.id)
+    @ManyToOne(() => UsersInfo, user => user.id)
     @JoinColumn({ name: 'id_user' })
-    user: Users
+    user: UsersInfo
 
     @Column({ default: OrderStatus.accepted })
     status: OrderStatus

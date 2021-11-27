@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, JoinTable, ManyToMany, OneToMany, DeleteResult, FindConditions, ObjectType, RemoveOptions } from "typeorm";
 import { Goods } from "./goods.entity";
 import Points from "./points.entity";
-import { Users } from "./user.entity";
+import { UsersInfo } from "./users_info.entity";
 import WarehousesGoods from "./warehouse_goods.entity";
 
 @Entity()
@@ -36,7 +36,7 @@ export default class Warehouses extends BaseEntity {
     })
     points: Points[]
 
-    @ManyToMany(() => Users, user => user.warehouses)
+    @ManyToMany(() => UsersInfo, user => user.warehouses)
     @JoinTable({
         name: "users_warehouses",
         joinColumn: {
@@ -48,7 +48,7 @@ export default class Warehouses extends BaseEntity {
             referencedColumnName: "id"
         }
     })
-    users: Users[]
+    users: UsersInfo[]
 
     @OneToMany(() => WarehousesGoods, wg => wg.good)
     goods: Goods[]
