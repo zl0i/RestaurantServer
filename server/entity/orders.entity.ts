@@ -18,9 +18,9 @@ export enum OrderStatus {
 export default class Orders extends BaseEntity {
 
     //These checks are necessary because TypeOrm creates all enitities on startup without save 
-    constructor(menu: Array<Menu>, user: Users) {
+    constructor(menu: Array<Menu>, id_user: number) {
         super()
-        this.id_user = user?.id
+        this.id_user = id_user
         this.total = 0
         for (const m of menu || []) {
             const content = new OrderContent(m)

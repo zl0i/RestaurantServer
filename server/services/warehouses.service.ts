@@ -1,6 +1,6 @@
 import { FindManyOptions, In } from "typeorm"
 import Points from "../entity/points.entity"
-import { UsersInfo } from "../entity/users_info.entity"
+import { Users } from "../entity/user.entity"
 import Warehouses from "../entity/warehouses.entity"
 import WarehousesGoods from "../entity/warehouse_goods.entity"
 import { BadRequestError, NotFoundError } from "../lib/httpErrorHandler"
@@ -28,7 +28,7 @@ export default class WarehousesService {
         item.points = points
 
         if (data.ids_users) {
-            const users = await UsersInfo.find({ id: In(data.ids_users as number[]) })
+            const users = await Users.find({ id: In(data.ids_users as number[]) })
             if (users.length !== data.ids_users.length)
                 throw new NotFoundError('Users not found')
             item.users = users
@@ -53,7 +53,7 @@ export default class WarehousesService {
             item.points = points ?? item.points
         }
         if (data.ids_users) {
-            const users = await UsersInfo.find({ id: In(data.ids_users as number[]) })
+            const users = await Users.find({ id: In(data.ids_users as number[]) })
             if (users.length !== data.ids_users.length)
                 throw new NotFoundError('Users not found')
             item.users = users
