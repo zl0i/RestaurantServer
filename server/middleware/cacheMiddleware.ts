@@ -3,6 +3,7 @@ import redis from 'redis'
 
 let client: redis.RedisClient;
 const CACHE_HOST: string = process.env['CACHE_HOST'] || 'redis';
+const IS_DEV = process.env['NODE_ENV'] == 'dev'
 
 if (process.env['NODE_ENV'] !== 'test') {
     client = redis.createClient({
@@ -39,6 +40,9 @@ export function cache(seconds: number) {
     return (req: express.Request, res: express.Response, next: Function) => {
 
         if (req.context?.isOwn)
+            return next()
+
+        if (IS_DEV)
             return next()
 
         res.set('Cache-Control', `private, max-age=${seconds}`);
