@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, DeleteResult, FindConditions, ObjectType, RemoveOptions, OneToMany, JoinTable, ManyToMany } from "typeorm";
 import MenuCategory from "./menu_category.entity";
-import { UsersInfo } from "./users_info.entity";
+import { Users } from "./user.entity";
 
 @Entity()
 export default class Points extends BaseEntity {
@@ -32,7 +32,7 @@ export default class Points extends BaseEntity {
     @OneToMany(() => MenuCategory, category => category.point)
     categories: MenuCategory[]
 
-    @ManyToMany(() => UsersInfo, user => user.points)
+    @ManyToMany(() => Users, user => user.points)
     @JoinTable({
         name: "users_points",
         joinColumn: {
@@ -44,7 +44,7 @@ export default class Points extends BaseEntity {
             referencedColumnName: "id"
         }
     })
-    users: UsersInfo[]
+    users: Users[]
 
     async remove(): Promise<this> {
         await MenuCategory.delete({ id_point: this.id })

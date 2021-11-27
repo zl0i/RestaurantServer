@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, CreateDateColumn, S
 import Menu from "./menu.entity";
 import OrdersPayment from "./orders_payment.entity";
 import OrderContent from "./order_content.entity";
-import { UsersInfo } from "./users_info.entity";
+import { Users } from "./user.entity";
 
 export enum OrderStatus {
     accepted = 'accepted',
@@ -16,11 +16,11 @@ export enum OrderStatus {
 
 @Entity()
 export default class Orders extends BaseEntity {
-    
+
     //These checks are necessary because TypeOrm creates all enitities on startup without save 
-    constructor(menu: Array<Menu>, id_user: number) {
+    constructor(menu: Array<Menu>, user: Users) {
         super()
-        this.id_user = id_user
+        this.id_user = user?.id
         this.total = 0
         for (const m of menu || []) {
             const content = new OrderContent(m)
@@ -44,9 +44,9 @@ export default class Orders extends BaseEntity {
     @Column()
     id_user: number
 
-    @ManyToOne(() => UsersInfo, user => user.id)
+    @ManyToOne(() => Users, user => user.id)
     @JoinColumn({ name: 'id_user' })
-    user: UsersInfo
+    user: Users
 
     @Column({ default: OrderStatus.accepted })
     status: OrderStatus
