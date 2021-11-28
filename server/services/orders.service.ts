@@ -1,13 +1,13 @@
 
 import Menu from '../entity/menu.entity';
 import { Users } from '../entity/user.entity';
-import Orders from '../entity/orders.entity'
+import Orders, { OrderStatus } from '../entity/orders.entity'
 import { createQueryBuilder, FindManyOptions, In } from 'typeorm';
 import AdditionsCategory from '../entity/additions_category.entity';
 import YokassaAPI from '../src/yokassaAPI';
 import { BadRequestError, NotFoundError } from '../lib/httpErrorHandler';
 import Additions from '../entity/additions.entity';
-import OrdersPayment from '../entity/orders_payment.entity';
+import OrdersPayment, { OrderPaymentStatus } from '../entity/orders_payment.entity';
 import { Serializer } from '../lib/Serializer';
 
 
@@ -50,14 +50,16 @@ export default class OrderService {
   }
 
   static async delete(id: number) {
-    const result = await Orders.delete({ id })
-    if (result.affected == 0)
+    const orders = await Orders.findOne({ id })
+    if (!orders)
       throw new NotFoundError('Order not found')
 
-    return result
+    orders.status = OrderStatus.cancel
+    const payment = await OrdersPayment.findOne({ where: { id_order: id } })
+    payment.status = OrderPaymentStatus.cancel
+    await payment.save()
+    return await orders.save()
   }
-
-
 
   private static async checkAndReturnAddtions(menu: Menu, ids_additions: number[]) {
 

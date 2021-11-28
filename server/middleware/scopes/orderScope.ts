@@ -12,10 +12,11 @@ export default class OrderScope extends BasicScope {
     private user: Users
 
     async own(): Promise<ICondition<Orders>> {
+        const orders = await Orders.find({ select: ['id'], where: { id_user: this.user.id } })
         return {
             findCondition: { id_user: this.user.id },
-            key: 'id_user',
-            value: [this.user.id]
+            key: 'id',
+            value: orders.map(item => item.id)
         }
     }
 

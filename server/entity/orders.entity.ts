@@ -8,7 +8,7 @@ export enum OrderStatus {
     accepted = 'accepted',
     wait_payment = 'wait_payment',
     paymented = 'paymented',
-    cancel_payment = 'cancel_payment',
+    cancel = 'cancel',
     cooking = 'cooking',
     delivering = 'delivered',
     completed = 'completed'
@@ -62,8 +62,10 @@ export default class Orders extends BaseEntity {
 
     async save(options?: SaveOptions): Promise<this> {
         const s = await super.save(options)
-        for (const c of this._content) {
-            await c.save({ data: s })
+        if (this._content) {
+            for (const c of this._content) {
+                await c.save({ data: s })
+            }
         }
         return s
     }

@@ -64,6 +64,7 @@ export default class PermissionsBuilder {
                 permissions.add(Resources.menu, Actions.read)
                 permissions.add(Resources.orders, Actions.create)
                 permissions.add(Resources.orders, Actions.read, Scopes.own)
+                permissions.add(Resources.orders, Actions.delete, Scopes.own)
                 break;
             case UserRoles.guest:
                 permissions.add(Resources.points, Actions.read)

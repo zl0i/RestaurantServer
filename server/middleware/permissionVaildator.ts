@@ -71,8 +71,9 @@ export default function allow(resource: Resources, action: Actions, param: strin
             if (!param)
                 return next()
 
+            console.log(req.context.condition.value)
             if (!req.context.isAll && !req.context.condition.value.includes(Number(req.params[param])))
-                throw new ForbiddenError('You   don\'t have permissions for it')
+                throw new ForbiddenError('You don\'t have permissions for it')
 
             next()
         } catch (e) {
