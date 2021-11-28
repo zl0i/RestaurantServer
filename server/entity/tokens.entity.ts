@@ -1,6 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, CreateDateColumn, DeleteResult, ObjectType, FindConditions, RemoveOptions, In, ManyToOne, RelationId, JoinColumn, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, CreateDateColumn, DeleteResult, ObjectType, FindConditions, RemoveOptions, In, OneToMany } from "typeorm";
 import jwt from 'jsonwebtoken'
-import { Users } from "./user.entity";
 import { TokenPermissions } from "./token_permissions.entity";
 
 const secret_key = process.env['APP_SECRET'] || 'shhhh'
@@ -26,16 +25,11 @@ export class Tokens extends BaseEntity {
     @Column()
     expired_at: Date
 
-    @RelationId((token: Tokens) => token.user)
     @Column()
     id_user: number
 
     @CreateDateColumn()
     create_date: Date
-
-    @ManyToOne(() => Users, user => user.tokens)
-    @JoinColumn({ name: 'id_user' })
-    user: Users
 
     @OneToMany(() => TokenPermissions, permissions => permissions.token)
     permissions: TokenPermissions[]

@@ -4,6 +4,7 @@ import request from 'supertest'
 import app from '../server'
 import PermissionsBuilder from '../lib/permissionsBuilder';
 import { Tokens } from '../entity/tokens.entity';
+import { UsersInfo } from '../entity/users_info.entity';
 
 
 
@@ -31,7 +32,7 @@ describe('Test /auth/phone', () => {
 
   test('new user', async () => {
 
-    Users.findOne = jest.fn().mockReturnValue(Promise.resolve(null))
+    UsersInfo.findOne = jest.fn().mockReturnValue(Promise.resolve(null))
     Users.prototype.save = jest.fn().mockImplementation(() => Promise.resolve())
     AuthSrvice.sendSMSCode = jest.fn().mockReturnValue(Promise.resolve('4654'))
     PermissionsBuilder.setUserRolePermissions = jest.fn().mockReturnValue(Promise.resolve())
@@ -42,7 +43,7 @@ describe('Test /auth/phone', () => {
 
     expect(response.statusCode).toBe(200)
     expect(response.body).toEqual({ result: 'ok' })
-    expect(Users.findOne).toBeCalledTimes(1)
+    expect(UsersInfo.findOne).toBeCalledTimes(1)
     expect(Users.prototype.save).toBeCalledTimes(1)
     expect(AuthSrvice.sendSMSCode).toBeCalledTimes(1)
     expect(PermissionsBuilder.setUserRolePermissions).toBeCalledTimes(1)
@@ -54,6 +55,7 @@ describe('Test /auth/phone', () => {
       sms_code: '',
       save: jest.fn().mockImplementation(() => Promise.resolve())
     }
+    UsersInfo.findOne = jest.fn().mockReturnValue(Promise.resolve({}))
     Users.findOne = jest.fn().mockReturnValue(Promise.resolve(user))
     AuthSrvice.sendSMSCode = jest.fn().mockReturnValue(Promise.resolve('4654'))
     Tokens.delete = jest.fn().mockResolvedValue({})

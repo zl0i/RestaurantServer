@@ -6,6 +6,7 @@ import YookassaAPI from './src/yokassaAPI';
 import { Users } from "./entity/user.entity";
 import PermissionsBuilder, { UserRoles } from "./lib/permissionsBuilder";
 import ObjectStorage from "./src/storage";
+import { UsersInfo } from "./entity/users_info.entity";
 
 const DB_HOST: string = process.env['DB_HOST'] || 'localhost'
 const DB_USER = 'root'
@@ -55,10 +56,11 @@ db.createConnection({
 }).then(async () => {
   console.log('[OK] DB is connected');
 
-  const admin = await Users.findOne({ login: 'admin' })
+  const admin = await UsersInfo.findOne({ login: 'admin' })
   if (!admin) {
     const newAdmin = new Users()
-    newAdmin.login = 'admin'
+    newAdmin.info = new UsersInfo()
+    newAdmin.info.login = 'admin'
     newAdmin.password = '$2a$05$njMr04iy.MTsL/aG49i8/e5dxzsdKf3I1IgBWEkoVAsPrS3VZwd5m'
     await newAdmin.save()
     await PermissionsBuilder.setUserRolePermissions(newAdmin.id, UserRoles.admin)

@@ -1,62 +1,42 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, ObjectType, DeleteResult, FindConditions, RemoveOptions, ManyToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, ObjectType, DeleteResult, FindConditions, RemoveOptions, SaveOptions, OneToOne } from "typeorm";
 import Orders from "./orders.entity";
-import Points from "./points.entity";
 import { Tokens } from "./tokens.entity";
 import { TokenPermissions } from "./token_permissions.entity";
 import { UsersInfo } from "./users_info.entity";
 import { UserPermissions } from "./user_permissions.entity";
-import Warehouses from "./warehouses.entity";
+
+
 
 @Entity()
 export class Users extends BaseEntity {
 
+    constructor() {
+        super()
+    }
+
     @PrimaryGeneratedColumn()
     id: number;
-
-    @Column({ default: '' })
-    name: string;
-
-    @Column({ default: '' })
-    lastname: string;
-
-    @Column({ unique: true })
-    login: string;
 
     @Column({ default: null })
     password: string;
 
-    @Column({ default: 0 })
-    age: number;
-
-    @Column({ default: null })
-    birthday: Date;
-
     @Column({ default: "" })
-    phone: string;
-
-    @Column({ default: false })
-    verify_phone: Boolean;
-
-    @Column({ default: "" })
-    sms_code: String;
+    sms_code: string;
 
     @Column({ default: null })
     sms_code_expired_at: Date;
 
-    @OneToMany(() => Orders, order => order.id)
-    orders: Orders[]
+    @OneToOne(() => UsersInfo)
+    info: UsersInfo
 
-    @OneToMany(() => UserPermissions, permissions => permissions.user)
-    permissions: UserPermissions[]
-
-    @ManyToMany(() => Warehouses, warehouses => warehouses.users)
-    warehouses: Warehouses[]
-
-    @ManyToMany(() => Points, point => point.users)
-    points: Points[]
-
-    @OneToMany(() => Tokens, token => token.user)
-    tokens: Tokens[]
+    async save(options?: SaveOptions): Promise<this> {
+        const user = await super.save(options)
+        if (this.info) {
+            this.info.id = user.id
+            await this.info.save()
+        }
+        return user
+    }
 
     async remove(): Promise<this> {
         await UserPermissions.delete({ id_user: this.id })

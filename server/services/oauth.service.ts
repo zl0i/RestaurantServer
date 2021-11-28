@@ -4,6 +4,7 @@ import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder';
 import { Users } from '../entity/user.entity';
 import { Tokens } from '../entity/tokens.entity';
 import { oauth_users } from '../entity/oauth_users.entity';
+import { UsersInfo } from '../entity/users_info.entity';
 
 const redirect_uri = "https://zloi.space/restaurant/api/oauth/code";
 const project_uri = "https://gossy.link"
@@ -88,14 +89,16 @@ export default class OAuthService {
             let user: Users
             if (oauth_user) {
                 user = await Users.findOne({ id: oauth_user.id_user })
+                user.info = await UsersInfo.findOne({id: oauth_user.id_user})
             } else {
                 user = new Users()
-                user.login = info.login
-                user.name = info.name;
-                user.lastname = info.lastname
-                user.phone = info.phone
-                user.verify_phone = true
-                user.birthday = info.birthday
+                user.info = new UsersInfo()
+                user.info.login = info.login
+                user.info.name = info.name;
+                user.info.lastname = info.lastname
+                user.info.phone = info.phone
+                user.info.verify_phone = true
+                user.info.birthday = info.birthday
                 await user.save()
                 await PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.client)
                 await oauth_users.insert({

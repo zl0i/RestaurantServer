@@ -25,17 +25,19 @@ export default class UserService {
 
     static async create(parent: Users, data: any) {
 
-        if (await Users.findOne({ where: { login: data.login } }))
+        if (await UsersInfo.findOne({ where: { login: data.login } }))
             throw new BadRequestError('User with this login already exists')
 
         const user = new Users()
+        console.log(user)
         user.password = bcrypt.hashSync(data.password, 5)
-        user.login = data.login
-        user.name = data.name
-        user.lastname = data.lastname
-        user.age = data.age
-        user.birthday = data.birthday
-        user.phone = data.phone
+        user.info = new UsersInfo()
+        user.info.login = data.login
+        user.info.name = data.name
+        user.info.lastname = data.lastname
+        user.info.age = data.age
+        user.info.birthday = data.birthday
+        user.info.phone = data.phone
 
         const parentPermissions = await UserPermissions.find({ where: { id_user: parent.id } })
 
@@ -74,17 +76,8 @@ export default class UserService {
         }
 
         await user.save()
-        const info = new UsersInfo()
-        info.id = user.id
-        info.login = data.login
-        info.name = data.name
-        info.lastname = data.lastname
-        info.age = data.age
-        info.birthday = data.birthday
-        info.phone = data.phone
-        await info.save()
         await PermissionsBuilder.setUserPermissions(user.id, data.permissions)
-        return info
+        return user.info
     }
 
     static async update(id: number, data: any) {

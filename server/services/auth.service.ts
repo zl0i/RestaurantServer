@@ -5,6 +5,7 @@ import { Users } from '../entity/user.entity';
 import { Tokens } from '../entity/tokens.entity';
 import PermissionsBuilder, { UserRoles } from '../lib/permissionsBuilder'
 import { MoreThan } from 'typeorm';
+import { UsersInfo } from '../entity/users_info.entity';
 
 const smsApiKey = process.env['APP_SMS_API_KEY'] || '';
 
@@ -24,18 +25,20 @@ export default class DefaultAuth {
 
   static async viaPhone(phone: string) {
     const code: string = await DefaultAuth.sendSMSCode(phone)
-    const user = await Users.findOne({ phone: phone })
-    if (user) {
+    const info = await UsersInfo.findOne({ phone: phone })
+    if (info) {
+      const user = await Users.findOne({ id: info.id })
       user.sms_code = code
       await user.save()
       await Tokens.delete({ id_user: user.id })
     } else {
-      const newUsers = new Users()
-      newUsers.login = phone
-      newUsers.phone = phone
-      newUsers.sms_code = code
-      await newUsers.save()
-      PermissionsBuilder.setUserRolePermissions(newUsers.id, UserRoles.guest)
+      const user = new Users()
+      user.info = new UsersInfo()
+      user.info.login = phone
+      user.info.phone = phone
+      user.sms_code = code
+      await user.save()
+      await PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.guest)
     }
     return {
       result: 'ok'
@@ -48,9 +51,10 @@ export default class DefaultAuth {
     await token.save()
 
     user.sms_code = ''
-    if (!user.verify_phone) {
+    const info = await UsersInfo.findOne({ id: user.id })
+    if (!info.verify_phone) {
       await PermissionsBuilder.setUserRolePermissions(user.id, UserRoles.client)
-      user.verify_phone = true
+      info.verify_phone = true
     }
     await user.save()
     await PermissionsBuilder.createTokenPermissionsByUser(user.id, token.id)
@@ -62,7 +66,8 @@ export default class DefaultAuth {
   }
 
   static async viaPassword(login: string, password: string) {
-    const user = await Users.findOne({ login })
+    const info = await UsersInfo.findOne({ login: login })
+    const user = await Users.findOne({ id: info.id })
     if (!user || !bcrypt.compareSync(password, user.password))
       throw new UnauthorizedError('login or password isn\'t correct')
 
@@ -110,7 +115,8 @@ export default class DefaultAuth {
     if (code == '')
       throw new UnauthorizedError('Code not right');
 
-    const user = await Users.findOne({ phone: phone, sms_code: code });
+    const info = await UsersInfo.findOne({ phone: phone })
+    const user = await Users.findOne({ id: info.id, sms_code: code });
     if (!user)
       throw new UnauthorizedError('Code not right');
 
