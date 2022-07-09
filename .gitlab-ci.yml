@@ -57,6 +57,7 @@ deploy:
     - helm upgrade --install $CI_PROJECT_PATH_SLUG .helm
       --set app.tag=$CI_COMMIT_REF_SLUG.$CI_PIPELINE_ID
       --set web.tag=$CI_COMMIT_REF_SLUG.$CI_PIPELINE_ID
+      --namespace restaurant --create-namespace
   only:
     - master
   needs:
